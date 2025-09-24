@@ -662,32 +662,11 @@
     let currentUser = null;
 
     // Helpers de vistas
-    async function refreshUserFromServer(){
-      if(!currentUser?.documento) return;
-      try{
-        const res = await apiGet('validarDocumento', { documento: currentUser.documento });
-        if(res?.existe){
-          currentUser = {
-            documento: res.documento,
-            nombre: res.nombre,
-            telefono: res.telefono || '',
-            residencia: res.residencia || '',
-            referencia: res.referencia || '',
-            municipio: res.municipio || '',
-            puesto: res.puesto || '',
-            mesa: res.mesa || ''
-          };
-          renderUserMenu();
-        }
-      }catch(e){ /* silencio */ }
-    }
     function showView(id){
       for(const el of document.querySelectorAll('.view')) el.classList.remove('active');
       document.getElementById(id).classList.add('active');
       overlay.classList.remove('open');
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      // Al volver al menú, refrescar datos desde servidor para ver cambios al instante
-      if(id === 'view-menu'){ refreshUserFromServer(); }
     }
     function renderUserMenu(){
       document.getElementById('u-nombre').textContent = currentUser?.nombre || '';
@@ -770,7 +749,7 @@
     btnRefMas.addEventListener('click', (ev)=>{ ev.preventDefault(); regRefWrap.style.display=''; btnRefMas.classList.add('hidden'); btnRefMenos.classList.remove('hidden'); });
     btnRefMenos.addEventListener('click', (ev)=>{ ev.preventDefault(); regRefWrap.style.display='none'; btnRefMas.classList.remove('hidden'); btnRefMenos.classList.add('hidden'); document.getElementById('reg-referencia').value=''; });
 
-    // Guardar Registro con Resumen (ajuste de ancho: sin width personalizado)
+    // Guardar Registro con Resumen
     btnGuardarRegistro.addEventListener('click', async ()=>{
       const documento = (docLogin.value || '').trim();
       const formData = {
@@ -801,7 +780,8 @@
       `;
       const rs = await Swal.fire({
         icon:'info', title:'Resumen de Registro', html:resumenHtml,
-        showCancelButton:true, confirmButtonText:'Confirmar', cancelButtonText:'Editar'
+        showCancelButton:true, confirmButtonText:'Confirmar', cancelButtonText:'Editar',
+        width:'80%', customClass:{ popup:'swal2-responsive-popup' }
       });
       if(!rs.isConfirmed) return;
 
@@ -821,8 +801,6 @@
               puesto: res.puesto || '',
               mesa: res.mesa || ''
             };
-            // NUEVO: alerta de registro exitoso (mismo estilo que actualización)
-            await Swal.fire({ icon:'success', title:'Registro exitoso', timer:1800, showConfirmButton:false });
             renderUserMenu();
             showView('view-menu');
             regCard.style.display='none';
@@ -863,7 +841,6 @@
     document.getElementById('go-consultar').addEventListener('click', ()=>{
       overlay.classList.remove('open');
       document.getElementById('c-documento').value = currentUser?.documento || '';
-      document.getElementById('c-result').style.display='none';
       showView('view-consultar');
     });
 
@@ -872,13 +849,7 @@
       try{
         const r = await apiGet('validarLider', { documento: currentUser.documento });
         if(r && r.codigo && r.nombre){
-          const msg = `Hola 👋🏻
-
-Quiero pedirte que apoyes a nuestro gran amigo *Jhonny Perdomo*. Ingresa a su *Portal* haciendo clic en este enlace 💙 https://tinyurl.com/jhonnyperdomo 💙
-
-Si te registras como referido, usa mi código: *${r.codigo}*.
-
-¡Gracias por tu apoyo! 🙌`;
+          const msg = "Hola 👋🏻\n\nQuiero pedirte que apoyes a nuestro gran amigo *Jhonny Perdomo*, ingresa a su *Portal* a través de este link azul 💙 https://tinyurl.com/jhonnyperdomo 💙\nRegistra tus datos y en el campo de *N° de Referido por favor escribe el N°👉🏻 " + r.codigo + " 👈🏻* 'solo el número'.\n\nEn este mismo Portal, podrás encontrar muchas opciones para ayudar a tu comunidad, ¡Bendiciones!\n\nCordialmente,\n\n*" + r.nombre + "*\n> Equipo del Hacer";
           const textoEscapado = encodeURIComponent(msg);
           const esMovil = /android|iphone|ipad|mobile/i.test(navigator.userAgent);
           if(navigator.clipboard){ navigator.clipboard.writeText(msg).catch(()=>{}); }
@@ -1022,61 +993,65 @@ Si te registras como referido, usa mi código: *${r.codigo}*.
     // ACTUALIZACIÓN (con Resumen)
     async function prepararActualizacion(){
       if(!currentUser) return;
-      const doc = currentUser.documento;
-      document.getElementById('upd-documento').value = doc;
+      document.getElementById('upd-documento').value = currentUser.documento;
       try{
-        const r = await apiGet('validarDocumento3',{ documento: doc });
+        const r = await apiGet('validarDocumento3',{ documento: currentUser.documento });
         document.getElementById('upd-nombre').value = r?.existe ? (r.nombre || '') : (currentUser.nombre || '');
-        document.getElementById('upd-telefono').value = r?.telefono || currentUser.telefono || '';
-        document.getElementById('upd-residencia').value = r?.residencia || currentUser.residencia || '';
-        if(choicesUpd){ choicesUpd.setChoiceByValue(document.getElementById('upd-residencia').value || ''); }
-        document.getElementById('upd-referencia').value = r?.referencia || currentUser.referencia || '';
       }catch{
         document.getElementById('upd-nombre').value = currentUser.nombre || '';
-        document.getElementById('upd-telefono').value = currentUser.telefono || '';
-        document.getElementById('upd-residencia').value = currentUser.residencia || '';
-        if(choicesUpd){ choicesUpd.setChoiceByValue(document.getElementById('upd-residencia').value || ''); }
-        document.getElementById('upd-referencia').value = currentUser.referencia || '';
       }
-      // Ocultar bloque de referido por defecto
-      document.getElementById('upd-referido-wrap').style.display='none';
-      document.getElementById('upd-ref-mas').classList.remove('hidden');
-      document.getElementById('upd-ref-menos').classList.add('hidden');
+      document.getElementById('upd-telefono').value = '';
+      document.getElementById('upd-residencia').value = '';
+      document.getElementById('upd-referencia').value = '';
+      if(choicesUpd) choicesUpd.setChoiceByValue('');
     }
-    // Toggle referido (actualización)
+    // Toggle Referido en Actualización
     const updRefWrap = document.getElementById('upd-referido-wrap');
-    const btnUpdRefMas = document.getElementById('upd-ref-mas');
-    const btnUpdRefMenos = document.getElementById('upd-ref-menos');
-    btnUpdRefMas.addEventListener('click', (ev)=>{ ev.preventDefault(); updRefWrap.style.display=''; btnUpdRefMas.classList.add('hidden'); btnUpdRefMenos.classList.remove('hidden'); });
-    btnUpdRefMenos.addEventListener('click', (ev)=>{ ev.preventDefault(); updRefWrap.style.display='none'; btnUpdRefMas.classList.remove('hidden'); btnUpdRefMenos.classList.add('hidden'); });
+    const updRefMas = document.getElementById('upd-ref-mas');
+    const updRefMenos = document.getElementById('upd-ref-menos');
+    updRefMas.addEventListener('click', (ev)=>{ ev.preventDefault(); updRefWrap.style.display=''; updRefMas.classList.add('hidden'); updRefMenos.classList.remove('hidden'); });
+    updRefMenos.addEventListener('click', (ev)=>{ ev.preventDefault(); updRefWrap.style.display='none'; updRefMas.classList.remove('hidden'); updRefMenos.classList.add('hidden'); document.getElementById('upd-referencia').value=''; });
 
-    // Guardar actualización
     document.getElementById('upd-guardar').addEventListener('click', async ()=>{
-      const documento = document.getElementById('upd-documento').value.trim();
-      const telefono = document.getElementById('upd-telefono').value.trim();
-      const residencia = document.getElementById('upd-residencia').value;
-      const referencia = (document.getElementById('upd-referencia').value || '').trim();
-
+      const body = {
+        documento: document.getElementById('upd-documento').value.trim(),
+        nombre: document.getElementById('upd-nombre').value.trim(),
+        telefono: document.getElementById('upd-telefono').value.trim(),
+        residencia: document.getElementById('upd-residencia').value,
+        referencia: document.getElementById('upd-referencia').value.trim()
+      };
+      const documentoRegex = /^[0-9]{6,10}$/;
       const telefonoRegex = /^[0-9]{10}$/;
       const referenciaRegex = /^[0-9]{1,3}$/;
 
-      if(telefono && !telefonoRegex.test(telefono)){
-        return Swal.fire({ icon:'warning', title:'Whatsapp inválido', text:'Debe tener 10 dígitos.' });
+      if(!documentoRegex.test(body.documento)){
+        return Swal.fire({ icon:'warning', title:'Documento inválido' });
       }
-      if(referencia && !referenciaRegex.test(referencia)){
+      if(body.telefono && !telefonoRegex.test(body.telefono)){
+        return Swal.fire({ icon:'warning', title:'Whatsapp inválido' });
+      }
+      if(body.referencia && !referenciaRegex.test(body.referencia)){
         return Swal.fire({ icon:'warning', title:'Referido inválido', text:'Debe tener 1 a 3 dígitos.' });
       }
-      if(!residencia){
-        return Swal.fire({ icon:'warning', title:'Residencia requerida' });
-      }
+
+      const resumenHtml = `
+        <b>N° Documento:</b> ${body.documento}<br>
+        <b>Whatsapp:</b> ${body.telefono || 'Sin cambios'}<br>
+        <b>Residencia:</b> ${body.residencia || 'Sin cambios'}<br>
+        <b>Referido:</b> ${body.referencia || 'Sin cambios'}<br><br>
+        <img class="brand" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png" alt="">
+      `;
+      const rs = await Swal.fire({
+        icon:'info', title:'Resumen de Actualización', html:resumenHtml,
+        showCancelButton:true, confirmButtonText:'Confirmar', cancelButtonText:'Editar',
+        width:'80%', customClass:{ popup:'swal2-responsive-popup' }
+      });
+      if(!rs.isConfirmed) return;
 
       try{
-        const r = await apiPost('actualizarContactoEnServidor', { documento, telefono, residencia, referencia });
+        const r = await apiPost('guardarActualizacionEnServidor', body);
         if(r && r.success){
-          await Swal.fire({ icon:'success', title:'Datos actualizados', timer:1800, showConfirmButton:false });
-          // NUEVO: refrescar datos en el menú automáticamente
-          currentUser = currentUser || { documento };
-          await refreshUserFromServer();
+          await Swal.fire({ icon:'success', title:'Actualización Exitosa', timer:1600, showConfirmButton:false });
           showView('view-menu');
         }else{
           Swal.fire({ icon:'error', title:'Error al guardar', text:r?.message || 'Error desconocido' });
@@ -1087,65 +1062,73 @@ Si te registras como referido, usa mi código: *${r.codigo}*.
     });
     document.getElementById('upd-volver').addEventListener('click', ()=> showView('view-menu'));
 
-    // CONSULTAR PUESTO (según requerimientos)
-    const btnCValidar = document.getElementById('c-validar');
-    const inpCDoc = document.getElementById('c-documento');
-    const cResult = document.getElementById('c-result');
-    const cDep = document.getElementById('c-dep');
-    const cMun = document.getElementById('c-mun');
-    const cPue = document.getElementById('c-pue');
-    const cDir = document.getElementById('c-dir');
-    const cMesa = document.getElementById('c-mesa');
-
-    btnCValidar.addEventListener('click', async ()=>{
-      const documento = (inpCDoc.value || '').trim();
+    // CONSULTAR (flujo condicionado)
+    document.getElementById('c-validar').addEventListener('click', async ()=>{
+      const documento = (document.getElementById('c-documento').value || '').trim();
       if(!/^\d{6,10}$/.test(documento)){
-        return Swal.fire({ icon:'warning', title:'Documento inválido', text:'Ingresa de 6 a 10 dígitos.' });
+        return Swal.fire({ icon:'warning', title:'Documento inválido' });
       }
       try{
-        const res = await apiGet('validarDocumento', { documento });
-        if(!res?.existe){
-          cResult.style.display='none';
-          await Swal.fire({ icon:'warning', title:'Documento No encontrado', timer:2000, showConfirmButton:false });
-          return;
-        }
-        const dep = res.departamento || '';
-        const mun = res.municipio || '';
-        const pue = res.puesto || '';
-        const dir = res.direccion || '';
-        const mesa = res.mesa || '';
-
-        const hasAll = Boolean(dep && mun && pue && dir && mesa);
-
-        if(!hasAll){
-          cResult.style.display='none';
-          const rs = await Swal.fire({
-            icon:'info',
-            title:'Información no encontrada',
-            text:'No encontramos datos de votación en el sistema para este documento.',
-            showDenyButton:true,
-            denyButtonText:'Validar Nuevamente',
-            showConfirmButton:true,
-            confirmButtonText:'Consultar'
-          });
-          if(rs.isConfirmed){
-            showView('view-votacion');
+        const r = await apiGet('validarDocumento2', { documento });
+        if(r?.existe){
+          const ok = !!(r.departamento && r.municipio && r.puesto && r.direccion && r.mesa);
+          if(ok){
+            document.getElementById('c-result').style.display = '';
+            document.getElementById('c-dep').textContent = r.departamento;
+            document.getElementById('c-mun').textContent = r.municipio;
+            document.getElementById('c-pue').textContent = r.puesto;
+            document.getElementById('c-dir').textContent = r.direccion;
+            document.getElementById('c-mesa').textContent = r.mesa;
+            Swal.fire({ icon:'success', title:`Datos de Votación para ${r.nombre}` });
+          }else{
+            document.getElementById('c-result').style.display = 'none';
+            // Alerta con dos botones: Validar Documento (nuevo) y Consulta (abre Votación)
+            await Swal.fire({
+              icon:'info',
+              title:`No tenemos información completa para ${r.nombre}`,
+              html:`<div style="display:flex; gap:8px; flex-direction:column;">
+                      <button id="btn-validar-new" class="swal2-confirm swal2-styled">Validar Documento</button>
+                      <button id="btn-ir-consulta" class="swal2-confirm swal2-styled" style="background:#0a0;">Consulta</button>
+                    </div>`,
+              showConfirmButton:false, width:'80%', padding:'1rem',
+              customClass:{ popup:'swal2-responsive-popup' }
+            });
+            setTimeout(()=>{
+              const v1 = document.getElementById('btn-validar-new');
+              const v2 = document.getElementById('btn-ir-consulta');
+              if(v1) v1.onclick = ()=> { Swal.close(); document.getElementById('c-documento').focus(); document.getElementById('c-documento').select(); };
+              if(v2) v2.onclick = ()=> { Swal.close(); showView('view-votacion'); };
+            }, 50);
           }
-          return;
+        }else{
+          document.getElementById('c-result').style.display = 'none';
+          await Swal.fire({
+            icon:'error', title:'Documento no encontrado',
+            html:`<div style="display:flex; gap:8px; flex-direction:column;">
+                    <button id="btn-validar-new" class="swal2-confirm swal2-styled">Validar Documento</button>
+                    <button id="btn-ir-consulta" class="swal2-confirm swal2-styled" style="background:#0a0;">Consulta</button>
+                  </div>`,
+            showConfirmButton:false, width:'80%', padding:'1rem',
+            customClass:{ popup:'swal2-responsive-popup' }
+          });
+          setTimeout(()=>{
+            const v1 = document.getElementById('btn-validar-new');
+            const v2 = document.getElementById('btn-ir-consulta');
+            if(v1) v1.onclick = ()=> { Swal.close(); document.getElementById('c-documento').focus(); };
+            if(v2) v2.onclick = ()=> { Swal.close(); showView('view-votacion'); };
+          }, 50);
         }
-
-        // Mostrar resultados
-        cDep.textContent = dep;
-        cMun.textContent = mun;
-        cPue.textContent = pue;
-        cDir.textContent = dir;
-        cMesa.textContent = mesa;
-        cResult.style.display='';
       }catch(e){
         Swal.fire({ icon:'error', title:'Error', text:e.message });
       }
     });
     document.getElementById('c-volver').addEventListener('click', ()=> showView('view-menu'));
+
+    // Volver genéricos
+    ['a-volver','v-volver','upd-volver','c-volver'].forEach(id=>{
+      const el = document.getElementById(id);
+      if(el) el.addEventListener('click', ()=> showView('view-menu'));
+    });
   </script>
 </body>
 </html>

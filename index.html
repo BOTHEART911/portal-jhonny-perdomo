@@ -109,26 +109,57 @@
     .video-card.playing .video-thumb{ display:none; }
     .video-card iframe{ width:100%; height:100%; display:block; }
 
-    /* PROGRESS BAR TOP */
-    .progress{
-      position:fixed; top:0; left:0; height:4px; width:100%;
-      background: transparent; z-index:9999; pointer-events:none;
-    }
-    .progress__bar{
-      height:100%; width:0%; background: var(--primary);
-      transition: width .25s ease;
-    }
-    .hidden{ display:none !important; }
+   /* Loader centrado (overlay) */
+.loader{
+  position:fixed; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(0,0,0,.35);
+  z-index:9999; backdrop-filter: blur(2px);
+}
 
-    .narrow{ max-width: 520px; margin: 0 auto; }
-    .spaced{ margin-top:12px; }
+/* Spinner tipo iOS (12 barras) */
+.spinner-ios{
+  position:relative; width:64px; height:64px;
+}
+.spinner-ios i{
+  position:absolute; left:50%; top:50%;
+  width:6px; height:18px; margin:-9px 0 0 -3px;
+  background:#fff; border-radius:3px;
+  opacity:.2;
+  animation:iosFade 1.2s linear infinite;
+  /* Cada barra se ubica por rotación y se aleja hacia arriba */
+  transform-origin: center center;
+}
 
-    @media (max-width: 700px){ .btn-row{ flex-direction:column; } }
+/* Keyframes de “iluminación” secuencial */
+@keyframes iosFade{
+  0%, 39%, 100% { opacity:.2; }
+  40% { opacity:1; }
+}
+
+/* 12 barras, separadas 30° y con retraso escalonado */
+.spinner-ios i:nth-child(1)  { transform: rotate(  0deg) translateY(-24px); animation-delay:-1.1s; }
+.spinner-ios i:nth-child(2)  { transform: rotate( 30deg) translateY(-24px); animation-delay:-1.0s; }
+.spinner-ios i:nth-child(3)  { transform: rotate( 60deg) translateY(-24px); animation-delay:-0.9s; }
+.spinner-ios i:nth-child(4)  { transform: rotate( 90deg) translateY(-24px); animation-delay:-0.8s; }
+.spinner-ios i:nth-child(5)  { transform: rotate(120deg) translateY(-24px); animation-delay:-0.7s; }
+.spinner-ios i:nth-child(6)  { transform: rotate(150deg) translateY(-24px); animation-delay:-0.6s; }
+.spinner-ios i:nth-child(7)  { transform: rotate(180deg) translateY(-24px); animation-delay:-0.5s; }
+.spinner-ios i:nth-child(8)  { transform: rotate(210deg) translateY(-24px); animation-delay:-0.4s; }
+.spinner-ios i:nth-child(9)  { transform: rotate(240deg) translateY(-24px); animation-delay:-0.3s; }
+.spinner-ios i:nth-child(10) { transform: rotate(270deg) translateY(-24px); animation-delay:-0.2s; }
+.spinner-ios i:nth-child(11) { transform: rotate(300deg) translateY(-24px); animation-delay:-0.1s; }
+.spinner-ios i:nth-child(12) { transform: rotate(330deg) translateY(-24px); animation-delay: 0s; }
   </style>
 </head>
 <body>
-  <!-- Barra de progreso -->
-  <div class="progress hidden" id="progress"><div class="progress__bar" id="progressBar"></div></div>
+ <!-- Loader centrado (efecto iOS, sin imagen) -->
+<div id="loader" class="loader hidden" aria-live="polite" aria-busy="true">
+  <div class="spinner-ios" role="status" aria-label="Cargando">
+    <i></i><i></i><i></i><i></i><i></i><i></i>
+    <i></i><i></i><i></i><i></i><i></i><i></i>
+  </div>
+</div>
 
   <div class="container">
 
@@ -611,30 +642,21 @@
     // URL de tu Apps Script desplegado
     const API_BASE = 'https://script.google.com/macros/s/AKfycbzYEzUpAoXZKgkCut4HI2CgcHiwkgldjx23RXucAGx-BlTKXreJO_ZQ2MCyr8aqnOl0/exec';
 
-    // Barra de carga
-    const progress = document.getElementById('progress');
-    const progressBar = document.getElementById('progressBar');
-    let loadingCount = 0, barTimer = null;
+   // Loader centrado
+    const loader = document.getElementById('loader');
+    let loadingCount = 0;
     function startLoading(){
       loadingCount++;
-      progress.classList.remove('hidden');
-      progressBar.style.transition = 'none';
-      progressBar.style.width = '0%';
-      // arranque a 80%
-      requestAnimationFrame(()=>{
-        progressBar.style.transition = 'width .8s ease';
-        progressBar.style.width = '80%';
-      });
+      if(loadingCount === 1){
+        loader.classList.remove('hidden');
+      }
     }
     function stopLoading(){
-      if(--loadingCount > 0) return;
-      progressBar.style.transition = 'width .2s ease';
-      progressBar.style.width = '100%';
-      clearTimeout(barTimer);
-      barTimer = setTimeout(()=>{
-        progress.classList.add('hidden');
-        progressBar.style.width = '0%';
-      }, 220);
+      if(loadingCount === 0) return;
+      loadingCount--;
+      if(loadingCount === 0){
+        loader.classList.add('hidden');
+      }
     }
 
     // Fetch helpers

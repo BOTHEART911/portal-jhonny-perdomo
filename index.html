@@ -96,12 +96,17 @@
       margin: 12px auto; background:#000; border-radius: 14px; overflow:hidden;
       border:2px solid #ddd; box-shadow: 0 10px 24px rgba(0,0,0,.25);
     }
+    .video-card .video-thumb{
+      position:absolute; inset:0; width:100%; height:100%;
+      object-fit:cover; display:block;
+    }
     .video-card .play-layer{
       position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
       background: radial-gradient(circle at center, rgba(255,255,255,.18), rgba(0,0,0,.55));
       color:#fff; font-size: 64px; cursor:pointer; transition: opacity .2s ease;
     }
     .video-card.playing .play-layer{ opacity:0; pointer-events:none; }
+    .video-card.playing .video-thumb{ display:none; }
     .video-card iframe{ width:100%; height:100%; display:block; }
 
     /* PROGRESS BAR TOP */
@@ -334,6 +339,7 @@
 
       <!-- Video de Drive -->
       <div class="video-card" id="videoCard">
+        <img id="videoThumb" class="video-thumb" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753562431/ASISTENCIA_JHONNY_co6qwy.png" alt="Video miniatura">
         <div class="play-layer" id="playLayer">▶</div>
       </div>
 
@@ -678,6 +684,26 @@
       document.getElementById('u-puesto').textContent = currentUser?.puesto || 'N/A';
       document.getElementById('u-mesa').textContent = currentUser?.mesa || 'N/A';
     }
+    async function refreshUserFromServer(){
+      try{
+        const doc = currentUser?.documento;
+        if(!doc) return;
+        const res = await apiGet('validarDocumento', { documento: doc });
+        if(res?.existe){
+          currentUser = {
+            documento: res.documento,
+            nombre: res.nombre,
+            telefono: res.telefono || '',
+            residencia: res.residencia || '',
+            referencia: res.referencia || '',
+            municipio: res.municipio || '',
+            puesto: res.puesto || '',
+            mesa: res.mesa || ''
+          };
+          renderUserMenu();
+        }
+      }catch(e){ /* silencio */ }
+    }
 
     // Choices (select con filtro)
     let choicesReg = null, choicesUpd = null;
@@ -801,6 +827,8 @@
               puesto: res.puesto || '',
               mesa: res.mesa || ''
             };
+            // Alerta de registro exitoso
+            await Swal.fire({ icon:'success', title:'Registro exitoso', timer:1800, showConfirmButton:false });
             renderUserMenu();
             showView('view-menu');
             regCard.style.display='none';
@@ -871,10 +899,11 @@
       window.open((esMovil ? "whatsapp://send?text=" : "https://api.whatsapp.com/send?text=") + enc, "_blank");
     });
 
-    // VIDEO (sin botón mute)
+    // VIDEO (con miniatura)
     const videoCard = document.getElementById('videoCard');
     const playLayer = document.getElementById('playLayer');
-    playLayer.addEventListener('click', ()=>{
+    const videoThumb = document.getElementById('videoThumb');
+    function playVideo(){
       if(videoCard.querySelector('iframe')) return;
       const id = '1SqcK8srE8CKbyHX66AnQmXHDjZPLeVhk'; // ID del video de Google Drive
       const iframe = document.createElement('iframe');
@@ -883,7 +912,9 @@
       iframe.frameBorder = "0";
       videoCard.appendChild(iframe);
       videoCard.classList.add('playing');
-    });
+    }
+    playLayer.addEventListener('click', playVideo);
+    videoThumb.addEventListener('click', playVideo);
 
     // ASISTENCIA
     async function prepararAsistencia(){
@@ -939,7 +970,7 @@
     });
     document.getElementById('a-volver').addEventListener('click', ()=> showView('view-menu'));
 
-    // VOTACIÓN
+    // VOTACIÓN (pegar fila)
     function parseFila(text){
       const ENC = ["NUIP","DEPARTAMENTO","MUNICIPIO","PUESTO","DIRECCIÓN","MESA"];
       let p = (text||'').split(/[\t\n\r]+/).map(s=>s.trim()).filter(Boolean);
@@ -1052,6 +1083,8 @@
         const r = await apiPost('guardarActualizacionEnServidor', body);
         if(r && r.success){
           await Swal.fire({ icon:'success', title:'Actualización Exitosa', timer:1600, showConfirmButton:false });
+          // Refrescar datos en menú automáticamente
+          await refreshUserFromServer();
           showView('view-menu');
         }else{
           Swal.fire({ icon:'error', title:'Error al guardar', text:r?.message || 'Error desconocido' });
@@ -1062,62 +1095,46 @@
     });
     document.getElementById('upd-volver').addEventListener('click', ()=> showView('view-menu'));
 
-    // CONSULTAR (flujo condicionado)
+    // CONSULTAR (requisitos de alertas y botones)
     document.getElementById('c-validar').addEventListener('click', async ()=>{
       const documento = (document.getElementById('c-documento').value || '').trim();
       if(!/^\d{6,10}$/.test(documento)){
-        return Swal.fire({ icon:'warning', title:'Documento inválido' });
+        return Swal.fire({ icon:'warning', title:'Documento inválido', text:'Ingresa de 6 a 10 dígitos.' });
       }
       try{
         const r = await apiGet('validarDocumento2', { documento });
-        if(r?.existe){
-          const ok = !!(r.departamento && r.municipio && r.puesto && r.direccion && r.mesa);
-          if(ok){
-            document.getElementById('c-result').style.display = '';
-            document.getElementById('c-dep').textContent = r.departamento;
-            document.getElementById('c-mun').textContent = r.municipio;
-            document.getElementById('c-pue').textContent = r.puesto;
-            document.getElementById('c-dir').textContent = r.direccion;
-            document.getElementById('c-mesa').textContent = r.mesa;
-            Swal.fire({ icon:'success', title:`Datos de Votación para ${r.nombre}` });
-          }else{
-            document.getElementById('c-result').style.display = 'none';
-            // Alerta con dos botones: Validar Documento (nuevo) y Consulta (abre Votación)
-            await Swal.fire({
-              icon:'info',
-              title:`No tenemos información completa para ${r.nombre}`,
-              html:`<div style="display:flex; gap:8px; flex-direction:column;">
-                      <button id="btn-validar-new" class="swal2-confirm swal2-styled">Validar Documento</button>
-                      <button id="btn-ir-consulta" class="swal2-confirm swal2-styled" style="background:#0a0;">Consulta</button>
-                    </div>`,
-              showConfirmButton:false, width:'80%', padding:'1rem',
-              customClass:{ popup:'swal2-responsive-popup' }
-            });
-            setTimeout(()=>{
-              const v1 = document.getElementById('btn-validar-new');
-              const v2 = document.getElementById('btn-ir-consulta');
-              if(v1) v1.onclick = ()=> { Swal.close(); document.getElementById('c-documento').focus(); document.getElementById('c-documento').select(); };
-              if(v2) v2.onclick = ()=> { Swal.close(); showView('view-votacion'); };
-            }, 50);
-          }
-        }else{
-          document.getElementById('c-result').style.display = 'none';
-          await Swal.fire({
-            icon:'error', title:'Documento no encontrado',
-            html:`<div style="display:flex; gap:8px; flex-direction:column;">
-                    <button id="btn-validar-new" class="swal2-confirm swal2-styled">Validar Documento</button>
-                    <button id="btn-ir-consulta" class="swal2-confirm swal2-styled" style="background:#0a0;">Consulta</button>
-                  </div>`,
-            showConfirmButton:false, width:'80%', padding:'1rem',
-            customClass:{ popup:'swal2-responsive-popup' }
-          });
-          setTimeout(()=>{
-            const v1 = document.getElementById('btn-validar-new');
-            const v2 = document.getElementById('btn-ir-consulta');
-            if(v1) v1.onclick = ()=> { Swal.close(); document.getElementById('c-documento').focus(); };
-            if(v2) v2.onclick = ()=> { Swal.close(); showView('view-votacion'); };
-          }, 50);
+        const cResult = document.getElementById('c-result');
+        if(!r?.existe){
+          cResult.style.display = 'none';
+          await Swal.fire({ icon:'warning', title:'Documento No encontrado', timer:2000, showConfirmButton:false });
+          return;
         }
+        const ok = !!(r.departamento && r.municipio && r.puesto && r.direccion && r.mesa);
+        if(!ok){
+          cResult.style.display = 'none';
+          const rs = await Swal.fire({
+            icon:'info',
+            title:`No encontramos información de votación`,
+            text:`Puedes validar nuevamente o ir a la sección "Votación" para registrarla.`,
+            showDenyButton:true,
+            denyButtonText:'Validar Nuevamente',
+            showConfirmButton:true,
+            confirmButtonText:'Consultar'
+          });
+          if(rs.isConfirmed){
+            showView('view-votacion');
+          }
+          // si es Deny, solo cerrar
+          return;
+        }
+        // Mostrar resultados
+        document.getElementById('c-dep').textContent = r.departamento;
+        document.getElementById('c-mun').textContent = r.municipio;
+        document.getElementById('c-pue').textContent = r.puesto;
+        document.getElementById('c-dir').textContent = r.direccion;
+        document.getElementById('c-mesa').textContent = r.mesa;
+        cResult.style.display = '';
+        Swal.fire({ icon:'success', title:`Datos de Votación cargados` , timer:1400, showConfirmButton:false });
       }catch(e){
         Swal.fire({ icon:'error', title:'Error', text:e.message });
       }

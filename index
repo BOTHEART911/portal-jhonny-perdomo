@@ -1,0 +1,699 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>JHONNY PERDOMO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="https://res.cloudinary.com/dqqeavica/image/upload/v1753538807/JHONNY_PERDOMO_dn3dah.png">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    :root{
+      --primary:#007BFF;
+      --primary-2:#0056b3;
+      --bg:#f7f7f7;
+      --text:#111;
+      --muted:#666;
+      --ok:#16a34a;
+      --error:#dc2626;
+    }
+    html,body{
+      margin:0; padding:0; height:100%; width:100%;
+      overflow-x:hidden; /* SIN scroll lateral */
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
+      background: url('https://res.cloudinary.com/dqqeavica/image/upload/v1753538930/FONDO_JHONNY_sugwsj.png') center/cover fixed no-repeat;
+    }
+    .container{
+      max-width: 1000px; margin: 0 auto; padding: 16px;
+    }
+    /* VISTAS con transición */
+    .view{
+      display:none; opacity:0; transform: translateY(8px);
+      transition: opacity .25s ease, transform .25s ease;
+      min-height: calc(100dvh - 32px);
+      box-sizing: border-box;
+      padding: 16px;
+    }
+    .view.active{ display:block; opacity:1; transform: translateY(0); }
+
+    /* Tarjetas y formularios */
+    .card{
+      background: rgba(255,255,255,.06);
+      backdrop-filter: blur(3px);
+      border: 2px solid #ddd; border-radius: 10px;
+      box-shadow: 0 8px 18px rgba(0,0,0,.15);
+      max-width: 420px; margin: 16px auto; padding: 16px;
+    }
+    h1,h2{ margin: 8px 0 12px; text-align:center; }
+    p.helper{ color:var(--muted); font-size:.95rem; text-align:center; margin:8px 0 16px; }
+    label{ display:block; font-weight:600; margin: 10px 0 4px; color:#084; }
+    input, select, textarea, button{
+      width:100%; padding:12px; box-sizing:border-box;
+      border:1.5px solid #ccc; border-radius:8px; background:#fff;
+      outline:none; transition: border-color .2s ease, transform .08s ease;
+      font-size:16px;
+    }
+    input:focus, select:focus, textarea:focus{ border-color:var(--primary); }
+    button{
+      cursor:pointer; border:2px solid var(--primary);
+      background:#fff; color:#000; font-weight:700;
+    }
+    button:hover{ background:var(--primary-2); color:#fff; border-color:var(--primary-2); }
+    .btn-primary{ background:var(--primary); color:#fff; }
+    .btn-row{ display:flex; gap:12px; }
+    .btn-row > *{ flex:1; }
+
+    .muted{ color:var(--muted); font-size:.9rem; }
+    .center{ text-align:center; }
+    .image-center{ display:flex; justify-content:center; }
+    .brand{
+      width: 210px; border-radius:8px; display:block; margin:12px auto 4px;
+    }
+
+    /* MENÚ SUPERIOR EN VISTA MENÚ */
+    .topbar{
+      display:flex; justify-content:space-between; align-items:center;
+      gap:12px; margin-bottom:12px;
+    }
+    .chip{
+      padding:8px 12px; border-radius:999px; border:2px solid var(--primary);
+      background:#fff; font-weight:700; color:#000;
+    }
+    .danger{ background:#e11; border-color:#e11; color:#fff; }
+
+    /* OVERLAY BANNER LATERAL */
+    .overlay{
+      position: fixed; inset: 0; pointer-events:none;
+    }
+    .overlay .scrim{
+      position:absolute; inset:0; background:rgba(0,0,0,.35);
+      opacity:0; transition:opacity .25s ease;
+    }
+    .overlay .panel{
+      position:absolute; top:0; left:0; width:min(360px, 90vw); height:100%;
+      background: #2f6bdb;
+      color:#fff; padding:16px; box-sizing:border-box;
+      transform: translateX(-100%); transition: transform .25s ease;
+      display:flex; flex-direction:column; gap:12px; overflow-y:auto;
+    }
+    .overlay.open{ pointer-events:auto; }
+    .overlay.open .scrim{ opacity:1; }
+    .overlay.open .panel{ transform: translateX(0); }
+    .panel h3{ margin: 4px 0 8px; text-align:center; }
+    .menu-btn{
+      background:#7de3ef; color:#000; border:0; font-weight:800;
+      border-radius:999px; padding:12px; box-shadow: 0 6px 12px rgba(0,0,0,.18);
+    }
+
+    /* VIDEO en vista menú */
+    .video-card{
+      position:relative; width: min(560px, 90vw); aspect-ratio: 16 / 9;
+      margin: 12px auto; background:#000; border-radius: 14px; overflow:hidden;
+      border:2px solid #ddd; box-shadow: 0 10px 24px rgba(0,0,0,.25);
+    }
+    .video-card .play-layer{
+      position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+      background: radial-gradient(circle at center, rgba(255,255,255,.18), rgba(0,0,0,.55));
+      color:#fff; font-size: 64px; cursor:pointer;
+      transition: opacity .2s ease;
+    }
+    .video-card.playing .play-layer{ opacity:0; pointer-events:none; }
+    .mute-badge{
+      position:absolute; bottom:8px; right:8px; background:#000c; color:#fff;
+      border-radius:999px; padding:6px 10px; font-size:.85rem; border:1px solid #fff3;
+      user-select:none;
+    }
+    .video-card iframe, .video-card video{ width:100%; height:100%; display:block; }
+
+    /* SECCIONES DE FORMULARIO LARGAS: contenedor estrecho en desktop */
+    .narrow{ max-width: 520px; margin: 0 auto; }
+    .spaced{ margin-top:12px; }
+
+    /* SOLO scroll vertical en móvil */
+    @media (max-width: 700px){
+      .btn-row{ flex-direction:column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- VISTA 1: LOGIN / REGISTRO -->
+    <section id="view-login" class="view active">
+      <div class="card">
+        <h1 style="color:var(--primary); text-shadow: 0 2px 2px #031732;">JHONNY PERDOMO</h1>
+        <p class="helper"><b>Al usar este aplicativo, aceptas voluntariamente suministrar tus datos Personales.</b><br><i>Art. 5 Ley 1581 de 2012 y Decreto 1074 de 2015</i></p>
+
+        <label>Documento:</label>
+        <input id="doc-login" type="tel" inputmode="numeric" placeholder="Sin puntos ni espacios" />
+
+        <div class="btn-row spaced">
+          <button class="btn-primary" id="btn-login">Iniciar Sesión</button>
+          <button id="btn-compartir">Compartir Portal 📲</button>
+        </div>
+
+        <img class="brand" alt="Brand" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png" />
+        <p class="center muted">Copyright © <a href="https://whatsapp.com/channel/0029VbBEYJ83LdQbOODLO10S" target="_blank"><b>BOT HEART</b></a></p>
+      </div>
+
+      <!-- REGISTRO (solo si no existe) -->
+      <div id="registro-card" class="card" style="display:none;">
+        <h2 style="color:var(--primary)">Información Personal</h2>
+        <div class="narrow">
+          <label>Nombre Completo</label>
+          <input id="reg-nombre" type="text" placeholder="Tu nombre completo" />
+          <label>WhatsApp</label>
+          <input id="reg-telefono" type="tel" inputmode="numeric" placeholder="10 dígitos" />
+          <label>Residencia (Barrio/Vereda/Conjunto)</label>
+          <input id="reg-residencia" type="text" placeholder="Escribe tu residencia" />
+          <label>N° Referido (opcional)</label>
+          <input id="reg-referencia" type="tel" inputmode="numeric" placeholder="Solo número" />
+          <button class="spaced btn-primary" id="btn-guardar-registro">Guardar</button>
+          <p class="center muted spaced"><b>Revisa los datos antes de guardar.</b></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- VISTA 2: MENÚ CON DATOS DEL USUARIO -->
+    <section id="view-menu" class="view">
+      <div class="topbar">
+        <button class="chip" id="btn-open-menu">MENÚ</button>
+        <button class="chip danger" id="btn-logout">Cerrar Sesión</button>
+      </div>
+
+      <div class="card">
+        <div class="image-center">
+          <img alt="usuario" src="https://res.cloudinary.com/dqqeavica/image/upload/v1758738139/user_zefosv.png" width="64" height="64" />
+        </div>
+        <h2 id="u-nombre">Nombre</h2>
+        <div class="narrow">
+          <p><b>C.C.:</b> <span id="u-doc"></span></p>
+          <p><b>Cel:</b> <span id="u-cel"></span></p>
+          <p><b>Residencia:</b> <span id="u-res"></span></p>
+          <p><b>Referencia:</b> <span id="u-ref"></span></p>
+          <p><b>Municipio:</b> <span id="u-mpio"></span></p>
+          <p><b>Puesto:</b> <span id="u-puesto"></span></p>
+          <p><b>Mesa:</b> <span id="u-mesa"></span></p>
+        </div>
+      </div>
+
+      <!-- Video de Drive -->
+      <div class="video-card" id="videoCard">
+        <div class="play-layer" id="playLayer">▶</div>
+        <!-- Mostramos iframe cuando el usuario haga clic (para performance y permisos) -->
+        <div class="mute-badge">Mute</div>
+      </div>
+
+      <div class="image-center">
+        <img class="brand" alt="Brand" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png" />
+      </div>
+      <p class="center muted">Copyright © <a href="#" target="_blank"><b>Oscar Polania</b></a></p>
+    </section>
+
+    <!-- OVERLAY BANNER DE OPCIONES -->
+    <div class="overlay" id="overlay">
+      <div class="scrim" id="ovlClose"></div>
+      <aside class="panel">
+        <div class="btn-row">
+          <button id="btn-ovl-back">ATRÁS</button>
+        </div>
+        <div class="image-center">
+          <img alt="banner" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753538807/JHONNY_PERDOMO_dn3dah.png" style="max-width:180px;border-radius:10px;" />
+        </div>
+        <h3>Selecciona una de las opciones</h3>
+        <button class="menu-btn" id="go-asistencia">Registra Asistencia a Reunión</button>
+        <button class="menu-btn" id="go-votacion">Agrega o Actualiza tu Puesto de Votación</button>
+        <button class="menu-btn" id="go-actualizacion">Actualiza tus Datos Personales</button>
+        <button class="menu-btn" id="go-consultar">Consultar Datos</button>
+        <button class="menu-btn" id="go-lider">Si eres Líder, Refriere con un solo Clic</button>
+        <div style="height:24px"></div>
+        <img class="brand" alt="Brand" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png" />
+        <p class="center muted">Copyright © Oscar Polania</p>
+      </aside>
+    </div>
+
+    <!-- VISTA 3: ASISTENCIA -->
+    <section id="view-asistencia" class="view">
+      <div class="card narrow">
+        <h2 style="color:var(--primary)">REGISTRA ASISTENCIA</h2>
+        <input id="a-documento" type="hidden" />
+        <input id="a-nombre" type="hidden" />
+        <input id="a-telefono" type="hidden" />
+
+        <label>N° de Reunión</label>
+        <input id="a-reunion" type="tel" inputmode="numeric" placeholder="N° de Reunión" />
+        <div id="evento-wrap" style="display:none;">
+          <label>Nombre de Evento</label>
+          <input id="a-evento" type="text" readonly>
+        </div>
+
+        <div class="btn-row spaced">
+          <button class="btn-primary" id="a-guardar">Guardar</button>
+          <button id="a-volver">Regresar</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- VISTA 4: VOTACIÓN -->
+    <section id="view-votacion" class="view">
+      <div class="card narrow">
+        <h2 style="color:#0a0">CONSULTA TU LUGAR DE VOTACIÓN</h2>
+        <p class="helper">
+          1) Abre la página oficial y consulta tu puesto.<br>
+          2) Copia la fila de resultados de la tabla.<br>
+          3) Pégala abajo: se completa automático.<br>
+        </p>
+        <div class="image-center">
+          <a class="chip" href="https://wsp.registraduria.gov.co/censo/consultar/" target="_blank">Ir a la página oficial</a>
+        </div>
+        <label>Pega aquí la fila copiada de la tabla</label>
+        <textarea id="v-row" rows="6" placeholder="Pega aquí..."></textarea>
+
+        <label>NUIP</label><input id="v-nuip" readonly>
+        <label>Departamento</label><input id="v-departamento" readonly>
+        <label>Municipio</label><input id="v-municipio" readonly>
+        <label>Puesto</label><input id="v-puesto" readonly>
+        <label>Dirección</label><input id="v-direccion" readonly>
+        <label>Mesa</label><input id="v-mesa" readonly>
+
+        <div class="btn-row spaced">
+          <button class="btn-primary" id="v-guardar">Guardar</button>
+          <button id="v-volver">Regresar</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- VISTA 5: ACTUALIZACIÓN -->
+    <section id="view-actualizacion" class="view">
+      <div class="card narrow">
+        <h2 style="color:var(--primary)">ACTUALIZA TUS DATOS</h2>
+        <input id="upd-documento" type="hidden" />
+        <label>Nombre (solo lectura)</label>
+        <input id="upd-nombre" type="text" readonly>
+        <label>Whatsapp</label>
+        <input id="upd-telefono" type="tel" inputmode="numeric" placeholder="10 dígitos (opcional)" />
+        <label>Residencia</label>
+        <input id="upd-residencia" type="text" placeholder="Barrio/Vereda/Conjunto (opcional)" />
+        <label>N° Referido (opcional)</label>
+        <input id="upd-referencia" type="tel" inputmode="numeric" />
+        <div class="btn-row spaced">
+          <button class="btn-primary" id="upd-guardar">Guardar</button>
+          <button id="upd-volver">Regresar</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- VISTA 6: CONSULTAR -->
+    <section id="view-consultar" class="view">
+      <div class="card narrow">
+        <h2 style="color:#0a0">VERIFICAR PUNTO DE VOTACIÓN</h2>
+        <label>Documento</label>
+        <input id="c-documento" type="tel" inputmode="numeric" placeholder="Pega tu Documento aquí" />
+        <div class="btn-row spaced">
+          <button class="btn-primary" id="c-validar">Validar Documento</button>
+          <button id="c-volver">Regresar</button>
+        </div>
+        <div id="c-result" class="spaced" style="display:none;">
+          <p><b>Departamento:</b> <span id="c-dep"></span></p>
+          <p><b>Municipio:</b> <span id="c-mun"></span></p>
+          <p><b>Puesto:</b> <span id="c-pue"></span></p>
+          <p><b>Dirección:</b> <span id="c-dir"></span></p>
+          <p><b>Mesa:</b> <span id="c-mesa"></span></p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // REEMPLAZA ESTO por tu URL de despliegue Apps Script (exec)
+    const API_BASE = 'https://script.google.com/macros/s/AKfycbzYEzUpAoXZKgkCut4HI2CgcHiwkgldjx23RXucAGx-BlTKXreJO_ZQ2MCyr8aqnOl0/exec';
+
+    // Evitar preflight: Content-Type 'text/plain'
+    async function apiGet(action, params = {}){
+      const url = new URL(API_BASE);
+      url.search = new URLSearchParams({ action, ...params }).toString();
+      const r = await fetch(url.toString(), { method: 'GET' });
+      const j = await r.json();
+      if(!j.ok) throw new Error(j.error || 'Error');
+      return j.data;
+    }
+    async function apiPost(action, body = {}){
+      const url = API_BASE + '?action=' + encodeURIComponent(action);
+      const r = await fetch(url, {
+        method:'POST',
+        headers: { 'Content-Type':'text/plain;charset=utf-8' },
+        body: JSON.stringify(body)
+      });
+      const j = await r.json();
+      if(!j.ok) throw new Error(j.error || 'Error');
+      return j.data;
+    }
+
+    // Estado simple
+    let currentUser = null; // {documento, nombre, telefono, residencia, ...}
+
+    // Helpers de vistas
+    function showView(id){
+      for(const el of document.querySelectorAll('.view')) el.classList.remove('active');
+      document.getElementById(id).classList.add('active');
+      // Cerrar overlay si estaba abierto
+      overlay.classList.remove('open');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // LOGIN
+    const btnLogin = document.getElementById('btn-login');
+    const docLogin = document.getElementById('doc-login');
+    const regCard = document.getElementById('registro-card');
+    const btnGuardarRegistro = document.getElementById('btn-guardar-registro');
+
+    btnLogin.addEventListener('click', async ()=>{
+      const documento = (docLogin.value || '').trim();
+      if(!/^\d{6,10}$/.test(documento)){
+        Swal.fire({ icon:'warning', title:'Documento inválido', text:'Ingresa de 6 a 10 dígitos.' });
+        return;
+      }
+      try{
+        const res = await apiGet('validarDocumento', { documento });
+        if(res && res.existe){
+          // Login OK: guardar y pasar al menú
+          currentUser = {
+            documento: res.documento,
+            nombre: res.nombre,
+            telefono: res.telefono || '',
+            residencia: res.residencia || '',
+            referencia: res.referencia || '',
+            municipio: res.municipio || '',
+            puesto: res.puesto || '',
+            mesa: res.mesa || ''
+          };
+          renderUserMenu();
+          showView('view-menu');
+        }else{
+          // Mostrar registro
+          regCard.style.display = '';
+          Swal.fire({ icon:'info', title:'Nuevo usuario', text:'Completa tu registro para continuar.' });
+        }
+      }catch(e){
+        Swal.fire({ icon:'error', title:'Error', text:e.message });
+      }
+    });
+
+    btnGuardarRegistro.addEventListener('click', async ()=>{
+      const documento = (docLogin.value || '').trim();
+      const formData = {
+        documento,
+        nombre: document.getElementById('reg-nombre').value.trim(),
+        telefono: document.getElementById('reg-telefono').value.trim(),
+        residencia: document.getElementById('reg-residencia').value.trim(),
+        referencia: (document.getElementById('reg-referencia').value || '').trim()
+      };
+      if(!formData.nombre || !/^\d{6,10}$/.test(formData.documento) || !/^\d{10}$/.test(formData.telefono) || !formData.residencia){
+        Swal.fire({ icon:'warning', title:'Campos inválidos', text:'Revisa nombre, documento, whatsapp y residencia.' });
+        return;
+      }
+      try{
+        const ok = await apiPost('guardarContactoEnServidor', formData);
+        // Revalidar para pasar a menú
+        const res = await apiGet('validarDocumento', { documento: formData.documento });
+        if(res && res.existe){
+          currentUser = {
+            documento: res.documento,
+            nombre: res.nombre,
+            telefono: res.telefono || '',
+            residencia: res.residencia || '',
+            referencia: res.referencia || '',
+            municipio: res.municipio || '',
+            puesto: res.puesto || '',
+            mesa: res.mesa || ''
+          };
+          renderUserMenu();
+          showView('view-menu');
+          regCard.style.display = 'none';
+        }else{
+          Swal.fire({ icon:'error', title:'No se pudo completar el registro' });
+        }
+      }catch(e){
+        Swal.fire({ icon:'error', title:'Error al guardar', text:e.message });
+      }
+    });
+
+    // MENÚ (datos)
+    function renderUserMenu(){
+      document.getElementById('u-nombre').textContent = currentUser?.nombre || '';
+      document.getElementById('u-doc').textContent = currentUser?.documento || '';
+      document.getElementById('u-cel').textContent = currentUser?.telefono || 'N/A';
+      document.getElementById('u-res').textContent = currentUser?.residencia || 'N/A';
+      document.getElementById('u-ref').textContent = currentUser?.referencia || 'N/A';
+      document.getElementById('u-mpio').textContent = currentUser?.municipio || 'N/A';
+      document.getElementById('u-puesto').textContent = currentUser?.puesto || 'N/A';
+      document.getElementById('u-mesa').textContent = currentUser?.mesa || 'N/A';
+    }
+
+    // LOGOUT
+    document.getElementById('btn-logout').addEventListener('click', ()=>{
+      currentUser = null;
+      docLogin.value = '';
+      regCard.style.display='none';
+      showView('view-login');
+    });
+
+    // OVERLAY BANNER
+    const overlay = document.getElementById('overlay');
+    document.getElementById('btn-open-menu').addEventListener('click', ()=> overlay.classList.add('open'));
+    document.getElementById('btn-ovl-back').addEventListener('click', ()=> overlay.classList.remove('open'));
+    document.getElementById('ovlClose').addEventListener('click', ()=> overlay.classList.remove('open'));
+
+    // Navegación desde overlay
+    document.getElementById('go-asistencia').addEventListener('click', async ()=>{
+      overlay.classList.remove('open');
+      await prepararAsistencia();
+      showView('view-asistencia');
+    });
+    document.getElementById('go-votacion').addEventListener('click', ()=>{
+      overlay.classList.remove('open');
+      showView('view-votacion');
+    });
+    document.getElementById('go-actualizacion').addEventListener('click', async ()=>{
+      overlay.classList.remove('open');
+      await prepararActualizacion();
+      showView('view-actualizacion');
+    });
+    document.getElementById('go-consultar').addEventListener('click', ()=>{
+      overlay.classList.remove('open');
+      document.getElementById('c-documento').value = currentUser?.documento || '';
+      showView('view-consultar');
+    });
+    document.getElementById('go-lider').addEventListener('click', async ()=>{
+      if(!currentUser){ return; }
+      try{
+        const r = await apiGet('validarLider', { documento: currentUser.documento });
+        if(r && r.codigo && r.nombre){
+          const msg = "Hola 👋🏻\n\nQuiero pedirte que apoyes a nuestro gran amigo *Jhonny Perdomo*, ingresa a su *Portal* a través de este link azul 💙 https://tinyurl.com/jhonnyperdomo 💙\nRegistra tus datos y en el campo de *N° de Referido por favor escribe el N°👉🏻 " + r.codigo + " 👈🏻* 'solo el número'.\n\nEn este mismo Portal, podrás encontrar muchas opciones para ayudar a tu comunidad, estaré con gran atención esperando tu confirmación o alguna duda al respecto, ¡Bendiciones!\n\nCordialmente,\n\n*" + r.nombre + "*\n> Equipo del Hacer";
+          const textoEscapado = encodeURIComponent(msg);
+          const esMovil = /android|iphone|ipad|mobile/i.test(navigator.userAgent);
+          if(navigator.clipboard){ navigator.clipboard.writeText(msg).catch(()=>{}); }
+          window.open((esMovil ? "whatsapp://send?text=" : "https://api.whatsapp.com/send?text=") + textoEscapado, "_blank");
+        }else{
+          Swal.fire({ icon:'info', title:'No estás en registros de Líderes' });
+        }
+      }catch(e){
+        Swal.fire({ icon:'error', title:'Error', text:e.message });
+      }
+    });
+
+    // COMPARTIR PORTAL
+    document.getElementById('btn-compartir').addEventListener('click', ()=>{
+      const txt = "Ingresa al *Portal de Jhonny Perdomo*, haz clic en el enlace 👉🏻 https://tinyurl.com/jhonnyperdomo";
+      if(navigator.clipboard){ navigator.clipboard.writeText(txt).catch(()=>{}); }
+      const enc = encodeURIComponent(txt);
+      const esMovil = /android|iphone|ipad|mobile/i.test(navigator.userAgent);
+      window.open((esMovil ? "whatsapp://send?text=" : "https://api.whatsapp.com/send?text=") + enc, "_blank");
+    });
+
+    // VIDEO drive (simple: abrir preview y superponer dentro de la tarjeta)
+    const videoCard = document.getElementById('videoCard');
+    const playLayer = document.getElementById('playLayer');
+    playLayer.addEventListener('click', ()=>{
+      if(videoCard.querySelector('iframe')) return;
+      const id = '1SqcK8srE8CKbyHX66AnQmXHDjZPLeVhk'; // ID del video de Google Drive
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://drive.google.com/file/d/${id}/preview`;
+      iframe.allow = "autoplay";
+      iframe.frameBorder = "0";
+      videoCard.appendChild(iframe);
+      videoCard.classList.add('playing');
+    });
+
+    // ASISTENCIA
+    async function prepararAsistencia(){
+      if(!currentUser) return;
+      document.getElementById('a-documento').value = currentUser.documento;
+      try{
+        const d = await apiGet('validarDocumento4', { documento: currentUser.documento });
+        if(d){
+          document.getElementById('a-nombre').value = d.nombre || '';
+          document.getElementById('a-telefono').value = d.telefono || '';
+        }
+      }catch{}
+      document.getElementById('a-reunion').value = '';
+      document.getElementById('a-evento').value = '';
+      document.getElementById('evento-wrap').style.display='none';
+    }
+    document.getElementById('a-reunion').addEventListener('input', async (e)=>{
+      const val = (e.target.value||'').trim();
+      if(!val){ document.getElementById('evento-wrap').style.display='none'; return; }
+      const r = await apiGet('validarReunion', { reunion: val });
+      document.getElementById('a-evento').value = r?.evento || '';
+      document.getElementById('evento-wrap').style.display='';
+    });
+    document.getElementById('a-guardar').addEventListener('click', async ()=>{
+      const body = {
+        documento: document.getElementById('a-documento').value.trim(),
+        nombre: document.getElementById('a-nombre').value.trim(),
+        telefono: document.getElementById('a-telefono').value.trim(),
+        reunion: document.getElementById('a-reunion').value.trim(),
+        evento: document.getElementById('a-evento').value.trim()
+      };
+      if(!/^\d{6,10}$/.test(body.documento)){ return Swal.fire({icon:'warning',title:'Documento inválido'}); }
+      if(!/^\d{1,3}$/.test(body.reunion)){ return Swal.fire({icon:'warning',title:'N° de Evento inválido'}); }
+      try{
+        const ok = await apiPost('guardarAsistenciaEnServidor', body);
+        Swal.fire({ icon:'success', title:'Asistencia registrada', timer:1500, showConfirmButton:false })
+          .then(()=> showView('view-menu'));
+      }catch(e){
+        Swal.fire({ icon:'info', title:'Atención', text:e.message });
+      }
+    });
+    document.getElementById('a-volver').addEventListener('click', ()=> showView('view-menu'));
+
+    // VOTACIÓN
+    function parseFila(text){
+      const ENC = ["NUIP","DEPARTAMENTO","MUNICIPIO","PUESTO","DIRECCIÓN","MESA"];
+      let p = (text||'').split(/[\t\n\r]+/).map(s=>s.trim()).filter(Boolean);
+      if(p.length>=6 && ENC.every(e => p.slice(0,6).join(' ').toUpperCase().includes(e))) p = p.slice(6);
+      p = p.filter(x => !ENC.includes(x.toUpperCase()));
+      if(p.length>6) p[5] = p.slice(5).join(' ');
+      if(p.length>6) p = p.slice(0,6);
+      return p;
+    }
+    function intentarAutocompletar(){
+      const t = document.getElementById('v-row').value.trim();
+      const p = parseFila(t);
+      if(p.length===6){
+        document.getElementById('v-nuip').value = p[0];
+        document.getElementById('v-departamento').value = p[1];
+        document.getElementById('v-municipio').value = p[2];
+        document.getElementById('v-puesto').value = p[3];
+        document.getElementById('v-direccion').value = p[4];
+        document.getElementById('v-mesa').value = p[5];
+      }
+    }
+    ['paste','input','blur'].forEach(evt=>{
+      document.getElementById('v-row').addEventListener(evt, ()=> setTimeout(intentarAutocompletar, 80));
+    });
+    document.getElementById('v-guardar').addEventListener('click', async ()=>{
+      const body = {
+        nuip: document.getElementById('v-nuip').value.trim(),
+        departamento: document.getElementById('v-departamento').value.trim(),
+        municipio: document.getElementById('v-municipio').value.trim(),
+        puesto: document.getElementById('v-puesto').value.trim(),
+        direccion: document.getElementById('v-direccion').value.trim(),
+        mesa: document.getElementById('v-mesa').value.trim()
+      };
+      if(Object.values(body).some(v=>!v)){
+        return Swal.fire({ icon:'warning', title:'Faltan datos', text:'Pega la fila de la consulta primero.' });
+      }
+      try{
+        await apiPost('guardarVotacionEnServidor', body);
+        Swal.fire({ icon:'success', title:'Información guardada', timer:1800, showConfirmButton:false })
+          .then(()=> showView('view-menu'));
+      }catch(e){
+        Swal.fire({ icon:'error', title:'Error al guardar', text:e.message });
+      }
+    });
+    document.getElementById('v-volver').addEventListener('click', ()=> showView('view-menu'));
+
+    // ACTUALIZACIÓN
+    async function prepararActualizacion(){
+      if(!currentUser) return;
+      document.getElementById('upd-documento').value = currentUser.documento;
+      // Usamos validarDocumento3 para traer nombre (comportamiento original)
+      try{
+        const r = await apiGet('validarDocumento3',{ documento: currentUser.documento });
+        document.getElementById('upd-nombre').value = r?.existe ? (r.nombre || '') : (currentUser.nombre || '');
+      }catch{
+        document.getElementById('upd-nombre').value = currentUser.nombre || '';
+      }
+      document.getElementById('upd-telefono').value = '';
+      document.getElementById('upd-residencia').value = '';
+      document.getElementById('upd-referencia').value = '';
+    }
+    document.getElementById('upd-guardar').addEventListener('click', async ()=>{
+      const body = {
+        documento: document.getElementById('upd-documento').value.trim(),
+        nombre: document.getElementById('upd-nombre').value.trim(),
+        telefono: document.getElementById('upd-telefono').value.trim(),
+        residencia: document.getElementById('upd-residencia').value.trim(),
+        referencia: document.getElementById('upd-referencia').value.trim()
+      };
+      if(!/^\d{6,10}$/.test(body.documento)){
+        return Swal.fire({ icon:'warning', title:'Documento inválido' });
+      }
+      if(body.telefono && !/^\d{10}$/.test(body.telefono)){
+        return Swal.fire({ icon:'warning', title:'Whatsapp inválido' });
+      }
+      try{
+        await apiPost('guardarActualizacionEnServidor', body);
+        Swal.fire({ icon:'success', title:'Actualización exitosa', timer:1600, showConfirmButton:false })
+          .then(()=> showView('view-menu'));
+      }catch(e){
+        Swal.fire({ icon:'error', title:'Error', text:e.message });
+      }
+    });
+    document.getElementById('upd-volver').addEventListener('click', ()=> showView('view-menu'));
+
+    // CONSULTAR
+    document.getElementById('c-validar').addEventListener('click', async ()=>{
+      const documento = (document.getElementById('c-documento').value || '').trim();
+      if(!/^\d{6,10}$/.test(documento)){
+        return Swal.fire({ icon:'warning', title:'Documento inválido' });
+      }
+      try{
+        const r = await apiGet('validarDocumento2', { documento });
+        if(r?.existe){
+          const ok = !!(r.departamento && r.municipio && r.puesto && r.direccion && r.mesa);
+          if(ok){
+            document.getElementById('c-result').style.display = '';
+            document.getElementById('c-dep').textContent = r.departamento;
+            document.getElementById('c-mun').textContent = r.municipio;
+            document.getElementById('c-pue').textContent = r.puesto;
+            document.getElementById('c-dir').textContent = r.direccion;
+            document.getElementById('c-mesa').textContent = r.mesa;
+            Swal.fire({ icon:'success', title:`Datos encontrados para ${r.nombre}` });
+          }else{
+            document.getElementById('c-result').style.display = 'none';
+            Swal.fire({
+              icon:'info', title:`No tenemos info completa para ${r.nombre}`,
+              text:'Ve a "Votación" para agregarla.'
+            });
+          }
+        }else{
+          document.getElementById('c-result').style.display = 'none';
+          Swal.fire({ icon:'error', title:'Documento no encontrado' });
+        }
+      }catch(e){
+        Swal.fire({ icon:'error', title:'Error', text:e.message });
+      }
+    });
+    document.getElementById('c-volver').addEventListener('click', ()=> showView('view-menu'));
+
+    // Volver genéricos
+    ['a-volver','v-volver','upd-volver','c-volver'].forEach(id=>{
+      const el = document.getElementById(id);
+      if(el) el.addEventListener('click', ()=> showView('view-menu'));
+    });
+  </script>
+</body>
+</html>

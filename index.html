@@ -191,7 +191,7 @@
         </div>
 
         <img class="brand" alt="Brand" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png" />
-        <p class="center muted">Copyright © <a href="https://whatsapp.com/channel/0029VbBEYJ83LdQbOODLO10S" target="_blank"><b>BOT HEART</b></a></p>
+        <p class="center muted">Copyright © <a href="https://wa.me/573103230712" target="_blank"><b>Oscar Polanía</b></a></p>
       </div>
 
       <!-- REGISTRO (solo si no existe) -->
@@ -390,7 +390,7 @@
       <div class="image-center">
         <img class="brand" alt="Brand" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png" />
       </div>
-      <p class="center muted">Copyright © <a href="#" target="_blank"><b>Oscar Polania</b></a></p>
+      <p class="center muted">Copyright © <a href="#" target="https://wa.me/573103230712"><b>Oscar Polanía</b></a></p>
     </section>
 
     <!-- OVERLAY BANNER -->
@@ -633,7 +633,7 @@
     <!-- VISTA 6: CONSULTAR -->
     <section id="view-consultar" class="view">
       <div class="card narrow">
-        <h2 style="color:#0a0">CONSULTA TU PUESTO DE VOTACIÓN</h2>
+        <h2 style="color:var(--primary)">CONSULTA TU PUESTO DE VOTACIÓN</h2>
         <label>Documento</label>
         <input id="c-documento" type="tel" inputmode="numeric" placeholder="Pega o escribe tu Documento" />
         <div class="btn-row spaced">
@@ -770,38 +770,64 @@
     const regCard = document.getElementById('registro-card');
     const btnGuardarRegistro = document.getElementById('btn-guardar-registro');
 
-    btnLogin.addEventListener('click', async ()=>{
-      const documento = (docLogin.value || '').trim();
-      if(!/^\d{6,10}$/.test(documento)){
-        Swal.fire({ icon:'warning', title:'Documento inválido', text:'Ingresa de 6 a 10 dígitos.' });
-        return;
-      }
-      try{
-        const res = await apiGet('validarDocumento', { documento });
-        if(res && res.existe){
-          currentUser = {
-            documento: res.documento,
-            nombre: res.nombre,
-            telefono: res.telefono || '',
-            residencia: res.residencia || '',
-            referencia: res.referencia || '',
-            municipio: res.municipio || '',
-            puesto: res.puesto || '',
-            mesa: res.mesa || ''
-          };
-          renderUserMenu();
-          showView('view-menu');
-        }else{
-          regCard.style.display = '';
-          Swal.fire({
-            icon:'info', title:'Nuevo usuario',
-            text:'Completa tu registro para continuar.'
-          });
-        }
-      }catch(e){
-        Swal.fire({ icon:'error', title:'Error', text:e.message });
-      }
+    btnLogin.addEventListener('click', async () => {
+  const documento = (docLogin.value || '').trim();
+
+  // Validación: campo vacío
+  if (documento === '') {
+    Swal.fire({
+      icon: 'question',
+      title: '¿Deseas comenzar?',
+      text: 'Ingresa un Documento para validar.',
+      timer: 3000,
+      width: '80%',
+      padding: '1rem',
+      customClass: { popup: 'swal2-responsive-popup' }
     });
+    return;
+  }
+
+  // Validación: formato (6 a 10 dígitos)
+  if (!/^\d{6,10}$/.test(documento)) {
+    Swal.fire({ 
+      icon: 'warning', 
+      title: 'Documento inválido', 
+      text: 'Ingresa de 6 a 10 dígitos.' 
+    });
+    return;
+  }
+
+  try {
+    const res = await apiGet('validarDocumento', { documento });
+    if (res && res.existe) {
+      currentUser = {
+        documento: res.documento,
+        nombre: res.nombre,
+        telefono: res.telefono || '',
+        residencia: res.residencia || '',
+        referencia: res.referencia || '',
+        municipio: res.municipio || '',
+        puesto: res.puesto || '',
+        mesa: res.mesa || ''
+      };
+      renderUserMenu();
+      showView('view-menu');
+    } else {
+      regCard.style.display = '';
+      Swal.fire({
+        icon: 'info',
+        title: 'Nuevo usuario',
+        text: 'Completa tu registro para continuar.'
+      });
+    }
+  } catch (e) {
+    Swal.fire({ 
+      icon: 'error', 
+      title: 'Error', 
+      text: e.message 
+    });
+  }
+});
 
     // Toggle Referido (registro)
     const regRefWrap = document.getElementById('reg-referido-wrap');
@@ -824,12 +850,51 @@
       const telefonoRegex = /^[0-9]{10}$/;
       const referenciaRegex = /^[0-9]{1,3}$/;
 
-      if(!formData.nombre || !documentoRegex.test(formData.documento) || !telefonoRegex.test(formData.telefono) || !formData.residencia){
-        return Swal.fire({ icon:'warning', title:'Campos inválidos', text:'Revisa nombre, documento, whatsapp y residencia.' });
-      }
-      if(formData.referencia && !referenciaRegex.test(formData.referencia)){
-        return Swal.fire({ icon:'warning', title:'Referido inválido', text:'Debe tener 1 a 3 dígitos.' });
-      }
+      // Requeridos básicos
+if (!formData.nombre || !formData.documento || !formData.telefono) {
+  return Swal.fire({
+    icon: 'warning',
+    title: 'Faltan campos Requeridos',
+    text: 'Completa Nombre, Documento y Whatsapp.'
+  });
+}
+
+// Validar que el nombre tenga al menos 2 palabras
+const nombrePalabras = formData.nombre.split(/\s+/).filter(Boolean);
+if (nombrePalabras.length < 2) {
+  return Swal.fire({
+    icon: 'warning',
+    title: 'Nombre incompleto',
+    text: 'Ingresa tu nombre completo (mínimo nombre y apellido).'
+  });
+}
+
+// Documento
+if (!documentoRegex.test(formData.documento)) {
+  return Swal.fire({
+    icon: 'warning',
+    title: 'Documento inválido',
+    text: 'Revisa el número de documento.'
+  });
+}
+
+// Whatsapp / Teléfono
+if (!telefonoRegex.test(formData.telefono)) {
+  return Swal.fire({
+    icon: 'warning',
+    title: 'Whatsapp inválido',
+    text: 'Debe tener exactamente 10 dígitos.'
+  });
+}
+
+// Referido (opcional)
+if (formData.referencia && !referenciaRegex.test(formData.referencia)) {
+  return Swal.fire({
+    icon: 'warning',
+    title: 'Referido inválido',
+    text: 'Debe tener 1 a 3 dígitos.'
+  });
+}
 
       const resumenHtml = `
         <b>Nombre:</b> ${formData.nombre}<br>

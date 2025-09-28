@@ -352,7 +352,10 @@
             <button id="btn-ref-menos" class="hidden">No soy Referido</button>
           </div>
 
-          <button class="spaced btn-primary" id="btn-guardar-registro">Guardar</button>
+          <div class="btn-row spaced">
+            <button class="spaced btn-primary" id="btn-guardar-registro">Guardar</button>
+            <button id="btn-reg-atras">Atrás</button>
+          </div>
           <p class="center muted spaced"><b>Revisa la información antes de guardar.</b></p>
         </div>
       </div>
@@ -672,6 +675,41 @@
       }
     }
 
+    // Sonidos
+    const SOUNDS = {
+      question: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011577/Pay_fail_ls2aif.mp3',
+      info: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011578/Default_notification_pkp4wr.mp3',
+      success: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011577/Pay_success_t5aawh.mp3',
+      error: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011578/Low_battery_d5qua1.mp3',
+      resumen: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011577/Charging_clkgcd.mp3',
+      login: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011577/Siri_star_g1owy4.mp3',
+      logout: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011577/Siri_End_kelv02.mp3',
+      menu: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011577/Namedrop_Popup_ale2zy.mp3',
+      back: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011578/Keyboard_Enter_b9k2dc.mp3'
+    };
+    function playSoundOnce(url){
+      try{
+        const a = new Audio(url);
+        a.preload = 'auto';
+        a.play().catch(()=>{});
+      }catch(e){}
+    }
+    // Patch de SweetAlert2 para sonar según icono o etiqueta de resumen
+    if (window.Swal && typeof Swal.fire === 'function'){
+      const __fire = Swal.fire.bind(Swal);
+      Swal.fire = function(options = {}, ...rest){
+        try{
+          if (options.soundTag === 'resumen'){
+            playSoundOnce(SOUNDS.resumen);
+          } else {
+            const icon = options.icon || options.type;
+            if (icon && SOUNDS[icon]) playSoundOnce(SOUNDS[icon]);
+          }
+        }catch(e){}
+        return __fire(options, ...rest);
+      }
+    }
+
     // Fetch helpers
     async function apiGet(action, params = {}){
       startLoading();
@@ -811,6 +849,7 @@
         mesa: res.mesa || ''
       };
       renderUserMenu();
+      playSoundOnce(SOUNDS.login);
       showView('view-menu');
     } else {
       regCard.style.display = '';
@@ -835,6 +874,17 @@
     const btnRefMenos = document.getElementById('btn-ref-menos');
     btnRefMas.addEventListener('click', (ev)=>{ ev.preventDefault(); regRefWrap.style.display=''; btnRefMas.classList.add('hidden'); btnRefMenos.classList.remove('hidden'); });
     btnRefMenos.addEventListener('click', (ev)=>{ ev.preventDefault(); regRefWrap.style.display='none'; btnRefMas.classList.remove('hidden'); btnRefMenos.classList.add('hidden'); document.getElementById('reg-referencia').value=''; });
+
+    // Botón Atrás en registro: vuelve a login/validación
+    const btnRegAtras = document.getElementById('btn-reg-atras');
+    if(btnRegAtras){
+      btnRegAtras.addEventListener('click', (e)=>{
+        e.preventDefault();
+        playSoundOnce(SOUNDS.back);
+        regCard.style.display='none';
+        showView('view-login');
+      });
+    }
 
     // Guardar Registro con Resumen
     btnGuardarRegistro.addEventListener('click', async ()=>{
@@ -907,7 +957,8 @@ if (formData.referencia && !referenciaRegex.test(formData.referencia)) {
       const rs = await Swal.fire({
         icon:'info', title:'Resumen de Registro', html:resumenHtml,
         showCancelButton:true, confirmButtonText:'Confirmar', cancelButtonText:'Editar',
-        width:'80%', customClass:{ popup:'swal2-responsive-popup' }
+        width:'80%', customClass:{ popup:'swal2-responsive-popup' },
+        soundTag:'resumen'
       });
       if(!rs.isConfirmed) return;
 
@@ -930,6 +981,7 @@ if (formData.referencia && !referenciaRegex.test(formData.referencia)) {
             // Alerta de registro exitoso
             await Swal.fire({ icon:'success', title:'Registro exitoso', timer:1800, showConfirmButton:false });
             renderUserMenu();
+            playSoundOnce(SOUNDS.login);
             showView('view-menu');
             regCard.style.display='none';
           }else{
@@ -945,11 +997,13 @@ if (formData.referencia && !referenciaRegex.test(formData.referencia)) {
 
     // MENÚ
     const overlay = document.getElementById('overlay');
+    document.getElementById('btn-open-menu').addEventListener('click', ()=> { playSoundOnce(SOUNDS.menu); });
     document.getElementById('btn-open-menu').addEventListener('click', ()=> overlay.classList.add('open'));
     document.getElementById('btn-ovl-back').addEventListener('click', ()=> overlay.classList.remove('open'));
     document.getElementById('ovlClose').addEventListener('click', ()=> overlay.classList.remove('open'));
 
     document.getElementById('btn-logout').addEventListener('click', ()=>{
+      playSoundOnce(SOUNDS.logout);
       currentUser = null;
       docLogin.value = '';
       regCard.style.display='none';
@@ -1175,7 +1229,8 @@ if (formData.referencia && !referenciaRegex.test(formData.referencia)) {
       const rs = await Swal.fire({
         icon:'info', title:'Resumen de Actualización', html:resumenHtml,
         showCancelButton:true, confirmButtonText:'Confirmar', cancelButtonText:'Editar',
-        width:'80%', customClass:{ popup:'swal2-responsive-popup' }
+        width:'80%', customClass:{ popup:'swal2-responsive-popup' },
+        soundTag:'resumen'
       });
       if(!rs.isConfirmed) return;
 
@@ -1240,6 +1295,12 @@ if (formData.referencia && !referenciaRegex.test(formData.referencia)) {
       }
     });
     document.getElementById('c-volver').addEventListener('click', ()=> showView('view-menu'));
+
+    // Sonido para botones Atrás/Regresar
+    ['btn-ovl-back','a-volver','v-volver','upd-volver','c-volver','btn-reg-atras'].forEach(id=>{
+      const el = document.getElementById(id);
+      if(el) el.addEventListener('click', ()=> playSoundOnce(SOUNDS.back));
+    });
 
     // Volver genéricos
     ['a-volver','v-volver','upd-volver','c-volver'].forEach(id=>{

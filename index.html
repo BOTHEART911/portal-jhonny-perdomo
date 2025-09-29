@@ -1313,7 +1313,7 @@ function playVideo(){
   const video = document.createElement('video');
   video.src = src;
   video.autoplay = true;     // autoplay en el primer clic
-  video.muted = true;        // necesario para autoplay en móvil
+  video.muted = false;        // necesario para autoplay en móvil
   video.playsInline = true;  // iOS: evita entrar a fullscreen automático
   video.controls = true;     // muestra controles para poder activar audio, pausar, etc.
   video.preload = 'auto';

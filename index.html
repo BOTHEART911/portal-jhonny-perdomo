@@ -163,6 +163,19 @@
 .narrow{ max-width: 520px; margin: 0 auto; }
 .spaced{ margin-top:12px; }
 
+/* INSERT: tarjeta de mapa estático (similar a video-card) */
+.map-card{
+  width:min(560px, 90vw);
+  aspect-ratio:16/9;
+  margin:12px auto;
+  border-radius:14px;
+  overflow:hidden;
+  border:2px solid #ddd;
+  box-shadow:0 10px 24px rgba(0,0,0,.25);
+  background:#f3f3f3;
+}
+.map-card img{ width:100%; height:100%; object-fit:cover; display:block; }
+
 @media (max-width: 700px){ .btn-row{ flex-direction:column; } }
 </style>
 </head>
@@ -412,6 +425,8 @@
         <button class="menu-btn" id="go-solicitud">Realiza tu Solicitud</button>
         <button class="menu-btn" id="go-ideas">Suma tus Ideas</button>
         <button class="menu-btn" id="go-actualizacion">Actualiza tus Datos Personales</button>
+        <!-- INSERT: nuevo botón de menú -->
+        <button class="menu-btn" id="go-sede">Visita Nuestra Casa Social</button>
         <button class="menu-btn" id="go-consultar">Consulta tu Puesto de Votación</button>
         <button class="menu-btn" id="go-lider">Si eres Líder, Refriere con un solo Clic</button>
         <div style="height:24px"></div>
@@ -727,6 +742,40 @@
         <div class="btn-row spaced">
           <button class="btn-primary" id="i-guardar">Guardar</button>
           <button id="i-volver">Atrás</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- INSERT: VISTA 9: CASA SOCIAL -->
+    <section id="view-sede" class="view">
+      <div class="card narrow">
+        <h2 style="color:var(--primary)">Casa Social Soy de Flandes</h2>
+
+        <!-- Mapa estático con pin en 4.289037, -74.814221. Al hacer clic, abre Google Maps -->
+        <div class="video-card" style="height:auto; aspect-ratio:unset;"> <iframe src="https://www.google.com/maps?q=4.289037,-74.814221&z=16&output=embed" style="width:100%; height:360px; border:0;" loading="lazy"></iframe> </div>
+
+        <div class="narrow">
+          <p class="helper" style="text-align:left;">
+            Aquí te escuchamos, te acompañamos y ponemos a tu alcance cursos y servicios totalmente gratuitos.
+          </p>
+          <ul style="line-height:1.6; padding-left:18px;">
+            <li>✅ Martes: asesorías jurídicas para las JAC</li>
+            <li>✅ Miércoles: asesorías en salud y trámites EPS</li>
+            <li>✅ Jueves: asesorías contables📈 y curso de guitarra 🎸</li>
+            <li>✅ Viernes: asesorías jurídicas y realización de derechos de petición y acciones de tutelas⚖. Y en la noche, aeróbicos para toda la familia 🏃‍♀</li>
+            <li>✅ Sábados: un espacio de escucha y amistad👥</li>
+            <li>✅ Red de apoyo con entrega gratuita de medicamentos 💊</li>
+          </ul>
+          <p style="margin-top:10px;">
+            Ven y visítanos <b>diagonal al Parque La Victoria📍</b>. Estamos para ti, trabajando de la mano con todos los flamencos. 🤝
+          </p>
+          <p class="muted" style="margin-top:8px;">
+            #SoyDeFlandes #CasaSocial #NoParamos #SiemprePresentes
+          </p>
+        </div>
+
+        <div class="btn-row spaced">
+          <button id="sede-volver">Atrás</button>
         </div>
       </div>
     </section>
@@ -1128,6 +1177,11 @@ if (formData.referencia && !referenciaRegex.test(formData.referencia)) {
       overlay.classList.remove('open');
       await prepararIdeas();
       showView('view-ideas');
+    });
+    // INSERT: NUEVO - CASA SOCIAL
+    document.getElementById('go-sede').addEventListener('click', ()=>{
+      overlay.classList.remove('open');
+      showView('view-sede');
     });
 
     document.getElementById('go-lider').addEventListener('click', async ()=>{
@@ -1566,13 +1620,13 @@ if (formData.referencia && !referenciaRegex.test(formData.referencia)) {
     document.getElementById('i-volver').addEventListener('click', ()=> showView('view-menu'));
 
     // Sonido para botones Atrás/Regresar
-    ['btn-ovl-back','a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver','btn-reg-atras'].forEach(id=>{
+    ['btn-ovl-back','a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver','btn-reg-atras','sede-volver'].forEach(id=>{
       const el = document.getElementById(id);
       if(el) el.addEventListener('click', ()=> playSoundOnce(SOUNDS.back));
     });
 
     // Volver genéricos
-    ['a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver'].forEach(id=>{
+    ['a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver','sede-volver'].forEach(id=>{
       const el = document.getElementById(id);
       if(el) el.addEventListener('click', ()=> showView('view-menu'));
     });

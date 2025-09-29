@@ -980,7 +980,7 @@ function stopLoading(){
       document.getElementById('u-doc').textContent = currentUser?.documento || '';
       document.getElementById('u-cel').textContent = currentUser?.telefono || 'SIN REGISTRO';
       document.getElementById('u-res').textContent = currentUser?.residencia || 'SIN REGISTRO';
-      document.getElementById('u-ref').textContent = currentUser?.referencia || 'SIN REGISTRO';
+      document.getElementById('u-ref').textContent = currentUser?.referencia || 'N/A';
       document.getElementById('u-mpio').textContent = currentUser?.municipio || 'SIN REGISTRO';
       document.getElementById('u-puesto').textContent = currentUser?.puesto || 'SIN REGISTRO';
       document.getElementById('u-mesa').textContent = currentUser?.mesa || 'SIN REGISTRO';
@@ -1300,21 +1300,28 @@ if (formData.referencia && !referenciaRegex.test(formData.referencia)) {
 
     // VIDEO (con miniatura)
     const videoCard = document.getElementById('videoCard');
-    const playLayer = document.getElementById('playLayer');
-    const videoThumb = document.getElementById('videoThumb');
-    function playVideo(){
-      if(videoCard.querySelector('iframe')) return;
-      const id = '1SqcK8srE8CKbyHX66AnQmXHDjZPLeVhk'; // ID del video de Google Drive
-      const iframe = document.createElement('iframe');
-      iframe.src = `https://drive.google.com/file/d/${id}/preview`;
-      iframe.allow = "autoplay";
-      iframe.frameBorder = "0";
-      videoCard.appendChild(iframe);
-      videoCard.classList.add('playing');
-    }
-    playLayer.addEventListener('click', playVideo);
-    videoThumb.addEventListener('click', playVideo);
+const playLayer = document.getElementById('playLayer');
+const videoThumb = document.getElementById('videoThumb');
 
+function playVideo(){
+  if(videoCard.querySelector('iframe')) return;
+  const id = '1SqcK8srE8CKbyHX66AnQmXHDjZPLeVhk'; // ID del video de Google Drive
+  // Autoplay en 1 clic: agregar autoplay=1 y muted=1
+  const src = `https://drive.google.com/file/d/${id}/preview?autoplay=1&muted=1&hl=es`;
+  const iframe = document.createElement('iframe');
+  iframe.src = src;
+  iframe.allow = "autoplay; encrypted-media";
+  iframe.allowFullscreen = true;
+  iframe.frameBorder = "0";
+  iframe.setAttribute('title', 'Video');
+  videoCard.appendChild(iframe);
+  videoCard.classList.add('playing');
+}
+
+// Un solo clic en imagen o capa de play
+playLayer.addEventListener('click', playVideo);
+videoThumb.addEventListener('click', playVideo);
+    
     // ASISTENCIA
     async function prepararAsistencia(){
       if(!currentUser) return;

@@ -410,12 +410,13 @@
         <h3>Selecciona una de las opciones</h3>
         <button class="menu-btn" id="go-asistencia">Registra Asistencia a Reunión</button>
         <button class="menu-btn" id="go-solicitud">Realiza tu Solicitud</button>
-         <button class="menu-btn" id="go-actualizacion">Actualiza tus Datos Personales</button>
+        <button class="menu-btn" id="go-ideas">Suma tus Ideas</button>
+        <button class="menu-btn" id="go-actualizacion">Actualiza tus Datos Personales</button>
         <button class="menu-btn" id="go-consultar">Consulta tu Puesto de Votación</button>
         <button class="menu-btn" id="go-lider">Si eres Líder, Refriere con un solo Clic</button>
         <div style="height:24px"></div>
         <img class="brand" alt="Brand" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png" />
-         <p class="center muted">Copyright © <a href="#" target="https://wa.me/573103230712"><b>Oscar Polanía</b></a></p>
+        <p class="center muted">Copyright © <a href="#" target="https://wa.me/573103230712"><b>Oscar Polanía</b></a></p>
       </aside>
     </div>
 
@@ -686,6 +687,49 @@
         </div>
       </div>
     </section>
+
+    <!-- VISTA 8: IDEAS -->
+    <section id="view-ideas" class="view">
+      <div class="card narrow">
+        <h2 style="color:var(--primary)">SUMA TUS IDEAS</h2>
+        <input id="i-documento" type="hidden" />
+        <input id="i-telefono" type="hidden" />
+        <input id="i-residencia" type="hidden" />
+
+        <label>Nombre (solo lectura)</label>
+        <input id="i-nombre" type="text" readonly placeholder="Tu Nombre" />
+
+        <p class="helper" style="margin-top:16px;">
+          En tu sector, barrio, calle, cuadra, vereda o conjunto; escriba las acciones o proyectos que te gustaría proponer. Tus propuestas e ideas son importantes para que juntos recuperemos la identidad de nuestro hermoso municipio de Flandes.
+        </p>
+
+        <label>Aspecto Social</label>
+        <p class="muted">Salud, educación, vivienda, cultura, deporte y recreación, agua potable y saneamiento básico, y promoción social (atención a grupos vulnerables)</p>
+        <textarea id="i-social" rows="4" placeholder="Redacta tus ideas para (Según el aspecto)"></textarea>
+
+        <label>Aspecto Institucional</label>
+        <p class="muted">Seguridad y justicia, desarrollo comunitario, fortalecimiento institucional, equipamiento público y centros de reclusión.</p>
+        <textarea id="i-institucional" rows="4" placeholder="Redacta tus ideas para (Según el aspecto)"></textarea>
+
+        <label>Aspecto Económico</label>
+        <p class="muted">Promoción del desarrollo, empleo, turismo, emprendimiento, agropecuario, transporte, servicios públicos diferentes a acueducto, alcantarillado y aseo.</p>
+        <textarea id="i-economico" rows="4" placeholder="Redacta tus ideas para (Según el aspecto)"></textarea>
+
+        <label>Aspecto Ambiental</label>
+        <p class="muted">Ambiental, prevención y atención de desastres, gestión del riesgo, protección animal.</p>
+        <textarea id="i-ambiental" rows="4" placeholder="Redacta tus ideas para (Según el aspecto)"></textarea>
+
+        <label>Otros</label>
+        <textarea id="i-otros" rows="4" placeholder="Redacta tus ideas para (Según el aspecto)"></textarea>
+
+        <p class="center muted spaced"><b>Revisa muy bien la información antes de Guardar</b></p>
+
+        <div class="btn-row spaced">
+          <button class="btn-primary" id="i-guardar">Guardar</button>
+          <button id="i-volver">Atrás</button>
+        </div>
+      </div>
+    </section>
   </div>
 
   <script>
@@ -797,12 +841,12 @@ function stopLoading(){
     function renderUserMenu(){
       document.getElementById('u-nombre').textContent = currentUser?.nombre || '';
       document.getElementById('u-doc').textContent = currentUser?.documento || '';
-      document.getElementById('u-cel').textContent = currentUser?.telefono || 'N/A';
-      document.getElementById('u-res').textContent = currentUser?.residencia || 'N/A';
-      document.getElementById('u-ref').textContent = currentUser?.referencia || 'N/A';
-      document.getElementById('u-mpio').textContent = currentUser?.municipio || 'N/A';
-      document.getElementById('u-puesto').textContent = currentUser?.puesto || 'N/A';
-      document.getElementById('u-mesa').textContent = currentUser?.mesa || 'N/A';
+      document.getElementById('u-cel').textContent = currentUser?.telefono || 'SIN REGISTRO';
+      document.getElementById('u-res').textContent = currentUser?.residencia || 'SIN REGISTRO';
+      document.getElementById('u-ref').textContent = currentUser?.referencia || 'SIN REGISTRO';
+      document.getElementById('u-mpio').textContent = currentUser?.municipio || 'SIN REGISTRO';
+      document.getElementById('u-puesto').textContent = currentUser?.puesto || 'SIN REGISTRO';
+      document.getElementById('u-mesa').textContent = currentUser?.mesa || 'SIN REGISTRO';
     }
     async function refreshUserFromServer(){
       try{
@@ -1077,6 +1121,12 @@ if (formData.referencia && !referenciaRegex.test(formData.referencia)) {
       overlay.classList.remove('open');
       await prepararSolicitud();
       showView('view-solicitud');
+    });
+    // NUEVO: IDEAS
+    document.getElementById('go-ideas').addEventListener('click', async ()=>{
+      overlay.classList.remove('open');
+      await prepararIdeas();
+      showView('view-ideas');
     });
 
     document.getElementById('go-lider').addEventListener('click', async ()=>{
@@ -1430,14 +1480,98 @@ if (formData.referencia && !referenciaRegex.test(formData.referencia)) {
     });
     document.getElementById('s-volver').addEventListener('click', ()=> showView('view-menu'));
 
+    // IDEAS (con Resumen)
+    async function prepararIdeas(){
+      if(!currentUser) return;
+      document.getElementById('i-documento').value = currentUser.documento || '';
+      // Limpiar campos
+      document.getElementById('i-nombre').value = '';
+      document.getElementById('i-telefono').value = '';
+      document.getElementById('i-residencia').value = '';
+      document.getElementById('i-social').value = '';
+      document.getElementById('i-institucional').value = '';
+      document.getElementById('i-economico').value = '';
+      document.getElementById('i-ambiental').value = '';
+      document.getElementById('i-otros').value = '';
+
+      try{
+        const r = await apiGet('validarDocumento6', { documento: currentUser.documento });
+        if(r && r.existe){
+          document.getElementById('i-nombre').value = r.nombre || '';
+          document.getElementById('i-telefono').value = r.telefono || '';
+          document.getElementById('i-residencia').value = r.residencia || '';
+        }else{
+          document.getElementById('i-nombre').value = currentUser.nombre || '';
+          document.getElementById('i-telefono').value = currentUser.telefono || '';
+          document.getElementById('i-residencia').value = currentUser.residencia || '';
+        }
+      }catch(_){
+        document.getElementById('i-nombre').value = currentUser.nombre || '';
+        document.getElementById('i-telefono').value = currentUser.telefono || '';
+        document.getElementById('i-residencia').value = currentUser.residencia || '';
+      }
+    }
+
+    document.getElementById('i-guardar').addEventListener('click', async ()=>{
+      const body = {
+        documento: (document.getElementById('i-documento').value || '').trim(),
+        nombre: (document.getElementById('i-nombre').value || '').trim(),
+        telefono: (document.getElementById('i-telefono').value || '').trim(),
+        residencia: (document.getElementById('i-residencia').value || '').trim(),
+        social: (document.getElementById('i-social').value || '').trim(),
+        institucional: (document.getElementById('i-institucional').value || '').trim(),
+        economico: (document.getElementById('i-economico').value || '').trim(),
+        ambiental: (document.getElementById('i-ambiental').value || '').trim(),
+        otros: (document.getElementById('i-otros').value || '').trim()
+      };
+      const docRegex = /^[0-9]{6,10}$/;
+      if(!docRegex.test(body.documento)){
+        return Swal.fire({ icon:'warning', title:'Documento inválido', text:'Documento no válido en sesión.' });
+      }
+
+      const resumenHtml = `
+        <b>Nombre:</b> ${body.nombre}<br>
+        <b>N° Documento:</b> ${body.documento}<br>
+        <b>Whatsapp:</b> ${body.telefono || 'N/A'}<br>
+        <b>Residencia:</b> ${body.residencia || 'N/A'}<br>
+        <hr>
+        <b>Aspecto Social:</b><br>${(body.social||'').replace(/\n/g,'<br>') || '<i>Sin ideas</i>'}<br><br>
+        <b>Aspecto Institucional:</b><br>${(body.institucional||'').replace(/\n/g,'<br>') || '<i>Sin ideas</i>'}<br><br>
+        <b>Aspecto Económico:</b><br>${(body.economico||'').replace(/\n/g,'<br>') || '<i>Sin ideas</i>'}<br><br>
+        <b>Aspecto Ambiental:</b><br>${(body.ambiental||'').replace(/\n/g,'<br>') || '<i>Sin ideas</i>'}<br><br>
+        <b>Otros:</b><br>${(body.otros||'').replace(/\n/g,'<br>') || '<i>Sin ideas</i>'}<br><br>
+        <img class="brand" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png" alt="">
+      `;
+      const rs = await Swal.fire({
+        icon:'info', title:'Resumen de Ideas', html:resumenHtml,
+        showCancelButton:true, confirmButtonText:'Confirmar', cancelButtonText:'Editar',
+        width:'80%', customClass:{ popup:'swal2-responsive-popup' },
+        soundTag:'resumen'
+      });
+      if(!rs.isConfirmed) return;
+
+      try{
+        const r = await apiPost('guardarIdeasEnServidor', body);
+        if(r && r.success){
+          await Swal.fire({ icon:'success', title:'¡Gracias por tus Ideas!', timer:1700, showConfirmButton:false });
+          showView('view-menu');
+        }else{
+          Swal.fire({ icon:'error', title:'Error al guardar', text:r?.message || 'Error desconocido' });
+        }
+      }catch(e){
+        Swal.fire({ icon:'error', title:'Error', text:e.message });
+      }
+    });
+    document.getElementById('i-volver').addEventListener('click', ()=> showView('view-menu'));
+
     // Sonido para botones Atrás/Regresar
-    ['btn-ovl-back','a-volver','v-volver','upd-volver','c-volver','s-volver','btn-reg-atras'].forEach(id=>{
+    ['btn-ovl-back','a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver','btn-reg-atras'].forEach(id=>{
       const el = document.getElementById(id);
       if(el) el.addEventListener('click', ()=> playSoundOnce(SOUNDS.back));
     });
 
     // Volver genéricos
-    ['a-volver','v-volver','upd-volver','c-volver','s-volver'].forEach(id=>{
+    ['a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver'].forEach(id=>{
       const el = document.getElementById(id);
       if(el) el.addEventListener('click', ()=> showView('view-menu'));
     });

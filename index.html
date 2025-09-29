@@ -412,6 +412,7 @@
         <button class="menu-btn" id="go-consultar">Consulta tu Puesto de Votación</button>
         <button class="menu-btn" id="go-actualizacion">Actualiza tus Datos Personales</button>
         <button class="menu-btn" id="go-lider">Si eres Líder, Refriere con un solo Clic</button>
+        <button class="menu-btn" id="go-solicitud">Realiza tu Solicitud</button>
         <div style="height:24px"></div>
         <img class="brand" alt="Brand" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png" />
         <p class="center muted">Copyright © Oscar Polania</p>
@@ -650,6 +651,37 @@
           <p><b>Puesto:</b> <span id="c-pue"></span></p>
           <p><b>Dirección:</b> <span id="c-dir"></span></p>
           <p><b>Mesa:</b> <span id="c-mesa"></span></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- VISTA 7: SOLICITUD -->
+    <section id="view-solicitud" class="view">
+      <div class="card narrow">
+        <h2 style="color:var(--primary)">REALIZA TU SOLICITUD</h2>
+        <input id="s-documento" type="hidden" />
+        <input id="s-telefono" type="hidden" />
+        <input id="s-residencia" type="hidden" />
+
+        <label>Nombre (solo lectura)</label>
+        <input id="s-nombre" type="text" readonly placeholder="Tu Nombre" />
+
+        <label>Servicio</label>
+        <select id="s-servicio">
+          <option value="" disabled selected>Selecciona el servicio que necesitas</option>
+          <option value="Asesoría Jurídica">Asesoría Jurídica</option>
+          <option value="Asesoría Contable">Asesoría Contable</option>
+          <option value="Orientación Psicológica">Orientación Psicológica</option>
+        </select>
+
+        <label>Solicitud</label>
+        <textarea id="s-solicitud" rows="5" placeholder="Describe brevemente tu solicitud (obligatorio)"></textarea>
+
+        <p class="center muted spaced"><b>Revisa muy bien la información antes de Guardar</b></p>
+
+        <div class="btn-row spaced">
+          <button class="btn-primary" id="s-guardar">Guardar</button>
+          <button id="s-volver">Atrás</button>
         </div>
       </div>
     </section>
@@ -1039,6 +1071,12 @@ if (formData.referencia && !referenciaRegex.test(formData.referencia)) {
       document.getElementById('c-documento').value = currentUser?.documento || '';
       showView('view-consultar');
     });
+    // NUEVO: SOLICITUD
+    document.getElementById('go-solicitud').addEventListener('click', async ()=>{
+      overlay.classList.remove('open');
+      await prepararSolicitud();
+      showView('view-solicitud');
+    });
 
     document.getElementById('go-lider').addEventListener('click', async ()=>{
       if(!currentUser){ return; }
@@ -1310,14 +1348,95 @@ if (formData.referencia && !referenciaRegex.test(formData.referencia)) {
     });
     document.getElementById('c-volver').addEventListener('click', ()=> showView('view-menu'));
 
+    // SOLICITUD (con Resumen)
+    async function prepararSolicitud(){
+      if(!currentUser) return;
+      document.getElementById('s-documento').value = currentUser.documento || '';
+      // Limpiar campos
+      document.getElementById('s-nombre').value = '';
+      document.getElementById('s-telefono').value = '';
+      document.getElementById('s-residencia').value = '';
+      document.getElementById('s-servicio').value = '';
+      document.getElementById('s-solicitud').value = '';
+
+      try{
+        const r = await apiGet('validarDocumento5', { documento: currentUser.documento });
+        if(r && r.existe){
+          document.getElementById('s-nombre').value = r.nombre || '';
+          document.getElementById('s-telefono').value = r.telefono || '';
+          document.getElementById('s-residencia').value = r.residencia || '';
+        }else{
+          // Si no existe, usar los datos del currentUser
+          document.getElementById('s-nombre').value = currentUser.nombre || '';
+          document.getElementById('s-telefono').value = currentUser.telefono || '';
+          document.getElementById('s-residencia').value = currentUser.residencia || '';
+        }
+      }catch(_){
+        document.getElementById('s-nombre').value = currentUser.nombre || '';
+        document.getElementById('s-telefono').value = currentUser.telefono || '';
+        document.getElementById('s-residencia').value = currentUser.residencia || '';
+      }
+    }
+
+    document.getElementById('s-guardar').addEventListener('click', async ()=>{
+      const body = {
+        documento: (document.getElementById('s-documento').value || '').trim(),
+        nombre: (document.getElementById('s-nombre').value || '').trim(),
+        telefono: (document.getElementById('s-telefono').value || '').trim(),
+        residencia: (document.getElementById('s-residencia').value || '').trim(),
+        servicio: document.getElementById('s-servicio').value,
+        solicitud: (document.getElementById('s-solicitud').value || '').trim()
+      };
+      const docRegex = /^[0-9]{6,10}$/;
+      if(!docRegex.test(body.documento)){
+        return Swal.fire({ icon:'warning', title:'Documento inválido', text:'Documento no válido en sesión.' });
+      }
+      if(!body.servicio){
+        return Swal.fire({ icon:'warning', title:'Servicio requerido', text:'Selecciona un servicio.' });
+      }
+      if(!body.solicitud){
+        return Swal.fire({ icon:'warning', title:'Solicitud requerida', text:'Describe brevemente tu solicitud.' });
+      }
+
+      const resumenHtml = `
+        <b>Nombre:</b> ${body.nombre}<br>
+        <b>N° Documento:</b> ${body.documento}<br>
+        <b>Whatsapp:</b> ${body.telefono || 'N/A'}<br>
+        <b>Residencia:</b> ${body.residencia || 'N/A'}<br>
+        <b>Servicio:</b> ${body.servicio}<br>
+        <b>Solicitud:</b> ${body.solicitud}<br><br>
+        <img class="brand" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png" alt="">
+      `;
+      const rs = await Swal.fire({
+        icon:'info', title:'Resumen de Solicitud', html:resumenHtml,
+        showCancelButton:true, confirmButtonText:'Confirmar', cancelButtonText:'Editar',
+        width:'80%', customClass:{ popup:'swal2-responsive-popup' },
+        soundTag:'resumen'
+      });
+      if(!rs.isConfirmed) return;
+
+      try{
+        const r = await apiPost('guardarSolicitudEnServidor', body);
+        if(r && r.success){
+          await Swal.fire({ icon:'success', title:'Solicitud enviada', timer:1700, showConfirmButton:false });
+          showView('view-menu');
+        }else{
+          Swal.fire({ icon:'error', title:'Error al guardar', text:r?.message || 'Error desconocido' });
+        }
+      }catch(e){
+        Swal.fire({ icon:'error', title:'Error', text:e.message });
+      }
+    });
+    document.getElementById('s-volver').addEventListener('click', ()=> showView('view-menu'));
+
     // Sonido para botones Atrás/Regresar
-    ['btn-ovl-back','a-volver','v-volver','upd-volver','c-volver','btn-reg-atras'].forEach(id=>{
+    ['btn-ovl-back','a-volver','v-volver','upd-volver','c-volver','s-volver','btn-reg-atras'].forEach(id=>{
       const el = document.getElementById(id);
       if(el) el.addEventListener('click', ()=> playSoundOnce(SOUNDS.back));
     });
 
     // Volver genéricos
-    ['a-volver','v-volver','upd-volver','c-volver'].forEach(id=>{
+    ['a-volver','v-volver','upd-volver','c-volver','s-volver'].forEach(id=>{
       const el = document.getElementById(id);
       if(el) el.addEventListener('click', ()=> showView('view-menu'));
     });

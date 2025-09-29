@@ -165,16 +165,51 @@
 
 /* INSERT: tarjeta de mapa estático (similar a video-card) */
 .map-card{
-  width:min(560px, 90vw);
-  aspect-ratio:16/9;
-  margin:12px auto;
-  border-radius:14px;
-  overflow:hidden;
-  border:2px solid #ddd;
-  box-shadow:0 10px 24px rgba(0,0,0,.25);
-  background:#f3f3f3;
+  width: 100%;              /* que se ajuste al ancho del card */
+  max-width: 100%;
+  aspect-ratio: 16 / 9;     /* mantiene proporción 16:9 */
+  margin: 12px 0;           /* mismo espaciado que otros medios dentro del card */
+  border-radius: 14px;
+  overflow: hidden;
+  border: 2px solid #ddd;
+  box-shadow: 0 10px 24px rgba(0,0,0,.25);
+  background: #f3f3f3;
 }
-.map-card img{ width:100%; height:100%; object-fit:cover; display:block; }
+.map-card img,
+.map-card iframe{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border: 0;
+}
+
+/* FIX mapa responsivo dentro del card (no se sale en móvil) */
+#view-sede .map-embed{
+  position: relative;
+  width: 100%;              /* ocupa el ancho del card */
+  aspect-ratio: 16 / 9;     /* mantiene proporción 16:9 */
+  border-radius: 14px;
+  overflow: hidden;
+  border: 2px solid #ddd;
+  box-shadow: 0 10px 24px rgba(0,0,0,.25);
+  background:#000;
+  margin: 12px 0;           /* igual que otras tarjetas de media */
+}
+#view-sede .map-embed iframe{
+  position:absolute; inset:0;
+  width:100%; height:100%; border:0; display:block;
+}
+
+/* Si accidentalmente vuelves a usar .video-card para el mapa en esta vista,
+   garantizamos que no use 90vw y no se salga del card */
+#view-sede .video-card{
+  width:100% !important;
+  max-width:100%;
+  margin:12px 0;
+  border-radius:14px; 
+  overflow:hidden;
+}
 
 @media (max-width: 700px){ .btn-row{ flex-direction:column; } }
 </style>
@@ -746,43 +781,95 @@
       </div>
     </section>
 
-    <!-- INSERT: VISTA 9: CASA SOCIAL -->
-    <section id="view-sede" class="view">
-      <div class="card narrow">
-        <h2 style="color:var(--primary)">Casa Social Soy de Flandes</h2>
+    <!-- VISTA 9: CASA SOCIAL -->
+<section id="view-sede" class="view">
+  <div class="card narrow">
+    <h2 style="color:var(--primary)">Casa Social Soy de Flandes</h2>
 
-        <!-- Mapa estático con pin en 4.289037, -74.814221. Al hacer clic, abre Google Maps -->
-        <div class="video-card" style="height:auto; aspect-ratio:unset;"> <iframe src="https://www.google.com/maps?q=4.289037,-74.814221&z=16&output=embed" style="width:100%; height:360px; border:0;" loading="lazy"></iframe> </div>
+    <!-- Mapa responsivo dentro del card -->
+    <div class="map-embed">
+      <iframe
+        src="https://www.google.com/maps?q=4.289037,-74.814221&z=16&output=embed"
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+        allowfullscreen
+        title="Ubicación Casa Social Soy de Flandes"
+      ></iframe>
+    </div>
 
-         <a href="https://maps.app.goo.gl/jSnssySiFDu42qCw8" target="_blank" class="chip" style="display:block; text-align:center; font-weight:800;">Cómo llegar</a>
-        
-        <div class="narrow">
-          <p class="helper" style="text-align:left;">
-            Aquí te escuchamos, te acompañamos y ponemos a tu alcance cursos y servicios totalmente gratuitos.
-          </p>
-    
-          <ul style="line-height:1.6; padding-left:18px;">
-            <li>✅ Martes: asesorías jurídicas para las JAC</li>
-            <li>✅ Miércoles: asesorías en salud y trámites EPS</li>
-            <li>✅ Jueves: asesorías contables📈 y curso de guitarra 🎸</li>
-            <li>✅ Viernes: asesorías jurídicas y realización de derechos de petición y acciones de tutelas⚖. Y en la noche, aeróbicos para toda la familia 🏃‍♀</li>
-            <li>✅ Sábados: un espacio de escucha y amistad👥</li>
-            <li>✅ Red de apoyo con entrega gratuita de medicamentos 💊</li>
-          </ul>
-          <p style="margin-top:10px;">
-            Ven y visítanos <b>diagonal al Parque La Victoria📍</b>. Estamos para ti, trabajando de la mano con todos los flamencos. 🤝
-          </p>
-          <p class="muted" style="margin-top:8px;">
-            #SoyDeFlandes #CasaSocial #NoParamos #SiemprePresentes
-          </p>
-        </div>
+    <!-- Botones -->
+    <div class="btn-row spaced">
+      <button class="btn-primary" id="btn-como-llegar">Cómo llegar</button>
+      <button id="sede-volver">Atrás</button>
+    </div>
 
-        <div class="btn-row spaced">
-          <button id="sede-volver">Atrás</button>
-        </div>
-      </div>
-    </section>
+    <div class="narrow">
+      <p class="helper" style="text-align:left;">
+        Aquí te escuchamos, te acompañamos y ponemos a tu alcance cursos y servicios totalmente gratuitos.
+      </p>
+      <ul style="line-height:1.6; padding-left:18px;">
+        <li>✅ Martes: asesorías jurídicas para las JAC</li>
+        <li>✅ Miércoles: asesorías en salud y trámites EPS</li>
+        <li>✅ Jueves: asesorías contables📈 y curso de guitarra 🎸</li>
+        <li>✅ Viernes: asesorías jurídicas y realización de derechos de petición y acciones de tutelas⚖. Y en la noche, aeróbicos para toda la familia 🏃‍♀</li>
+        <li>✅ Sábados: un espacio de escucha y amistad👥</li>
+        <li>✅ Red de apoyo con entrega gratuita de medicamentos 💊</li>
+      </ul>
+      <p style="margin-top:10px;">
+        Ven y visítanos <b>diagonal al Parque La Victoria📍</b>. Estamos para ti, trabajando de la mano con todos los flamencos. 🤝
+      </p>
+      <p class="muted" style="margin-top:8px;">
+        #SoyDeFlandes #CasaSocial #NoParamos #SiemprePresentes
+      </p>
+    </div>
   </div>
+
+  <!-- Lógica para forzar abrir Google Maps app con fallback web -->
+  <script>
+    (function(){
+      const btn = document.getElementById('btn-como-llegar');
+      if (!btn) return;
+
+      const LAT = 4.289037, LNG = -74.814221;
+
+      btn.addEventListener('click', () => {
+        const ua = navigator.userAgent || '';
+        const isAndroid = /android/i.test(ua);
+        const isIOS = /(iphone|ipad|ipod)/i.test(ua);
+
+        // Fallback web (funciona en todos)
+        const webUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + LAT + ',' + LNG + '&travelmode=driving';
+
+        if (isAndroid){
+          // Chrome/Android: intenta abrir la app de Google Maps
+          const intentUrl = 'intent://maps.google.com/maps?daddr=' + LAT + ',' + LNG + '&directionsmode=driving#Intent;scheme=https;package=com.google.android.apps.maps;end';
+          // Red de seguridad tras un breve delay (si el intent no abre app)
+          let fallbackTimer = setTimeout(()=> window.open(webUrl, '_blank'), 700);
+          try{
+            window.location.href = intentUrl;
+          }catch(_){
+            clearTimeout(fallbackTimer);
+            window.open(webUrl, '_blank');
+          }
+          return;
+        }
+
+        if (isIOS){
+          // iOS: esquema de Google Maps (abre la app si está instalada)
+          const appUrl = 'comgooglemaps://?daddr=' + LAT + ',' + LNG + '&directionsmode=driving';
+          let fallbackTimer = setTimeout(()=> window.open(webUrl, '_blank'), 700);
+          // Intento abrir la app
+          window.location.href = appUrl;
+          // Si no está instalada, el timer abrirá la versión web
+          return;
+        }
+
+        // Desktop u otros sistemas: versión web
+        window.open(webUrl, '_blank');
+      });
+    })();
+  </script>
+</section>
 
   <script>
     // URL de tu Apps Script desplegado

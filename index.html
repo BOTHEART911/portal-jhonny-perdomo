@@ -1298,11 +1298,12 @@ if (formData.referencia && !referenciaRegex.test(formData.referencia)) {
       window.open((esMovil ? "whatsapp://send?text=" : "https://api.whatsapp.com/send?text=") + enc, "_blank");
     });
 
-    // VIDEO (con miniatura)
-    // VIDEO (1 clic, Cloudinary MP4)
+   // VIDEO (con miniatura, Cloudinary MP4, 1 clic)
 const videoCard = document.getElementById('videoCard');
 const playLayer = document.getElementById('playLayer');
 const videoThumb = document.getElementById('videoThumb');
+
+let currentVideo = null; // referencia al <video> creado
 
 function playVideo(){
   // Evita crear el video más de una vez
@@ -1313,13 +1314,13 @@ function playVideo(){
   const video = document.createElement('video');
   video.src = src;
   video.autoplay = true;     // autoplay en el primer clic
-  video.muted = false;        // necesario para autoplay en móvil
-  video.playsInline = true;  // iOS: evita entrar a fullscreen automático
-  video.controls = true;     // muestra controles para poder activar audio, pausar, etc.
+  video.muted = false;       // reproducción con audio (puede requerir interacción en algunos navegadores)
+  video.playsInline = true;  // iOS: evita fullscreen automático
+  video.controls = true;     // controles visibles
   video.preload = 'auto';
   video.setAttribute('title', 'Video');
 
-  // Opcional: usa la miniatura actual como poster (mientras carga)
+  // Miniatura como poster mientras carga
   if (videoThumb && videoThumb.src) video.poster = videoThumb.src;
 
   // Ajuste visual al contenedor
@@ -1331,16 +1332,60 @@ function playVideo(){
   videoCard.appendChild(video);
   videoCard.classList.add('playing');
 
-  // Asegura el inicio de reproducción
+  currentVideo = video;
+
+  // Intentar reproducir y, si falla por políticas de autoplay con sonido,
+  // como fallback silencia y vuelve a intentar (manteniendo 1 clic)
   const p = video.play();
   if (p && typeof p.then === 'function') {
-    p.catch(() => { /* Silenciar errores de autoplay si ocurren */ });
+    p.catch(() => {
+      video.muted = true;
+      video.play().catch(()=>{ /* ignorar */ });
+    });
   }
+
+  // Limpieza al finalizar
+  video.addEventListener('ended', stopVideoPlayback);
+}
+
+// Detener y limpiar el video (se llama al cambiar de vista/menú, logout, etc.)
+function stopVideoPlayback(){
+  const v = currentVideo || videoCard.querySelector('video');
+  if (!v) {
+    videoCard.classList.remove('playing');
+    return;
+  }
+  try {
+    v.pause();
+    // liberar recursos de la descarga
+    v.removeAttribute('src');
+    v.load();
+  } catch(_){}
+  // quitar del DOM
+  v.remove();
+  currentVideo = null;
+  // restaurar estado visual (mostrar miniatura y capa play)
+  videoCard.classList.remove('playing');
 }
 
 // Un solo clic en imagen o capa de play
-playLayer.addEventListener('click', playVideo);
-videoThumb.addEventListener('click', playVideo);
+if (playLayer) playLayer.addEventListener('click', playVideo);
+if (videoThumb) videoThumb.addEventListener('click', playVideo);
+
+// Detener si la pestaña pierde foco (opcional pero recomendado)
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) stopVideoPlayback();
+});
+
+// Detener al navegar desde el menú a cualquier otra vista
+['go-asistencia','go-actualizacion','go-consultar','go-solicitud','go-ideas','go-sede','btn-logout']
+  .forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      // capture:true asegura que pare antes de que se cambie la vista
+      el.addEventListener('click', () => stopVideoPlayback(), { capture: true });
+    }
+  });
     
     // ASISTENCIA
     async function prepararAsistencia(){

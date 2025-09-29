@@ -854,39 +854,6 @@
     </div>
   </div>
 
-  <!-- VISTA 10: REDES SOCIALES -->
-<section id="view-redes" class="view">
-  <div class="card narrow">
-    <h2 style="color:var(--primary)">Síguenos</h2>
-    <p class="helper">Conoce todo el trabajo que venimos desarrollando todos los días #SoyDeFlandes #CasaSocial #NoParamos #SiemprePresentes</p>
-
-    <div class="social-grid">
-      <a class="social-btn" href="https://www.facebook.com/share/1CD6ubtcRA/" target="_blank" rel="noopener">
-        Facebook
-        <img src="https://res.cloudinary.com/dqqeavica/image/upload/v1759166342/facebook_nezbkz.webp" alt="Facebook">
-      </a>
-      <a class="social-btn" href="https://www.instagram.com/jhonnyperdomor?igsh=MTN5eHZucTd5OGNtbw==" target="_blank" rel="noopener">
-        Instagram
-        <img src="https://res.cloudinary.com/dqqeavica/image/upload/v1759166342/instragram_uft2wl.webp" alt="Instagram">
-      </a>
-      <a class="social-btn" href="https://vt.tiktok.com/ZSD7FBBNG/" target="_blank" rel="noopener">
-        TikTok
-        <img src="https://res.cloudinary.com/dqqeavica/image/upload/v1759166342/tiktok_tdvc2x.webp" alt="TikTok">
-      </a>
-      <a class="social-btn" href="https://whatsapp.com/channel/0029VbBEYJ83LdQbOODLO10S" target="_blank" rel="noopener">
-        WhatsApp Canal
-        <img src="https://res.cloudinary.com/dqqeavica/image/upload/v1759166341/WhatsApp_mljaqm.webp" alt="WhatsApp">
-      </a>
-    </div>
-
-    <div class="btn-row spaced">
-      <button id="redes-volver">Atrás</button>
-    </div>
-  </div>
-</section>
-
-  
-
   <!-- Forzar abrir Google Maps app con fallback a web -->
   <script>
     (function(){
@@ -929,6 +896,37 @@
       });
     })();
   </script>
+</section>
+
+     <!-- VISTA 10: REDES SOCIALES -->
+<section id="view-redes" class="view">
+  <div class="card narrow">
+    <h2 style="color:var(--primary)">Síguenos</h2>
+    <p class="helper">Conoce todo el trabajo que venimos desarrollando todos los días #SoyDeFlandes #CasaSocial #NoParamos #SiemprePresentes</p>
+
+    <div class="social-grid">
+      <a class="social-btn" href="https://www.facebook.com/share/1CD6ubtcRA/" target="_blank" rel="noopener">
+        Facebook
+        <img src="https://res.cloudinary.com/dqqeavica/image/upload/v1759166342/facebook_nezbkz.webp" alt="Facebook">
+      </a>
+      <a class="social-btn" href="https://www.instagram.com/jhonnyperdomor?igsh=MTN5eHZucTd5OGNtbw==" target="_blank" rel="noopener">
+        Instagram
+        <img src="https://res.cloudinary.com/dqqeavica/image/upload/v1759166342/instragram_uft2wl.webp" alt="Instagram">
+      </a>
+      <a class="social-btn" href="https://vt.tiktok.com/ZSD7FBBNG/" target="_blank" rel="noopener">
+        TikTok
+        <img src="https://res.cloudinary.com/dqqeavica/image/upload/v1759166342/tiktok_tdvc2x.webp" alt="TikTok">
+      </a>
+      <a class="social-btn" href="https://whatsapp.com/channel/0029VbBEYJ83LdQbOODLO10S" target="_blank" rel="noopener">
+        WhatsApp Canal
+        <img src="https://res.cloudinary.com/dqqeavica/image/upload/v1759166341/WhatsApp_mljaqm.webp" alt="WhatsApp">
+      </a>
+    </div>
+
+    <div class="btn-row spaced">
+      <button id="redes-volver">Atrás</button>
+    </div>
+  </div>
 </section>
 
   <script>
@@ -1848,16 +1846,16 @@ document.addEventListener('visibilitychange', () => {
     document.getElementById('i-volver').addEventListener('click', ()=> showView('view-menu'));
 
     // Sonido para botones Atrás/Regresar
-    ['btn-ovl-back','a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver','btn-reg-atras','sede-volver', 'redes-volver'].forEach(id=>{
-      const el = document.getElementById(id);
-      if(el) el.addEventListener('click', ()=> playSoundOnce(SOUNDS.back));
-    });
+    ['btn-ovl-back','a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver','btn-reg-atras','sede-volver','redes-volver'].forEach(id=>{
+  const el = document.getElementById(id);
+  if(el) el.addEventListener('click', ()=> playSoundOnce(SOUNDS.back));
+});
 
     // Volver genéricos
-    ['a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver','sede-volver'].forEach(id=>{
-      const el = document.getElementById(id);
-      if(el) el.addEventListener('click', ()=> showView('view-menu'));
-    });
+    ['a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver','sede-volver','redes-volver'].forEach(id=>{
+  const el = document.getElementById(id);
+  if(el) el.addEventListener('click', ()=> showView('view-menu'));
+});
   </script>
 </body>
 </html>

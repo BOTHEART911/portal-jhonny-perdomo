@@ -1299,28 +1299,49 @@ if (formData.referencia && !referenciaRegex.test(formData.referencia)) {
     });
 
     // VIDEO (con miniatura)
-    const videoCard = document.getElementById('videoCard');
+    // VIDEO (1 clic, Cloudinary MP4)
+const videoCard = document.getElementById('videoCard');
 const playLayer = document.getElementById('playLayer');
 const videoThumb = document.getElementById('videoThumb');
 
 function playVideo(){
-  if(videoCard.querySelector('iframe')) return;
-  const id = '1SqcK8srE8CKbyHX66AnQmXHDjZPLeVhk'; // ID del video de Google Drive
-  // Autoplay en 1 clic: agregar autoplay=1 y muted=1
-  const src = `https://drive.google.com/file/d/${id}/preview?autoplay=1&muted=1&hl=es`;
-  const iframe = document.createElement('iframe');
-  iframe.src = src;
-  iframe.allow = "autoplay; encrypted-media";
-  iframe.allowFullscreen = true;
-  iframe.frameBorder = "0";
-  iframe.setAttribute('title', 'Video');
-  videoCard.appendChild(iframe);
+  // Evita crear el video más de una vez
+  if (videoCard.querySelector('video')) return;
+
+  const src = 'https://res.cloudinary.com/dqqeavica/video/upload/v1746906083/Firma_bmcatv.mp4';
+
+  const video = document.createElement('video');
+  video.src = src;
+  video.autoplay = true;     // autoplay en el primer clic
+  video.muted = true;        // necesario para autoplay en móvil
+  video.playsInline = true;  // iOS: evita entrar a fullscreen automático
+  video.controls = true;     // muestra controles para poder activar audio, pausar, etc.
+  video.preload = 'auto';
+  video.setAttribute('title', 'Video');
+
+  // Opcional: usa la miniatura actual como poster (mientras carga)
+  if (videoThumb && videoThumb.src) video.poster = videoThumb.src;
+
+  // Ajuste visual al contenedor
+  video.style.width = '100%';
+  video.style.height = '100%';
+  video.style.display = 'block';
+  video.style.objectFit = 'cover';
+
+  videoCard.appendChild(video);
   videoCard.classList.add('playing');
+
+  // Asegura el inicio de reproducción
+  const p = video.play();
+  if (p && typeof p.then === 'function') {
+    p.catch(() => { /* Silenciar errores de autoplay si ocurren */ });
+  }
 }
 
 // Un solo clic en imagen o capa de play
 playLayer.addEventListener('click', playVideo);
 videoThumb.addEventListener('click', playVideo);
+```
     
     // ASISTENCIA
     async function prepararAsistencia(){

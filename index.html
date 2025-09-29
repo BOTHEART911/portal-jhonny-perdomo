@@ -786,20 +786,21 @@
   <div class="card narrow">
     <h2 style="color:var(--primary)">Casa Social Soy de Flandes</h2>
 
-    <!-- Mapa responsivo dentro del card -->
-    <div class="map-embed">
+    <!-- Mapa responsivo e interactivo en móvil -->
+    <div class="map-embed" style="overscroll-behavior: contain;">
       <iframe
-        src="https://www.google.com/maps?q=4.289037,-74.814221&z=16&output=embed"
+        src="https://www.google.com/maps?q=4.289037,-74.814221&z=16&hl=es&output=embed&gestureHandling=greedy"
         loading="lazy"
         referrerpolicy="no-referrer-when-downgrade"
         allowfullscreen
         title="Ubicación Casa Social Soy de Flandes"
+        style="width:100%; height:100%; border:0; touch-action: pan-x pan-y; -ms-touch-action: pan-x pan-y;"
       ></iframe>
     </div>
 
     <!-- Botones -->
     <div class="btn-row spaced">
-      <button class="btn-primary" id="btn-como-llegar">Cómo llegar</button>
+      <button class="btn-primary" id="btn-como-llegar">Iniciar Recorrido</button>
       <button id="sede-volver">Atrás</button>
     </div>
 
@@ -808,12 +809,12 @@
         Aquí te escuchamos, te acompañamos y ponemos a tu alcance cursos y servicios totalmente gratuitos.
       </p>
       <ul style="line-height:1.6; padding-left:18px;">
-        <li>✅ Martes: asesorías jurídicas para las JAC</li>
-        <li>✅ Miércoles: asesorías en salud y trámites EPS</li>
-        <li>✅ Jueves: asesorías contables📈 y curso de guitarra 🎸</li>
-        <li>✅ Viernes: asesorías jurídicas y realización de derechos de petición y acciones de tutelas⚖. Y en la noche, aeróbicos para toda la familia 🏃‍♀</li>
-        <li>✅ Sábados: un espacio de escucha y amistad👥</li>
-        <li>✅ Red de apoyo con entrega gratuita de medicamentos 💊</li>
+        <li>*Martes:* asesorías jurídicas para las JAC</li>
+        <li>*Miércoles:* asesorías en salud y trámites EPS</li>
+        <li>*Jueves:* asesorías contables📈 y curso de guitarra 🎸</li>
+        <li>*Viernes:* asesorías jurídicas y realización de derechos de petición y acciones de tutelas⚖. Y en la noche, aeróbicos para toda la familia 🏃‍♀</li>
+        <li>*Sábados:* un espacio de escucha y amistad👥</li>
+        <li>*Red de apoyo con entrega gratuita de medicamentos 💊*</li>
       </ul>
       <p style="margin-top:10px;">
         Ven y visítanos <b>diagonal al Parque La Victoria📍</b>. Estamos para ti, trabajando de la mano con todos los flamencos. 🤝
@@ -824,7 +825,7 @@
     </div>
   </div>
 
-  <!-- Lógica para forzar abrir Google Maps app con fallback web -->
+  <!-- Forzar abrir Google Maps app con fallback a web -->
   <script>
     (function(){
       const btn = document.getElementById('btn-como-llegar');
@@ -837,13 +838,12 @@
         const isAndroid = /android/i.test(ua);
         const isIOS = /(iphone|ipad|ipod)/i.test(ua);
 
-        // Fallback web (funciona en todos)
+        // Fallback web universal (indicando destino y modo)
         const webUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + LAT + ',' + LNG + '&travelmode=driving';
 
         if (isAndroid){
-          // Chrome/Android: intenta abrir la app de Google Maps
+          // Intent para abrir app de Google Maps
           const intentUrl = 'intent://maps.google.com/maps?daddr=' + LAT + ',' + LNG + '&directionsmode=driving#Intent;scheme=https;package=com.google.android.apps.maps;end';
-          // Red de seguridad tras un breve delay (si el intent no abre app)
           let fallbackTimer = setTimeout(()=> window.open(webUrl, '_blank'), 700);
           try{
             window.location.href = intentUrl;
@@ -855,16 +855,14 @@
         }
 
         if (isIOS){
-          // iOS: esquema de Google Maps (abre la app si está instalada)
+          // Esquema de Google Maps (si la app está instalada)
           const appUrl = 'comgooglemaps://?daddr=' + LAT + ',' + LNG + '&directionsmode=driving';
           let fallbackTimer = setTimeout(()=> window.open(webUrl, '_blank'), 700);
-          // Intento abrir la app
           window.location.href = appUrl;
-          // Si no está instalada, el timer abrirá la versión web
           return;
         }
 
-        // Desktop u otros sistemas: versión web
+        // Desktop u otros
         window.open(webUrl, '_blank');
       });
     })();

@@ -964,6 +964,46 @@ if ('serviceWorker' in navigator){
     navigator.serviceWorker.register('./sw.js').catch(()=>{});
   });
 }
+
+// Abrir el botón de instalación si la URL viene con #instalar
+(function(){
+  function openInstallCTAFromHash(){
+    if (location.hash !== '#instalar') return;
+    try{
+      overlay.classList.add('open');
+      setTimeout(()=>{
+        const btn = document.getElementById('btn-instalar');
+        if (btn && btn.style.display !== 'none'){
+          btn.scrollIntoView({behavior:'smooth', block:'center'});
+          // iOS muestra instrucciones; Android/PC muestra botón para prompt
+          const ua = navigator.userAgent || '';
+          const isIOS = /(iphone|ipad|ipod)/i.test(ua);
+          if (isIOS){
+            Swal.fire({
+              icon:'info',
+              title:'Instalar en iPhone/iPad',
+              html:'1) Toca Compartir (cuadro con flecha).<br>2) Elige "Agregar a pantalla de inicio".<br>3) Confirma "Agregar".'
+            });
+          }else{
+            Swal.fire({
+              icon:'info',
+              title:'Instala la App',
+              text:'Toca “Instalar la App 📲” para crear el acceso directo.'
+            });
+          }
+        }else{
+          Swal.fire({
+            icon:'info',
+            title:'Instalación no disponible',
+            text:'Abre este sitio en Chrome/Edge (Android o PC). En iPhone usa “Agregar a pantalla de inicio”.'
+          });
+        }
+      }, 150);
+    }catch(_){}
+  }
+  window.addEventListener('load', openInstallCTAFromHash);
+})();
+
   </script>
 </section>
 
@@ -1412,7 +1452,7 @@ document.getElementById('go-redes').addEventListener('click', ()=>{
       try{
         const r = await apiGet('validarLider', { documento: currentUser.documento });
         if(r && r.codigo && r.nombre){
-          const msg = "Hola 👋🏻\n\nQuiero pedirte que apoyes a nuestro gran amigo *Jhonny Perdomo*, ingresa a su *Portal* a través de este link azul 💙 https://tinyurl.com/jhonny-perdomo 💙\nRegistra tus datos y en el campo de *N° de Referido por favor escribe el N°👉🏻 " + r.codigo + " 👈🏻* 'solo el número'.\n\nEn este mismo Portal, podrás encontrar muchas opciones para ayudar a tu comunidad, ¡Bendiciones!\n\nCordialmente,\n\n*" + r.nombre + "*\n> Equipo del Hacer";
+         const msg = "Hola 👋🏻\n\nQuiero pedirte que apoyes a nuestro gran amigo *Jhonny Perdomo*.\n\nInstala la App y regístrate aquí 👉 " + "https://botheart911.github.io/portal-jhonny-perdomo/#instalar" + " 👈\n\nEn el campo *N° de Referido* por favor escribe el N° 👉 " + r.codigo + " 👈 (solo el número).\n\nEn esta App encontrarás muchas opciones para ayudar a tu comunidad. ¡Bendiciones!\n\nCordialmente,\n\n*" + r.nombre + "*\n> Equipo del Hacer";
           const textoEscapado = encodeURIComponent(msg);
           const esMovil = /android|iphone|ipad|mobile/i.test(navigator.userAgent);
           if(navigator.clipboard){ navigator.clipboard.writeText(msg).catch(()=>{}); }
@@ -1427,12 +1467,13 @@ document.getElementById('go-redes').addEventListener('click', ()=>{
 
     // COMPARTIR PORTAL
     document.getElementById('btn-compartir').addEventListener('click', ()=>{
-      const txt = "Ingresa al *Portal de Jhonny Perdomo*, haz clic en el enlace 👉🏻 https://tinyurl.com/jhonny-perdomo";
-      if(navigator.clipboard){ navigator.clipboard.writeText(txt).catch(()=>{}); }
-      const enc = encodeURIComponent(txt);
-      const esMovil = /android|iphone|ipad|mobile/i.test(navigator.userAgent);
-      window.open((esMovil ? "whatsapp://send?text=" : "https://api.whatsapp.com/send?text=") + enc, "_blank");
-    });
+  const url = "https://botheart911.github.io/portal-jhonny-perdomo/#instalar";
+  const txt = "Instala la *App de Jhonny Perdomo* 📲 y regístrate con un clic:\n" + url;
+  if(navigator.clipboard){ navigator.clipboard.writeText(txt).catch(()=>{}); }
+  const enc = encodeURIComponent(txt);
+  const esMovil = /android|iphone|ipad|mobile/i.test(navigator.userAgent);
+  window.open((esMovil ? "whatsapp://send?text=" : "https://api.whatsapp.com/send?text=") + enc, "_blank");
+});
 
    // VIDEO (con miniatura, Cloudinary MP4, 1 clic)
 const videoCard = document.getElementById('videoCard');

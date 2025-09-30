@@ -912,8 +912,8 @@
       });
     })();
 
-   /* PWA: botón instalar (Android/PC con prompt; iOS muestra instrucciones).
-   Soporta botón en menú (#btn-instalar) y en vista dedicada (#btn-instalar-standalone). */
+   /* PWA: instalar + detección de instalada (Android/PC prompt; iOS instrucciones).
+   Botones soportados: #btn-instalar (menú) y #btn-instalar-standalone (vista instalar). */
 let deferredPrompt = null;
 const installButtons = Array.from(document.querySelectorAll('#btn-instalar, #btn-instalar-standalone'));
 
@@ -923,14 +923,17 @@ function isStandalone(){
 function isIOS(){
   return /(iphone|ipad|ipod)/i.test(navigator.userAgent || '');
 }
+function isMarkedInstalled(){
+  try{ return localStorage.getItem('appInstalled') === '1'; }catch(_){ return false; }
+}
+function markInstalled(){
+  try{ localStorage.setItem('appInstalled', '1'); }catch(_){}
+}
+
 function updateInstallButtonsVisibility(){
-  const showBecauseIOS = isIOS();           // iOS no dispara beforeinstallprompt, pero sí queremos mostrar instrucciones
-  const showBecausePrompt = !!deferredPrompt; // Android/PC: mostrar solo cuando haya evento listo
-  const shouldShow = !isStandalone() && (showBecauseIOS || showBecausePrompt);
-  installButtons.forEach(btn => {
-    if (!btn) return;
-    btn.style.display = shouldShow ? '' : 'none';
-  });
+  const installedFlag = isMarkedInstalled();
+  const shouldShow = !isStandalone() && !installedFlag && (isIOS() || !!deferredPrompt);
+  installButtons.forEach(btn => { if (btn) btn.style.display = shouldShow ? '' : 'none'; });
 }
 
 // Guardar el evento para lanzar prompt en Android/PC
@@ -940,12 +943,18 @@ window.addEventListener('beforeinstallprompt', (e)=>{
   updateInstallButtonsVisibility();
 });
 
+// Guardar bandera cuando se complete instalación
+window.addEventListener('appinstalled', ()=>{
+  markInstalled();
+  updateInstallButtonsVisibility();
+});
+
 // Click en cualquier botón de instalar
 installButtons.forEach(btn=>{
   if (!btn) return;
   btn.addEventListener('click', async ()=>{
     if (isIOS()){
-      // iOS: instrucciones (sin el alert de “no disponible”)
+      // iOS: no hay prompt, solo instrucciones
       return Swal.fire({
         icon:'info',
         title:'Instalar en iPhone/iPad',
@@ -953,21 +962,21 @@ installButtons.forEach(btn=>{
       });
     }
     if (!deferredPrompt){
-      // Si el navegador aún no habilita instalación, no mostramos el alert.
-      // Simplemente no hacemos nada para evitar mensajes que “no tienen sentido”.
+      // Aún no habilitado; no mostramos alertas para no confundir.
       return;
     }
     deferredPrompt.prompt();
     const choice = await deferredPrompt.userChoice;
     deferredPrompt = null;
-    updateInstallButtonsVisibility();
     if (choice.outcome === 'accepted'){
+      markInstalled();
       Swal.fire({ icon:'success', title:'¡App instalada!', timer:1500, showConfirmButton:false });
     }
+    updateInstallButtonsVisibility();
   });
 });
 
-// Registrar Service Worker
+// Registrar Service Worker (requerido para instalabilidad)
 if ('serviceWorker' in navigator){
   window.addEventListener('load', ()=>{
     navigator.serviceWorker.register('./sw.js').catch(()=>{});
@@ -977,16 +986,52 @@ if ('serviceWorker' in navigator){
 // Estado inicial
 updateInstallButtonsVisibility();
     
-// Si la URL trae #instalar, mostrar la vista de instalación (sin modales)
+// #instalar: vista de instalación o abrir app si ya está instalada
 (function(){
-  function goInstallIfHash(){
-    if (location.hash === '#instalar'){
-      overlay.classList.remove('open'); // por si estaba abierto
-      showView('view-instalar');
+  function openOrInstall(){
+    if (location.hash !== '#instalar') return;
+
+    // Si ya estamos dentro de la app (standalone), vamos al menú
+    if (typeof isStandalone === 'function' && isStandalone()){
+      overlay.classList.remove('open');
+      showView('view-menu');
+      return;
     }
+
+    const installedFlag = (typeof isMarkedInstalled === 'function') ? isMarkedInstalled() : false;
+    const iOS = (typeof isIOS === 'function') ? isIOS() : false;
+
+    if (installedFlag){
+      if (iOS){
+        // iOS no permite abrir la app instalada desde Safari: instrucción clara
+        Swal.fire({
+          icon:'info',
+          title:'Ya tienes la App instalada',
+          html:'Ábrela desde el ícono en tu pantalla de inicio.',
+          confirmButtonText:'OK'
+        });
+        return;
+      }
+      // Android/PC: intentar abrir la app instalada mediante link capturing
+      Swal.fire({
+        icon:'success',
+        title:'Ya tienes la App instalada',
+        confirmButtonText:'Abrir la App'
+      }).then(()=>{
+        // Navegación a la raíz del sitio (sin #instalar) para que el navegador entregue la URL a la PWA instalada
+        const target = location.origin + location.pathname; // e.g., https://.../portal-jhonny-perdomo/
+        window.location.href = target;
+      });
+      return;
+    }
+
+    // No instalada: mostrar la vista limpia de instalación
+    overlay.classList.remove('open');
+    showView('view-instalar');
   }
-  window.addEventListener('load', goInstallIfHash);
-  window.addEventListener('hashchange', goInstallIfHash);
+
+  window.addEventListener('load', openOrInstall);
+  window.addEventListener('hashchange', openOrInstall);
 })();
 
   </script>

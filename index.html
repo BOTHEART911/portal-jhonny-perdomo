@@ -1040,48 +1040,7 @@ updateInstallButtonsVisibility();
   window.addEventListener('hashchange', openOrInstall);
 })();
 
-    // OneSignal: init + autoprompt (sin botón)
-window.OneSignal = window.OneSignal || [];
-OneSignal.push(function(){
-  OneSignal.init({
-    appId: "dfb84a48-c9c8-402b-8db3-e3ed591aba80",
-    serviceWorkerPath: "sw.js",
-    serviceWorkerParam: { scope: "./" },
-    notifyButton: { enable: false } // no usamos botón flotante
-  });
-});
-
-// Mostrar el slidedown automáticamente una sola vez (si aún no decidió)
-(function(){
-  const PROMPT_FLAG = 'onesignal_prompted_v1';
-
-  function isIOS(){ return /(iphone|ipad|ipod)/i.test(navigator.userAgent || ''); }
-  function isStandalone(){
-    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-  }
-
-  OneSignal.push(async ()=>{
-    try{
-      // En iOS solo funcionan push en PWA instalada. Si no está instalada, no intentes pedir permiso.
-      if (isIOS() && !isStandalone()){
-        // Opcional: muestra una nota para instalar la app primero.
-        return;
-      }
-
-      const status = await OneSignal.Notifications.getPermissionStatus(); // 'default' | 'granted' | 'denied'
-      const prompted = localStorage.getItem(PROMPT_FLAG) === '1';
-
-      if (status === 'default' && !prompted){
-        localStorage.setItem(PROMPT_FLAG, '1');
-        // Muestra el cuadro de OneSignal; el usuario hace un clic y se dispara el prompt nativo
-        OneSignal.Slidedown.promptPush();
-      }
-      // Si ya está 'granted' no hacemos nada. Si está 'denied', solo se puede cambiar desde ajustes del navegador.
-    }catch(_){}
-  });
-})();
-
-    // OneSignal: init (si ya lo inicializaste, no dupliques este bloque)
+   // OneSignal: init (único)
 window.OneSignal = window.OneSignal || [];
 OneSignal.push(function(){
   OneSignal.init({
@@ -1092,7 +1051,7 @@ OneSignal.push(function(){
   });
 });
 
-// Botón para habilitar notificaciones
+// Botón para habilitar notificaciones (solo bajo demanda)
 (function(){
   const btn = document.getElementById('btn-notificaciones');
   if(!btn) return;
@@ -1145,6 +1104,11 @@ OneSignal.push(function(){
     });
   });
 
+  // Actualiza el texto cuando cargas o abres el menú
+  window.addEventListener('load', refreshLabel);
+  const openMenu = document.getElementById('btn-open-menu');
+  if (openMenu) openMenu.addEventListener('click', refreshLabel);
+})();
   // Actualiza el texto cuando cargas o abres el menú
   window.addEventListener('load', refreshLabel);
   const openMenu = document.getElementById('btn-open-menu');

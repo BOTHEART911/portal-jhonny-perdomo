@@ -1343,7 +1343,7 @@ document.getElementById('go-redes').addEventListener('click', ()=>{
       try{
         const r = await apiGet('validarLider', { documento: currentUser.documento });
         if(r && r.codigo && r.nombre){
-          const msg = "Hola 👋🏻\n\nQuiero pedirte que apoyes a nuestro gran amigo *Jhonny Perdomo*, ingresa a su *Portal* a través de este link azul 💙 https://tinyurl.com/jhonnyperdomo 💙\nRegistra tus datos y en el campo de *N° de Referido por favor escribe el N°👉🏻 " + r.codigo + " 👈🏻* 'solo el número'.\n\nEn este mismo Portal, podrás encontrar muchas opciones para ayudar a tu comunidad, ¡Bendiciones!\n\nCordialmente,\n\n*" + r.nombre + "*\n> Equipo del Hacer";
+          const msg = "Hola 👋🏻\n\nQuiero pedirte que apoyes a nuestro gran amigo *Jhonny Perdomo*, ingresa a su *Portal* a través de este link azul 💙 https://tinyurl.com/jhonny-perdomo 💙\nRegistra tus datos y en el campo de *N° de Referido por favor escribe el N°👉🏻 " + r.codigo + " 👈🏻* 'solo el número'.\n\nEn este mismo Portal, podrás encontrar muchas opciones para ayudar a tu comunidad, ¡Bendiciones!\n\nCordialmente,\n\n*" + r.nombre + "*\n> Equipo del Hacer";
           const textoEscapado = encodeURIComponent(msg);
           const esMovil = /android|iphone|ipad|mobile/i.test(navigator.userAgent);
           if(navigator.clipboard){ navigator.clipboard.writeText(msg).catch(()=>{}); }
@@ -1358,7 +1358,7 @@ document.getElementById('go-redes').addEventListener('click', ()=>{
 
     // COMPARTIR PORTAL
     document.getElementById('btn-compartir').addEventListener('click', ()=>{
-      const txt = "Ingresa al *Portal de Jhonny Perdomo*, haz clic en el enlace 👉🏻 https://tinyurl.com/jhonnyperdomo";
+      const txt = "Ingresa al *Portal de Jhonny Perdomo*, haz clic en el enlace 👉🏻 https://tinyurl.com/jhonny-perdomo";
       if(navigator.clipboard){ navigator.clipboard.writeText(txt).catch(()=>{}); }
       const enc = encodeURIComponent(txt);
       const esMovil = /android|iphone|ipad|mobile/i.test(navigator.userAgent);
@@ -1548,16 +1548,12 @@ document.addEventListener('visibilitychange', () => {
       try{
         const r = await apiPost('guardarVotacionEnServidor', body);
         if(r && r.success){
-          await Swal.fire({ icon:'success', title:'Información guardada', timer:1800, showConfirmButton:false });
-          showView('view-menu');
-        }else{
-          Swal.fire({ icon:'error', title:'Error al guardar', text:r?.message || 'Error desconocido' });
-        }
-      }catch(e){
-        Swal.fire({ icon:'error', title:'Error al guardar', text:e.message });
-      }
-    });
-    document.getElementById('v-volver').addEventListener('click', ()=> showView('view-menu'));
+  await Swal.fire({ icon:'success', title:'Información guardada', timer:1800, showConfirmButton:false });
+  await refreshUserFromServer(); // actualiza municipio/puesto/mesa en el menú
+  showView('view-menu');
+}else{
+  Swal.fire({ icon:'error', title:'Error al guardar', text:r?.message || 'Error desconocido' });
+}
 
     // ACTUALIZACIÓN (con Resumen)
     async function prepararActualizacion(){
@@ -1661,6 +1657,8 @@ document.addEventListener('visibilitychange', () => {
             confirmButtonText:'Consultar'
           });
           if(rs.isConfirmed){
+            // CAMBIO: Copiar documento al portapapeles antes de abrir Votación
+            try { await navigator.clipboard.writeText(documento); } catch(_) {}
             showView('view-votacion');
           }
           // si es Deny, solo cerrar

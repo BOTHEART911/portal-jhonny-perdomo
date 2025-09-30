@@ -7,8 +7,10 @@
   <link rel="icon" href="https://res.cloudinary.com/dqqeavica/image/upload/v1753538807/JHONNY_PERDOMO_dn3dah.png">
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+  <link rel="manifest" href="manifest.webmanifest">
   <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
   <style>
 :root{
       --primary:#007BFF;
@@ -240,6 +242,7 @@
 }
     
 </style>
+  
 </head>
 <body>
  <!-- Loader centrado (efecto iOS, sin imagen) -->
@@ -488,9 +491,10 @@
         <button class="menu-btn" id="go-ideas">Suma tus Ideas 💡</button>
         <button class="menu-btn" id="go-actualizacion">Actualiza tus Datos Personales 🔁</button>
         <button class="menu-btn" id="go-consultar">Consulta tu Puesto de Votación 🗳</button>
-        <button class="menu-btn" id="go-lider">Si eres Líder, Refriere con un solo Clic 📲</button>
+        <button class="menu-btn" id="go-lider">Si eres Líder, Refriere con un solo Clic 📤</button>
         <button class="menu-btn" id="go-sede">Visita Nuestra Casa Social 📍</button>
         <button class="menu-btn" id="go-redes">Conoce Nuestras Redes Sociales 🌐</button>
+        <button class="menu-btn" id="btn-instalar" style="display:none;">Instalar la App 📲</button>
         <div style="height:24px"></div>
         <img class="brand" alt="Brand" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png" />
         <p class="center muted">Copyright © <a href="#" target="https://wa.me/573103230712"><b>Oscar Polanía</b></a></p>
@@ -895,6 +899,71 @@
         window.open(webUrl, '_blank');
       });
     })();
+
+    /* PWA: botón instalar (Android/PC con prompt; iOS muestra instrucciones) */
+let deferredPrompt = null;
+const installBtn = document.getElementById('btn-instalar');
+
+function isStandalone(){
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+
+if (installBtn){
+  const ua = navigator.userAgent || '';
+  const isIOS = /(iphone|ipad|ipod)/i.test(ua);
+
+  // Mostrar/ocultar botón según plataforma/estado
+  if (isStandalone()){
+    installBtn.style.display = 'none';
+  } else if (isIOS){
+    // En iOS no hay beforeinstallprompt, muestra botón para instrucciones
+    installBtn.style.display = '';
+  }
+
+  // Android/PC: guardar el evento para lanzar el prompt nativo
+  window.addEventListener('beforeinstallprompt', (e)=>{
+    e.preventDefault();
+    deferredPrompt = e;
+    if (!isStandalone()) installBtn.style.display = '';
+  });
+
+  installBtn.addEventListener('click', async ()=>{
+    if (isIOS){
+      // iOS: mostrar instrucciones manuales
+      return Swal.fire({
+        icon:'info',
+        title:'Instalar en iPhone/iPad',
+        html:'1) Toca Compartir (cuadro con flecha).<br>2) Elige "Agregar a pantalla de inicio".<br>3) Confirma "Agregar".'
+      });
+    }
+
+    if (!deferredPrompt){
+      return Swal.fire({
+        icon:'info',
+        title:'Instalación no disponible',
+        text:'Usa el menú del navegador y elige “Instalar app” o “Crear acceso directo”.'
+      });
+    }
+
+    deferredPrompt.prompt();
+    const choice = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+
+    if (choice.outcome === 'accepted'){
+      Swal.fire({ icon:'success', title:'¡App instalada!', timer:1600, showConfirmButton:false });
+      installBtn.style.display = 'none';
+    }else{
+      Swal.fire({ icon:'info', title:'Instalación cancelada', timer:1200, showConfirmButton:false });
+    }
+  });
+}
+
+// Registrar Service Worker (requerido para instalabilidad en Android/PC)
+if ('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  });
+}
   </script>
 </section>
 

@@ -986,52 +986,16 @@ if ('serviceWorker' in navigator){
 // Estado inicial
 updateInstallButtonsVisibility();
     
-// #instalar: vista de instalación o abrir app si ya está instalada
+// Si la URL trae #instalar, mostrar la vista de instalación (sin modales)
 (function(){
-  function openOrInstall(){
-    if (location.hash !== '#instalar') return;
-
-    // Si ya estamos dentro de la app (standalone), vamos al menú
-    if (typeof isStandalone === 'function' && isStandalone()){
-      overlay.classList.remove('open');
-      showView('view-menu');
-      return;
+  function goInstallIfHash(){
+    if (location.hash === '#instalar'){
+      overlay.classList.remove('open'); // por si estaba abierto
+      showView('view-instalar');
     }
-
-    const installedFlag = (typeof isMarkedInstalled === 'function') ? isMarkedInstalled() : false;
-    const iOS = (typeof isIOS === 'function') ? isIOS() : false;
-
-    if (installedFlag){
-      if (iOS){
-        // iOS no permite abrir la app instalada desde Safari: instrucción clara
-        Swal.fire({
-          icon:'info',
-          title:'Ya tienes la App instalada',
-          html:'Ábrela desde el ícono en tu pantalla de inicio.',
-          confirmButtonText:'OK'
-        });
-        return;
-      }
-      // Android/PC: intentar abrir la app instalada mediante link capturing
-      Swal.fire({
-        icon:'success',
-        title:'Ya tienes la App instalada',
-        confirmButtonText:'Abrir la App'
-      }).then(()=>{
-        // Navegación a la raíz del sitio (sin #instalar) para que el navegador entregue la URL a la PWA instalada
-        const target = location.origin + location.pathname; // e.g., https://.../portal-jhonny-perdomo/
-        window.location.href = target;
-      });
-      return;
-    }
-
-    // No instalada: mostrar la vista limpia de instalación
-    overlay.classList.remove('open');
-    showView('view-instalar');
   }
-
-  window.addEventListener('load', openOrInstall);
-  window.addEventListener('hashchange', openOrInstall);
+  window.addEventListener('load', goInstallIfHash);
+  window.addEventListener('hashchange', goInstallIfHash);
 })();
 
   </script>

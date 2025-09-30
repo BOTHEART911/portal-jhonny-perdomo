@@ -912,108 +912,81 @@
       });
     })();
 
-    /* PWA: botón instalar (Android/PC con prompt; iOS muestra instrucciones) */
+   /* PWA: botón instalar (Android/PC con prompt; iOS muestra instrucciones).
+   Soporta botón en menú (#btn-instalar) y en vista dedicada (#btn-instalar-standalone). */
 let deferredPrompt = null;
-const installBtn = document.getElementById('btn-instalar');
+const installButtons = Array.from(document.querySelectorAll('#btn-instalar, #btn-instalar-standalone'));
 
 function isStandalone(){
   return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 }
-
-if (installBtn){
-  const ua = navigator.userAgent || '';
-  const isIOS = /(iphone|ipad|ipod)/i.test(ua);
-
-  // Mostrar/ocultar botón según plataforma/estado
-  if (isStandalone()){
-    installBtn.style.display = 'none';
-  } else if (isIOS){
-    // En iOS no hay beforeinstallprompt, muestra botón para instrucciones
-    installBtn.style.display = '';
-  }
-
-  // Android/PC: guardar el evento para lanzar el prompt nativo
-  window.addEventListener('beforeinstallprompt', (e)=>{
-    e.preventDefault();
-    deferredPrompt = e;
-    if (!isStandalone()) installBtn.style.display = '';
+function isIOS(){
+  return /(iphone|ipad|ipod)/i.test(navigator.userAgent || '');
+}
+function updateInstallButtonsVisibility(){
+  const showBecauseIOS = isIOS();           // iOS no dispara beforeinstallprompt, pero sí queremos mostrar instrucciones
+  const showBecausePrompt = !!deferredPrompt; // Android/PC: mostrar solo cuando haya evento listo
+  const shouldShow = !isStandalone() && (showBecauseIOS || showBecausePrompt);
+  installButtons.forEach(btn => {
+    if (!btn) return;
+    btn.style.display = shouldShow ? '' : 'none';
   });
+}
 
-  installBtn.addEventListener('click', async ()=>{
-    if (isIOS){
-      // iOS: mostrar instrucciones manuales
+// Guardar el evento para lanzar prompt en Android/PC
+window.addEventListener('beforeinstallprompt', (e)=>{
+  e.preventDefault();
+  deferredPrompt = e;
+  updateInstallButtonsVisibility();
+});
+
+// Click en cualquier botón de instalar
+installButtons.forEach(btn=>{
+  if (!btn) return;
+  btn.addEventListener('click', async ()=>{
+    if (isIOS()){
+      // iOS: instrucciones (sin el alert de “no disponible”)
       return Swal.fire({
         icon:'info',
         title:'Instalar en iPhone/iPad',
         html:'1) Toca Compartir (cuadro con flecha).<br>2) Elige "Agregar a pantalla de inicio".<br>3) Confirma "Agregar".'
       });
     }
-
     if (!deferredPrompt){
-      return Swal.fire({
-        icon:'info',
-        title:'Instalación no disponible',
-        text:'Usa el menú del navegador y elige “Instalar app” o “Crear acceso directo”.'
-      });
+      // Si el navegador aún no habilita instalación, no mostramos el alert.
+      // Simplemente no hacemos nada para evitar mensajes que “no tienen sentido”.
+      return;
     }
-
     deferredPrompt.prompt();
     const choice = await deferredPrompt.userChoice;
     deferredPrompt = null;
-
+    updateInstallButtonsVisibility();
     if (choice.outcome === 'accepted'){
-      Swal.fire({ icon:'success', title:'¡App instalada!', timer:1600, showConfirmButton:false });
-      installBtn.style.display = 'none';
-    }else{
-      Swal.fire({ icon:'info', title:'Instalación cancelada', timer:1200, showConfirmButton:false });
+      Swal.fire({ icon:'success', title:'¡App instalada!', timer:1500, showConfirmButton:false });
     }
   });
-}
+});
 
-// Registrar Service Worker (requerido para instalabilidad en Android/PC)
+// Registrar Service Worker
 if ('serviceWorker' in navigator){
   window.addEventListener('load', ()=>{
     navigator.serviceWorker.register('./sw.js').catch(()=>{});
   });
 }
 
-// Abrir el botón de instalación si la URL viene con #instalar
+// Estado inicial
+updateInstallButtonsVisibility();
+    
+// Si la URL trae #instalar, mostrar la vista de instalación (sin modales)
 (function(){
-  function openInstallCTAFromHash(){
-    if (location.hash !== '#instalar') return;
-    try{
-      overlay.classList.add('open');
-      setTimeout(()=>{
-        const btn = document.getElementById('btn-instalar');
-        if (btn && btn.style.display !== 'none'){
-          btn.scrollIntoView({behavior:'smooth', block:'center'});
-          // iOS muestra instrucciones; Android/PC muestra botón para prompt
-          const ua = navigator.userAgent || '';
-          const isIOS = /(iphone|ipad|ipod)/i.test(ua);
-          if (isIOS){
-            Swal.fire({
-              icon:'info',
-              title:'Instalar en iPhone/iPad',
-              html:'1) Toca Compartir (cuadro con flecha).<br>2) Elige "Agregar a pantalla de inicio".<br>3) Confirma "Agregar".'
-            });
-          }else{
-            Swal.fire({
-              icon:'info',
-              title:'Instala la App',
-              text:'Toca “Instalar la App 📲” para crear el acceso directo.'
-            });
-          }
-        }else{
-          Swal.fire({
-            icon:'info',
-            title:'Instalación no disponible',
-            text:'Abre este sitio en Chrome/Edge (Android o PC). En iPhone usa “Agregar a pantalla de inicio”.'
-          });
-        }
-      }, 150);
-    }catch(_){}
+  function goInstallIfHash(){
+    if (location.hash === '#instalar'){
+      overlay.classList.remove('open'); // por si estaba abierto
+      showView('view-instalar');
+    }
   }
-  window.addEventListener('load', openInstallCTAFromHash);
+  window.addEventListener('load', goInstallIfHash);
+  window.addEventListener('hashchange', goInstallIfHash);
 })();
 
   </script>

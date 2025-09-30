@@ -495,6 +495,7 @@
         <button class="menu-btn" id="go-lider">Si eres Líder, Refriere con un solo Clic 📤</button>
         <button class="menu-btn" id="go-sede">Visita Nuestra Casa Social 📍</button>
         <button class="menu-btn" id="go-redes">Conoce Nuestras Redes Sociales 🌐</button>
+        <button class="menu-btn" id="btn-notificaciones">Habilitar Notificaciones 🔔</button>
         <button class="menu-btn" id="btn-instalar" style="display:none;">Instalar la App 📲</button>
         <div style="height:24px"></div>
         <img class="brand" alt="Brand" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png" />
@@ -1078,6 +1079,76 @@ OneSignal.push(function(){
       // Si ya está 'granted' no hacemos nada. Si está 'denied', solo se puede cambiar desde ajustes del navegador.
     }catch(_){}
   });
+})();
+
+    // OneSignal: init (si ya lo inicializaste, no dupliques este bloque)
+window.OneSignal = window.OneSignal || [];
+OneSignal.push(function(){
+  OneSignal.init({
+    appId: "dfb84a48-c9c8-402b-8db3-e3ed591aba80",
+    serviceWorkerPath: "sw.js",
+    serviceWorkerParam: { scope: "./" },
+    notifyButton: { enable: false } // sin botón flotante
+  });
+});
+
+// Botón para habilitar notificaciones
+(function(){
+  const btn = document.getElementById('btn-notificaciones');
+  if(!btn) return;
+
+  const isIOS = ()=> /(iphone|ipad|ipod)/i.test(navigator.userAgent || '');
+  const isStandalone = ()=> window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+  function setLabel(status){
+    if(status === 'granted'){
+      btn.textContent = 'Notificaciones activas ✅';
+      // Si prefieres ocultarlo cuando ya están activas:
+      // btn.style.display = 'none';
+    }else{
+      btn.textContent = 'Habilitar Notificaciones 🔔';
+      btn.style.display = '';
+    }
+  }
+
+  async function refreshLabel(){
+    try{
+      await new Promise(res=>OneSignal.push(res)); // espera a que OneSignal esté listo
+      const status = await OneSignal.Notifications.getPermissionStatus(); // 'default'|'granted'|'denied'
+      setLabel(status);
+    }catch(_){}
+  }
+
+  btn.addEventListener('click', ()=>{
+    // iOS: push solo funciona si la PWA está instalada (pantalla de inicio)
+    if (isIOS() && !isStandalone()){
+      Swal.fire({
+        icon:'info',
+        title:'Instala la App',
+        html:'Para recibir notificaciones en iPhone/iPad, instala la App en tu pantalla de inicio y luego vuelve a tocar este botón.'
+      });
+      return;
+    }
+    OneSignal.push(async ()=>{
+      try{
+        await OneSignal.Notifications.requestPermission(); // dispara el prompt nativo
+        const status = await OneSignal.Notifications.getPermissionStatus();
+        setLabel(status);
+        if (status === 'granted'){
+          Swal.fire({ icon:'success', title:'Notificaciones habilitadas', timer:1400, showConfirmButton:false });
+        }else if (status === 'denied'){
+          Swal.fire({ icon:'info', title:'Permiso denegado', text:'Habilítalas en los permisos del sitio si cambias de opinión.' });
+        }
+      }catch(e){
+        Swal.fire({ icon:'error', title:'Error', text: (e && e.message) || 'No se pudo solicitar el permiso.' });
+      }
+    });
+  });
+
+  // Actualiza el texto cuando cargas o abres el menú
+  window.addEventListener('load', refreshLabel);
+  const openMenu = document.getElementById('btn-open-menu');
+  if (openMenu) openMenu.addEventListener('click', refreshLabel);
 })();
   </script>
 </section>

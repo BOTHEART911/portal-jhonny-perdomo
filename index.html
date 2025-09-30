@@ -986,15 +986,21 @@ if ('serviceWorker' in navigator){
 // Estado inicial
 updateInstallButtonsVisibility();
 
-    // #instalar: vista de instalación o abrir app si ya está instalada
+   // #instalar: vista de instalación o abrir app si ya está instalada
 (function(){
   function openOrInstall(){
     if (location.hash !== '#instalar') return;
 
-    // Si ya estamos dentro de la app (standalone), ir al menú
+    // Si ya estamos dentro de la app (standalone), IR A LOGIN (no menú)
     if (typeof isStandalone === 'function' && isStandalone()){
       overlay.classList.remove('open');
-      showView('view-menu');
+      Swal.fire({
+        icon:'success',
+        title:'Ya tienes la App instalada',
+        confirmButtonText:'Ir al inicio'
+      }).then(()=>{
+        showView('view-login');
+      });
       return;
     }
 

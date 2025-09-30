@@ -986,20 +986,6 @@ if ('serviceWorker' in navigator){
 // Estado inicial
 updateInstallButtonsVisibility();
     
-// Si la URL trae #instalar, mostrar la vista de instalación (sin modales)
-(function(){
-  function goInstallIfHash(){
-    if (location.hash === '#instalar'){
-      overlay.classList.remove('open'); // por si estaba abierto
-      showView('view-instalar');
-    }
-  }
-  window.addEventListener('load', goInstallIfHash);
-  window.addEventListener('hashchange', goInstallIfHash);
-})();
-
-   
-    
   </script>
 </section>
 
@@ -1743,7 +1729,7 @@ document.getElementById('v-guardar').addEventListener('click', async ()=>{
     });
     document.getElementById('upd-volver').addEventListener('click', ()=> showView('view-menu'));
 
-    // CONSULTAR (requisitos de alertas y botones)
+
     // CONSULTAR (requisitos de alertas y botones)
 document.getElementById('c-validar').addEventListener('click', async ()=>{
   const documento = (document.getElementById('c-documento').value || '').trim();

@@ -985,6 +985,52 @@ if ('serviceWorker' in navigator){
 
 // Estado inicial
 updateInstallButtonsVisibility();
+
+    // #instalar: vista de instalación o abrir app si ya está instalada
+(function(){
+  function openOrInstall(){
+    if (location.hash !== '#instalar') return;
+
+    // Si ya estamos dentro de la app (standalone), ir al menú
+    if (typeof isStandalone === 'function' && isStandalone()){
+      overlay.classList.remove('open');
+      showView('view-menu');
+      return;
+    }
+
+    const installedFlag = (typeof isMarkedInstalled === 'function') ? isMarkedInstalled() : false;
+    const iOS = (typeof isIOS === 'function') ? isIOS() : false;
+
+    if (installedFlag){
+      if (iOS){
+        // iOS no permite abrir la app instalada desde Safari
+        Swal.fire({
+          icon:'info',
+          title:'Ya tienes la App instalada',
+          html:'Ábrela desde el ícono en tu pantalla de inicio.',
+          confirmButtonText:'OK'
+        });
+        return;
+      }
+      // Android/PC: intentar abrir la PWA instalada (link capturing)
+      Swal.fire({
+        icon:'success',
+        title:'Ya tienes la App instalada',
+        confirmButtonText:'Abrir la App'
+      }).then(()=>{
+        window.location.href = 'https://botheart911.github.io/portal-jhonny-perdomo/';
+      });
+      return;
+    }
+
+    // No instalada: mostrar la vista de instalación
+    overlay.classList.remove('open');
+    showView('view-instalar');
+  }
+
+  window.addEventListener('load', openOrInstall);
+  window.addEventListener('hashchange', openOrInstall);
+})();
     
   </script>
 </section>

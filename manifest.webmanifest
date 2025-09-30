@@ -1,10 +1,14 @@
 {
+  "id": "./",
   "name": "JHONNY PERDOMO",
-  "short_name": "Jhonny Perdomo",
+  "short_name": "J. Perdomo",
   "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#007BFF",
+  "capture_links": "existing-client-navigate",
+  "launch_handler": { "client_mode": "navigate-existing" },
   "icons": [
     {
       "src": "https://res.cloudinary.com/dqqeavica/image/upload/v1753538807/JHONNY_PERDOMO_dn3dah.png",

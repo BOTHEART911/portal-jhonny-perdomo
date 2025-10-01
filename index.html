@@ -1040,7 +1040,7 @@ updateInstallButtonsVisibility();
   window.addEventListener('hashchange', openOrInstall);
 })();
 
-   // OneSignal: init (único)
+// OneSignal: init (único)
 window.OneSignal = window.OneSignal || [];
 OneSignal.push(function(){
   OneSignal.init({
@@ -1062,6 +1062,8 @@ OneSignal.push(function(){
   function setLabel(status){
     if(status === 'granted'){
       btn.textContent = 'Notificaciones activas ✅';
+      // Si prefieres ocultarlo cuando ya están activas:
+      // btn.style.display = 'none';
     }else{
       btn.textContent = 'Habilitar Notificaciones 🔔';
       btn.style.display = '';
@@ -1070,7 +1072,7 @@ OneSignal.push(function(){
 
   async function refreshLabel(){
     try{
-      await new Promise(res=>OneSignal.push(res)); // espera OneSignal listo
+      await new Promise(res=>OneSignal.push(res)); // espera a que OneSignal esté listo
       const status = await OneSignal.Notifications.getPermissionStatus(); // 'default'|'granted'|'denied'
       setLabel(status);
     }catch(_){}
@@ -1082,21 +1084,18 @@ OneSignal.push(function(){
       Swal.fire({
         icon:'info',
         title:'Instala la App',
-        html:'Para recibir notificaciones en iPhone/iPad, instala la App en tu pantalla de inicio y vuelve a tocar este botón.'
+        html:'Para recibir notificaciones en iPhone/iPad, instala la App en tu pantalla de inicio y luego vuelve a tocar este botón.'
       });
       return;
     }
     OneSignal.push(async ()=>{
       try{
-        await OneSignal.Notifications.requestPermission(); // prompt nativo
+        await OneSignal.Notifications.requestPermission(); // dispara el prompt nativo
         const status = await OneSignal.Notifications.getPermissionStatus();
         setLabel(status);
         if (status === 'granted'){
           Swal.fire({ icon:'success', title:'Notificaciones habilitadas', timer:1400, showConfirmButton:false });
-          // Depuración opcional:
-          try{
-            OneSignal.User.getId().then(id=>console.log('OneSignal User ID:', id));
-          }catch(_){}
+          try{ OneSignal.User.getId().then(id=>console.log('OneSignal User ID:', id)); }catch(_){}
         }else if (status === 'denied'){
           Swal.fire({ icon:'info', title:'Permiso denegado', text:'Habilítalas en los permisos del sitio si cambias de opinión.' });
         }
@@ -1106,7 +1105,7 @@ OneSignal.push(function(){
     });
   });
 
-  // Actualiza el texto al cargar y al abrir el menú
+  // Actualiza el texto cuando cargas o abres el menú
   window.addEventListener('load', refreshLabel);
   const openMenu = document.getElementById('btn-open-menu');
   if (openMenu) openMenu.addEventListener('click', refreshLabel);

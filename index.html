@@ -2112,7 +2112,7 @@ document.getElementById('c-validar').addEventListener('click', async ()=>{
 });
   </script>
     <script>
-  // Cola recomendada por v16
+  // SDK v16: cola recomendada
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   OneSignalDeferred.push(async function(OneSignal) {
     try {
@@ -2125,7 +2125,7 @@ document.getElementById('c-validar').addEventListener('click', async ()=>{
       return;
     }
 
-    // Lógica del botón "Habilitar Notificaciones"
+    // Botón "Habilitar Notificaciones" (solo bajo demanda)
     function attachButtonLogic(){
       const btn = document.getElementById('btn-notificaciones');
       if (!btn) return;
@@ -2139,7 +2139,7 @@ document.getElementById('c-validar').addEventListener('click', async ()=>{
 
       async function refreshLabel(){
         try{
-          const status = await OneSignal.Notifications.getPermissionStatus();
+          const status = await OneSignal.Notifications.getPermissionStatus(); // v16
           setLabel(status);
         }catch(_){}
       }
@@ -2153,13 +2153,13 @@ document.getElementById('c-validar').addEventListener('click', async ()=>{
           });
         }
         try{
-          await OneSignal.Notifications.requestPermission();
+          await OneSignal.Notifications.requestPermission(); // v16
           const status = await OneSignal.Notifications.getPermissionStatus();
           setLabel(status);
           if (status === 'granted'){
             Swal.fire({ icon:'success', title:'Notificaciones habilitadas', timer:1400, showConfirmButton:false });
-            try { OneSignal.User.getId().then(id => console.log('OneSignal User ID:', id)); } catch(_){}
-          } else if (status === 'denied'){
+            try{ OneSignal.User.getId().then(id=>console.log('OneSignal User ID:', id)); }catch(_){}
+          }else if (status === 'denied'){
             Swal.fire({ icon:'info', title:'Permiso denegado', text:'Habilítalas en los permisos del sitio si cambias de opinión.' });
           }
         }catch(e){

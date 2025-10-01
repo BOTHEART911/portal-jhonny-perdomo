@@ -8,7 +8,6 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
   <link rel="manifest" href="manifest.webmanifest">
-  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   
@@ -495,7 +494,7 @@
         <button class="menu-btn" id="go-lider">Si eres Líder, Refriere con un solo Clic 📤</button>
         <button class="menu-btn" id="go-sede">Visita Nuestra Casa Social 📍</button>
         <button class="menu-btn" id="go-redes">Conoce Nuestras Redes Sociales 🌐</button>
-        <button class="menu-btn" id="btn-notificaciones">Habilitar Notificaciones 🔔</button>
+        <!-- <button class="menu-btn" id="btn-notificaciones">Habilitar Notificaciones 🔔</button> -->
         <button class="menu-btn" id="btn-instalar" style="display:none;">Instalar la App 📲</button>
         <div style="height:24px"></div>
         <img class="brand" alt="Brand" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png" />
@@ -1039,73 +1038,6 @@ updateInstallButtonsVisibility();
   window.addEventListener('load', openOrInstall);
   window.addEventListener('hashchange', openOrInstall);
 })();
-
-// OneSignal: init (único)
-window.OneSignal = window.OneSignal || [];
-OneSignal.push(function(){
-  OneSignal.init({
-    appId: "dfb84a48-c9c8-402b-8db3-e3ed591aba80",
-    serviceWorkerPath: "sw.js",
-    serviceWorkerParam: { scope: "./" },
-    notifyButton: { enable: false } // sin botón flotante
-  });
-});
-
-// Botón para habilitar notificaciones (compatible v16 y v15)
-(function(){
-  const btn = document.getElementById('btn-notificaciones');
-  if(!btn) return;
-
-  const isIOS = ()=> /(iphone|ipad|ipod)/i.test(navigator.userAgent || '');
-  const isStandalone = ()=> window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-
-  function setLabel(status){
-    if(status === 'granted'){
-      btn.textContent = 'Notificaciones activas ✅';
-    }else{
-      btn.textContent = 'Habilitar Notificaciones 🔔';
-      btn.style.display = '';
-    }
-  }
-
-  async function getPermissionStatusSafe(){
-    try{
-      // v16
-      if (OneSignal?.Notifications?.getPermissionStatus) {
-        return await OneSignal.Notifications.getPermissionStatus();
-      }
-      // v15
-      if (OneSignal?.getNotificationPermission) {
-        return await OneSignal.getNotificationPermission();
-      }
-    }catch(_){}
-    return 'default';
-  }
-
-  async function requestPermissionSafe(){
-    // v16
-    if (OneSignal?.Notifications?.requestPermission){
-      return await OneSignal.Notifications.requestPermission();
-    }
-    // Slidedown (v15/v16)
-    if (OneSignal?.Slidedown?.promptPush){
-      return await OneSignal.Slidedown.promptPush();
-    }
-    // Legacy v15
-    if (typeof OneSignal?.registerForPushNotifications === 'function'){
-      OneSignal.registerForPushNotifications();
-      return;
-    }
-    throw new Error('El SDK de OneSignal no está listo. Recarga la página.');
-  }
-
-  async function refreshLabel(){
-    try{
-      await new Promise(res=>OneSignal.push(res)); // espera SDK listo
-      const status = await getPermissionStatusSafe();
-      setLabel(status);
-    }catch(_){}
-  }
 
   btn.addEventListener('click', ()=>{
     // iOS: push solo en PWA instalada
@@ -2111,68 +2043,6 @@ document.getElementById('c-validar').addEventListener('click', async ()=>{
   if(el) el.addEventListener('click', ()=> showView('view-menu'));
 });
   </script>
-    <script>
-  // SDK v16: cola recomendada
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(async function(OneSignal) {
-    try {
-      await OneSignal.init({
-        appId: "dfb84a48-c9c8-402b-8db3-e3ed591aba80"
-      });
-    } catch (e) {
-      console.error('OneSignal.init error:', e);
-      Swal?.fire?.({ icon:'error', title:'Error inicializando OneSignal', text: e?.message || String(e) });
-      return;
-    }
-
-    // Botón "Habilitar Notificaciones" (solo bajo demanda)
-    function attachButtonLogic(){
-      const btn = document.getElementById('btn-notificaciones');
-      if (!btn) return;
-
-      const isIOS = ()=> /(iphone|ipad|ipod)/i.test(navigator.userAgent || '');
-      const isStandalone = ()=> window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-
-      function setLabel(status){
-        btn.textContent = (status === 'granted') ? 'Notificaciones activas ✅' : 'Habilitar Notificaciones 🔔';
-      }
-
-      async function refreshLabel(){
-        try{
-          const status = await OneSignal.Notifications.getPermissionStatus(); // v16
-          setLabel(status);
-        }catch(_){}
-      }
-
-      btn.addEventListener('click', async ()=>{
-        if (isIOS() && !isStandalone()){
-          return Swal.fire({
-            icon:'info',
-            title:'Instala la App',
-            html:'En iPhone/iPad, agrega la App a tu pantalla de inicio y luego vuelve a tocar este botón.'
-          });
-        }
-        try{
-          await OneSignal.Notifications.requestPermission(); // v16
-          const status = await OneSignal.Notifications.getPermissionStatus();
-          setLabel(status);
-          if (status === 'granted'){
-            Swal.fire({ icon:'success', title:'Notificaciones habilitadas', timer:1400, showConfirmButton:false });
-            try{ OneSignal.User.getId().then(id=>console.log('OneSignal User ID:', id)); }catch(_){}
-          }else if (status === 'denied'){
-            Swal.fire({ icon:'info', title:'Permiso denegado', text:'Habilítalas en los permisos del sitio si cambias de opinión.' });
-          }
-        }catch(e){
-          Swal.fire({ icon:'error', title:'Error', text: e?.message || 'No se pudo solicitar el permiso.' });
-        }
-      });
-
-      window.addEventListener('load', refreshLabel);
-    }
-
-    attachButtonLogic();
-    window.addEventListener('DOMContentLoaded', attachButtonLogic);
-  });
-</script>
+    
 </body>
 </html>

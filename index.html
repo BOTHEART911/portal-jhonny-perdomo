@@ -243,7 +243,18 @@
 }
     
 </style>
-  
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  window.OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "88af48e7-f62a-45c4-ba61-4196b30ddcbc",  // tu appId
+      serviceWorkerPath: "sw.js",
+      serviceWorkerParam: { scope: "./" }
+      // safariWebId: "web.onesignal..." // opcional si configuraste Safari
+    });
+  });
+</script>
 </head>
 <body>
  <!-- Loader centrado (efecto iOS, sin imagen) -->
@@ -495,7 +506,7 @@
         <button class="menu-btn" id="go-lider">Si eres Líder, Refriere con un solo Clic 📤</button>
         <button class="menu-btn" id="go-sede">Visita Nuestra Casa Social 📍</button>
         <button class="menu-btn" id="go-redes">Conoce Nuestras Redes Sociales 🌐</button>
-        <!-- <button class="menu-btn" id="btn-notificaciones">Habilitar Notificaciones 🔔</button> -->
+        <<button class="menu-btn" id="btn-notificaciones">Habilitar Notificaciones 🔔</button>
         <button class="menu-btn" id="btn-instalar" style="display:none;">Instalar la App 📲</button>
         <div style="height:24px"></div>
         <img class="brand" alt="Brand" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png" />
@@ -2114,6 +2125,19 @@ document.getElementById('c-validar').addEventListener('click', async ()=>{
       }
     });
   }
+</script>
+    <script>
+  async function onesignalLoginIfPossible(){
+    if (!currentUser || !currentUser.documento) return;
+    const externalId = String(currentUser.documento);
+    window.OneSignalDeferred.push(async function(OneSignal){
+      try { await OneSignal.login(externalId); } catch(e){ console.warn(e); }
+    });
+  }
+
+// En tu código donde ya haces renderUserMenu(); showView('view-menu');
+// añade inmediatamente esta llamada:
+  // onesignalLoginIfPossible();
 </script>
 </body>
 </html>

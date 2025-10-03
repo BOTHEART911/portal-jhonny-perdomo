@@ -987,43 +987,39 @@ if ('serviceWorker' in navigator){
 updateInstallButtonsVisibility();
 
     // #instalar: vista de instalación o abrir app si ya está instalada
-(function(){
-  function openOrInstall(){
+(function() {
+  async function openOrInstall() {
     if (location.hash !== '#instalar') return;
 
-    // Si ya estamos dentro de la app (standalone), ir al menú
-    if (typeof isStandalone === 'function' && isStandalone()){
+    // Detectar si está en modo standalone (Android/PC)
+    function isStandalone() {
+      return window.matchMedia('(display-mode: standalone)').matches ||
+             window.navigator.standalone === true;
+    }
+    // iOS detection
+    function isIOS() {
+      return /(iphone|ipad|ipod)/i.test(navigator.userAgent || '');
+    }
+    // Localstorage flag
+    function isMarkedInstalled() {
+      try { return localStorage.getItem('appInstalled') === '1'; } catch(_) { return false; }
+    }
+
+    // 1. Si ya está instalada (standalone), saltar a login/menú
+    if (isStandalone() || isMarkedInstalled()) {
       overlay.classList.remove('open');
-      showView('view-menu');
+      showView('view-login'); // O showView('view-menu') si ya hay sesión
       return;
     }
 
-    const installedFlag = (typeof isMarkedInstalled === 'function') ? isMarkedInstalled() : false;
-    const iOS = (typeof isIOS === 'function') ? isIOS() : false;
-
-    if (installedFlag){
-      if (iOS){
-        // iOS no permite abrir la app instalada desde Safari
-        Swal.fire({
-          icon:'info',
-          title:'Ya tienes la App instalada',
-          html:'Ábrela desde el ícono en tu pantalla de inicio.',
-          confirmButtonText:'OK'
-        });
-        return;
-      }
-      // Android/PC: intentar abrir la PWA instalada (link capturing)
-      Swal.fire({
-        icon:'success',
-        title:'Ya tienes la App instalada',
-        confirmButtonText:'Abrir la App'
-      }).then(()=>{
-        window.location.href = 'https://botheart911.github.io/portal-jhonny-perdomo/';
-      });
+    // 2. Si es iOS y está instalada (sólo Safari reconoce navigator.standalone)
+    if (isIOS() && window.navigator.standalone) {
+      overlay.classList.remove('open');
+      showView('view-login');
       return;
     }
 
-    // No instalada: mostrar la vista de instalación
+    // 3. Si no está instalada, mostrar la vista de instalación
     overlay.classList.remove('open');
     showView('view-instalar');
   }

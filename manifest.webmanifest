@@ -10,7 +10,6 @@
   "capture_links": "existing-client-navigate",
   "launch_handler": { "client_mode": "navigate-existing" },
 
-  // Permite a Chrome/Android/Escritorio detectar la PWA ya instalada
   "prefer_related_applications": false,
   "related_applications": [
     {

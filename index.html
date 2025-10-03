@@ -912,13 +912,19 @@
       });
     })();
 
-   /* PWA: instalar + detección de instalada (Android/PC prompt; iOS instrucciones).
+  /* PWA: instalar + detección de instalada (Android/PC prompt; iOS instrucciones).
    Botones soportados: #btn-instalar (menú) y #btn-instalar-standalone (vista instalar). */
 let deferredPrompt = null;
 const installButtons = Array.from(document.querySelectorAll('#btn-instalar, #btn-instalar-standalone'));
 
 function isStandalone(){
-  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  // Chrome/Android, Desktop Chrome
+  const dmStandalone = window.matchMedia('(display-mode: standalone)').matches;
+  // iOS PWA lanzada desde la pantalla de inicio
+  const iosStandalone = (window.navigator.standalone === true);
+  // Algunos navegadores empiezan a exponer "(display-mode: installed)"
+  const dmInstalled = window.matchMedia('(display-mode: installed)').matches;
+  return dmStandalone || iosStandalone || dmInstalled;
 }
 function isIOS(){
   return /(iphone|ipad|ipod)/i.test(navigator.userAgent || '');
@@ -928,6 +934,31 @@ function isMarkedInstalled(){
 }
 function markInstalled(){
   try{ localStorage.setItem('appInstalled', '1'); }catch(_){}
+}
+
+// Nueva detección robusta de instalación (Android/PC) con fallback a flags locales y standalone.
+// En iOS Safari no hay API para saber si ya está instalada si no estamos en standalone.
+async function detectInstalled(){
+  if (isStandalone()) return true;
+  if (isMarkedInstalled()) return true;
+
+  // Compatibilidad: Chrome Android/Escritorio
+  if (typeof navigator.getInstalledRelatedApps === 'function'){
+    try{
+      const apps = await navigator.getInstalledRelatedApps();
+      // Busca una entrada "webapp" que apunte a tu manifest
+      const found = apps.some(a =>
+        a.platform === 'webapp' &&
+        typeof a.url === 'string' &&
+        /portal-jhonny-perdomo\/manifest\.webmanifest$/.test(a.url)
+      );
+      if (found){
+        markInstalled();
+        return true;
+      }
+    }catch(_){}
+  }
+  return false;
 }
 
 function updateInstallButtonsVisibility(){
@@ -986,42 +1017,43 @@ if ('serviceWorker' in navigator){
 // Estado inicial
 updateInstallButtonsVisibility();
 
-    // #instalar: vista de instalación o abrir app si ya está instalada
-(function() {
-  async function openOrInstall() {
+/* #instalar: nueva lógica
+   - Mostrar SIEMPRE la vista "Instalar App" primero
+   - Si se detecta instalada, tras ~2s ir a login
+   - Si no instalada, permanecer en "Instalar App" con botón visible
+*/
+(function(){
+  let installRedirectTimer = null;
+
+  async function openOrInstall(){
     if (location.hash !== '#instalar') return;
 
-    // Detectar si está en modo standalone (Android/PC)
-    function isStandalone() {
-      return window.matchMedia('(display-mode: standalone)').matches ||
-             window.navigator.standalone === true;
-    }
-    // iOS detection
-    function isIOS() {
-      return /(iphone|ipad|ipod)/i.test(navigator.userAgent || '');
-    }
-    // Localstorage flag
-    function isMarkedInstalled() {
-      try { return localStorage.getItem('appInstalled') === '1'; } catch(_) { return false; }
-    }
-
-    // 1. Si ya está instalada (standalone), saltar a login/menú
-    if (isStandalone() || isMarkedInstalled()) {
-      overlay.classList.remove('open');
-      showView('view-login'); // O showView('view-menu') si ya hay sesión
-      return;
-    }
-
-    // 2. Si es iOS y está instalada (sólo Safari reconoce navigator.standalone)
-    if (isIOS() && window.navigator.standalone) {
-      overlay.classList.remove('open');
-      showView('view-login');
-      return;
-    }
-
-    // 3. Si no está instalada, mostrar la vista de instalación
-    overlay.classList.remove('open');
+    // Asegura que el overlay se cierre sin lanzar errores si aún no existe la ref
+    try{ overlay.classList.remove('open'); }catch(_){}
+    // 1) Siempre mostrar la vista de instalación inicialmente
     showView('view-instalar');
+
+    // 2) Detección de instalación (robusta si es posible)
+    const installed = await detectInstalled();
+
+    // 3) En ambos casos, esperamos un pequeño tiempo para que se vea la pantalla
+    //    y para que los botones se actualicen correctamente
+    if (installRedirectTimer){
+      clearTimeout(installRedirectTimer);
+      installRedirectTimer = null;
+    }
+
+    if (installed){
+      // Mostrar "Instalar App" aprox. 2s y luego ir a login
+      installRedirectTimer = setTimeout(()=>{
+        showView('view-login');
+      }, 2000);
+    } else {
+      // No instalada: asegurar visibilidad del botón
+      updateInstallButtonsVisibility();
+      // Opcionalmente, podrías lanzar un tip en iOS
+      // if (isIOS()) Swal.fire({icon:'info', title:'Instalación en iOS', text:'Usa el botón Compartir > Agregar a pantalla de inicio.'});
+    }
   }
 
   window.addEventListener('load', openOrInstall);

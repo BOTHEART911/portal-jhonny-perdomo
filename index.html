@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
   <link rel="manifest" href="manifest.webmanifest">
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   
@@ -242,7 +243,18 @@
 }
     
 </style>
-  
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  window.OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "88af48e7-f62a-45c4-ba61-4196b30ddcbc",  // tu appId
+      serviceWorkerPath: "sw.js",
+      serviceWorkerParam: { scope: "./" }
+      // safariWebId: "web.onesignal..." // opcional si configuraste Safari
+    });
+  });
+</script>
 </head>
 <body>
  <!-- Loader centrado (efecto iOS, sin imagen) -->
@@ -266,7 +278,7 @@
 
         <div class="btn-row spaced">
           <button class="btn-primary" id="btn-login">Iniciar Sesión</button>
-          <button id="btn-compartir">Comparte el Portal 📲</button>
+          <button id="btn-compartir">Comparte la App 📲</button>
         </div>
 
         <img class="brand" alt="Brand" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png" />
@@ -494,7 +506,7 @@
         <button class="menu-btn" id="go-lider">Si eres Líder, Refriere con un solo Clic 📤</button>
         <button class="menu-btn" id="go-sede">Visita Nuestra Casa Social 📍</button>
         <button class="menu-btn" id="go-redes">Conoce Nuestras Redes Sociales 🌐</button>
-        <!-- <button class="menu-btn" id="btn-notificaciones">Habilitar Notificaciones 🔔</button> -->
+        <<button class="menu-btn" id="btn-notificaciones">Habilitar Notificaciones 🔔</button>
         <button class="menu-btn" id="btn-instalar" style="display:none;">Instalar la App 📲</button>
         <div style="height:24px"></div>
         <img class="brand" alt="Brand" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png" />
@@ -2043,6 +2055,89 @@ document.getElementById('c-validar').addEventListener('click', async ()=>{
   if(el) el.addEventListener('click', ()=> showView('view-menu'));
 });
   </script>
-    
+    <script>
+  // Usa OneSignalDeferred (patrón v16) para evitar condiciones de carrera
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  window.OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "TU-APP-ID-ONESIGNAL",          // pega aquí el APP ID de ESTA web app
+      serviceWorkerPath: "sw.js",            // tu SW está en la carpeta de la app
+      serviceWorkerParam: { scope: "./" }    // IMPORTANTÍSIMO en GitHub Pages/subcarpeta
+      // safariWebId: "web.onesignal...."     // si configuraste Safari Web Push
+    });
+  });
+
+  // Llama esto inmediatamente después de que tu usuario inició sesión (cuando tengas currentUser.documento)
+  async function onesignalLoginIfPossible(){
+    if (!currentUser || !currentUser.documento) return;
+    const externalId = String(currentUser.documento); // Modelo: 1 App de OneSignal por web app
+    window.OneSignalDeferred.push(async function(OneSignal){
+      try{
+        await OneSignal.login(externalId);
+        // Si quieres tags adicionales (p. ej. idioma, plan), puedes añadirlos aquí:
+        // await OneSignal.User.addTag("idioma", "es");
+      }catch(e){ console.warn("OneSignal.login error", e); }
+    });
+  }
+
+  // Botón “Habilitar Notificaciones”: solicita permiso y guarda el consentimiento en tu Apps Script
+  async function requestPushAndSave(){
+    window.OneSignalDeferred.push(async function(OneSignal){
+      try{
+        // iOS: Web Push requiere PWA instalada
+        const isiOS = /(iphone|ipad|ipod)/i.test(navigator.userAgent || "");
+        const standalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+        if (isiOS && !standalone){
+          await Swal.fire({ icon:"info", title:"Instala la App", html:"En iPhone/iPad, agrega la App a pantalla de inicio y vuelve a intentar." });
+          return;
+        }
+
+        // Solicitar permiso con v16
+        const res = await OneSignal.Notifications.requestPermission(); // 'granted' | 'denied' | 'default'
+        const permission = res || (Notification?.permission ?? "default");
+
+        // ID único del usuario de OneSignal (no confundir con external_user_id)
+        const oneSignalUserId = await (OneSignal.User?.getId?.() || null);
+
+        // Info útil para tu registro
+        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || null;
+        const externalId = currentUser?.documento || null;
+
+        // Guarda en tu backend (Apps Script) — usa la ruta action=guardarpushconsent del GS completo que te pasé
+        try{
+          await apiPost("guardarpushconsent", {
+            external_user_id: externalId,
+            onesignal_id: oneSignalUserId,
+            permission,
+            timezone: tz
+          });
+        }catch(_){}
+
+        if (permission === "granted"){
+          Swal.fire({ icon:"success", title:"Notificaciones habilitadas", timer:1400, showConfirmButton:false });
+        }else if (permission === "denied"){
+          Swal.fire({ icon:"info", title:"Permiso denegado", text:"Puedes habilitarlas en los permisos del sitio." });
+        }else{
+          Swal.fire({ icon:"info", title:"Acción cancelada" });
+        }
+      }catch(e){
+        Swal.fire({ icon:"error", title:"Error", text: e?.message || "No se pudo solicitar el permiso." });
+      }
+    });
+  }
+</script>
+    <script>
+  async function onesignalLoginIfPossible(){
+    if (!currentUser || !currentUser.documento) return;
+    const externalId = String(currentUser.documento);
+    window.OneSignalDeferred.push(async function(OneSignal){
+      try { await OneSignal.login(externalId); } catch(e){ console.warn(e); }
+    });
+  }
+
+// En tu código donde ya haces renderUserMenu(); showView('view-menu');
+// añade inmediatamente esta llamada:
+  // onesignalLoginIfPossible();
+</script>
 </body>
 </html>

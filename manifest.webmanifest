@@ -9,6 +9,17 @@
   "theme_color": "#007BFF",
   "capture_links": "existing-client-navigate",
   "launch_handler": { "client_mode": "navigate-existing" },
+
+  // Permite a Chrome/Android/Escritorio detectar la PWA ya instalada
+  "prefer_related_applications": false,
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "https://botheart911.github.io/portal-jhonny-perdomo/manifest.webmanifest",
+      "id": "./"
+    }
+  ],
+
   "icons": [
     {
       "src": "https://res.cloudinary.com/dqqeavica/image/upload/v1753538807/JHONNY_PERDOMO_dn3dah.png",

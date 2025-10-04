@@ -1345,42 +1345,50 @@ function stopLoading(){
 
   // Validación: formato (6 a 10 dígitos)
   if (!/^\d{6,10}$/.test(documento)) {
-    Swal.fire({ 
-      icon: 'warning', 
-      title: 'Documento inválido', 
-      text: 'Ingresa de 6 a 10 dígitos.' 
+    Swal.fire({
+      icon: 'warning',
+      title: 'Documento inválido',
+      text: 'Ingresa de 6 a 10 dígitos.'
     });
     return;
   }
 
   try {
     const res = await apiGet('validarDocumento', { documento });
-   if (res && res.existe) {
-  currentUser = {
-    documento: res.documento,
-    nombre: res.nombre,
-    telefono: res.telefono || '',
-    residencia: res.residencia || '',
-    referencia: res.referencia || '',
-    municipio: res.municipio || '',
-    puesto: res.puesto || '',
-    mesa: res.mesa || ''
-  };
+    if (res && res.existe) {
+      currentUser = {
+        documento: res.documento,
+        nombre: res.nombre,
+        telefono: res.telefono || '',
+        residencia: res.residencia || '',
+        referencia: res.referencia || '',
+        municipio: res.municipio || '',
+        puesto: res.puesto || '',
+        mesa: res.mesa || ''
+      };
 
-  // Guardar documento en el dispositivo
-  saveDocumentoLocal(documento);
+      // Guardar documento en el dispositivo
+      saveDocumentoLocal(documento);
 
-  renderUserMenu();
-  playSoundOnce(SOUNDS.login);
-  showView('view-menu');
-} else {
-  regCard.style.display = '';
-  Swal.fire({
-    icon: 'info',
-    title: 'Nuevo usuario',
-    text: 'Completa tu registro para continuar.'
-  });
-}
+      renderUserMenu();
+      playSoundOnce(SOUNDS.login);
+      showView('view-menu');
+    } else {
+      regCard.style.display = '';
+      Swal.fire({
+        icon: 'info',
+        title: 'Nuevo usuario',
+        text: 'Completa tu registro para continuar.'
+      });
+    }
+  } catch (e) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: e.message
+    });
+  }
+}); 
 
     // Toggle Referido (registro)
     const regRefWrap = document.getElementById('reg-referido-wrap');

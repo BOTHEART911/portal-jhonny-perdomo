@@ -570,7 +570,7 @@
     <button class="menu-btn" id="go-ideas">Suma tus Ideas 💡</button>
     <button class="menu-btn" id="go-actualizacion">Actualiza tus Datos Personales 🔁</button>
     <button class="menu-btn" id="go-consultar">Consulta tu Puesto de Votación 🗳</button>
-    <button class="menu-btn" id="go-lider">Si eres Líder, Refriere con un solo Clic 📤</button>
+    <button class="menu-btn" id="go-lider">Si eres Líder, Refiere con un solo Clic 📤</button>
     <button class="menu-btn" id="go-sede">Visita Nuestra Casa Social 📍</button>
     <button class="menu-btn" id="go-redes">Conoce Nuestras Redes Sociales 🌐</button>
     <button class="menu-btn" id="btn-instalar" style="display:none;">Instalar la App 📲</button>
@@ -1345,10 +1345,10 @@ function stopLoading(){
 
   // Validación: formato (6 a 10 dígitos)
   if (!/^\d{6,10}$/.test(documento)) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Documento inválido',
-      text: 'Ingresa de 6 a 10 dígitos.'
+    Swal.fire({ 
+      icon: 'warning', 
+      title: 'Documento inválido', 
+      text: 'Ingresa de 6 a 10 dígitos.' 
     });
     return;
   }
@@ -1366,10 +1366,6 @@ function stopLoading(){
         puesto: res.puesto || '',
         mesa: res.mesa || ''
       };
-
-      // Guardar documento en el dispositivo
-      saveDocumentoLocal(documento);
-
       renderUserMenu();
       playSoundOnce(SOUNDS.login);
       showView('view-menu');
@@ -1382,13 +1378,13 @@ function stopLoading(){
       });
     }
   } catch (e) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: e.message
+    Swal.fire({ 
+      icon: 'error', 
+      title: 'Error', 
+      text: e.message 
     });
   }
-}); 
+});
 
     // Toggle Referido (registro)
     const regRefWrap = document.getElementById('reg-referido-wrap');
@@ -1486,35 +1482,36 @@ if (formData.referencia && !referenciaRegex.test(formData.referencia)) {
 
       try{
         const r = await apiPost('guardarContactoEnServidor', formData);
-        if (r && r.success){
-  const res = await apiGet('validarDocumento', { documento: formData.documento });
-  if(res?.existe){
-    currentUser = {
-      documento: res.documento,
-      nombre: res.nombre,
-      telefono: res.telefono || '',
-      residencia: res.residencia || '',
-      referencia: res.referencia || '',
-      municipio: res.municipio || '',
-      puesto: res.puesto || '',
-      mesa: res.mesa || ''
-    };
-
-    // Guardar documento en el dispositivo
-    saveDocumentoLocal(formData.documento);
-
-    await Swal.fire({ icon:'success', title:'Registro exitoso', timer:1800, showConfirmButton:false });
-    renderUserMenu();
-    playSoundOnce(SOUNDS.login);
-    showView('view-menu');
-    regCard.style.display='none';
-  } else {
-    Swal.fire({ icon:'error', title:'No se pudo completar el registro' });
-  }
-} else {
-  Swal.fire({ icon:'error', title:'Error al guardar', html: r?.message || 'Error desconocido' });
-}
-});
+        if(r && r.success){
+          // Revalidar y pasar a menú
+          const res = await apiGet('validarDocumento', { documento: formData.documento });
+          if(res?.existe){
+            currentUser = {
+              documento: res.documento,
+              nombre: res.nombre,
+              telefono: res.telefono || '',
+              residencia: res.residencia || '',
+              referencia: res.referencia || '',
+              municipio: res.municipio || '',
+              puesto: res.puesto || '',
+              mesa: res.mesa || ''
+            };
+            // Alerta de registro exitoso
+            await Swal.fire({ icon:'success', title:'Registro exitoso', timer:1800, showConfirmButton:false });
+            renderUserMenu();
+            playSoundOnce(SOUNDS.login);
+            showView('view-menu');
+            regCard.style.display='none';
+          }else{
+            Swal.fire({ icon:'error', title:'No se pudo completar el registro' });
+          }
+        }else{
+          Swal.fire({ icon:'error', title:'Error al guardar', html: r?.message || 'Error desconocido' });
+        }
+      }catch(e){
+        Swal.fire({ icon:'error', title:'Error', text:e.message });
+      }
+    });
 
     // MENÚ
     const overlay = document.getElementById('overlay');
@@ -1524,13 +1521,12 @@ if (formData.referencia && !referenciaRegex.test(formData.referencia)) {
     document.getElementById('ovlClose').addEventListener('click', ()=> overlay.classList.remove('open'));
 
     document.getElementById('btn-logout').addEventListener('click', ()=>{
-  playSoundOnce(SOUNDS.logout);
-  const saved = localStorage.getItem('jp:documento');
-  currentUser = null;
-  regCard.style.display='none';
-  showView('view-login');
-  if (saved) docLogin.value = saved;
-});
+      playSoundOnce(SOUNDS.logout);
+      currentUser = null;
+      docLogin.value = '';
+      regCard.style.display='none';
+      showView('view-login');
+    });
 
     document.getElementById('go-asistencia').addEventListener('click', async ()=>{
       overlay.classList.remove('open');
@@ -2101,43 +2097,5 @@ document.getElementById('c-validar').addEventListener('click', async ()=>{
   if(el) el.addEventListener('click', ()=> showView('view-menu'));
 });
   </script>
-    <script>
-(function(){
-  const DOC_KEY = 'jp:documento';
-  const $docInput  = document.getElementById('doc-login');
-  const $btnLogin  = document.getElementById('btn-login');
-  const $btnLogout = document.getElementById('btn-logout');
-
-  // 1) Prefill al abrir
-  try {
-    const saved = localStorage.getItem(DOC_KEY);
-    if (saved && $docInput) {
-      $docInput.value = saved;
-      // Opcional: auto-login (descomenta si lo quieres)
-      // setTimeout(() => $btnLogin?.click(), 0);
-    }
-  } catch (e) {
-    // localStorage puede no estar disponible (modo privado, etc.)
-    console.warn('No se pudo acceder a localStorage:', e);
-  }
-
-  // 2) Exponer una función para guardar tras login exitoso
-  // Llama a window.saveDocumentoLocal(doc) inmediatamente después de validar OK el login.
-  window.saveDocumentoLocal = function(documento){
-    try {
-      if (documento && /^\d{6,}$/.test(documento)) {
-        localStorage.setItem(DOC_KEY, documento);
-      }
-    } catch (e) {
-      console.warn('No se pudo guardar el documento:', e);
-    }
-  };
-
-  // 3) Limpiar al cerrar sesión
-  // $btnLogout?.addEventListener('click', () => {
-  // try { localStorage.removeItem(DOC_KEY); } catch {}
-  // });
-})();
-</script>
 </body>
 </html>

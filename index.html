@@ -2097,5 +2097,43 @@ document.getElementById('c-validar').addEventListener('click', async ()=>{
   if(el) el.addEventListener('click', ()=> showView('view-menu'));
 });
   </script>
+    <script>
+(function(){
+  const DOC_KEY = 'jp:documento';
+  const $docInput  = document.getElementById('doc-login');
+  const $btnLogin  = document.getElementById('btn-login');
+  const $btnLogout = document.getElementById('btn-logout');
+
+  // 1) Prefill al abrir
+  try {
+    const saved = localStorage.getItem(DOC_KEY);
+    if (saved && $docInput) {
+      $docInput.value = saved;
+      // Opcional: auto-login (descomenta si lo quieres)
+      // setTimeout(() => $btnLogin?.click(), 0);
+    }
+  } catch (e) {
+    // localStorage puede no estar disponible (modo privado, etc.)
+    console.warn('No se pudo acceder a localStorage:', e);
+  }
+
+  // 2) Exponer una función para guardar tras login exitoso
+  // Llama a window.saveDocumentoLocal(doc) inmediatamente después de validar OK el login.
+  window.saveDocumentoLocal = function(documento){
+    try {
+      if (documento && /^\d{6,}$/.test(documento)) {
+        localStorage.setItem(DOC_KEY, documento);
+      }
+    } catch (e) {
+      console.warn('No se pudo guardar el documento:', e);
+    }
+  };
+
+  // 3) Limpiar al cerrar sesión
+  $btnLogout?.addEventListener('click', () => {
+    try { localStorage.removeItem(DOC_KEY); } catch {}
+  });
+})();
+</script>
 </body>
 </html>

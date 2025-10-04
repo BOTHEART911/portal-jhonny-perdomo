@@ -1529,7 +1529,7 @@ document.getElementById('go-redes').addEventListener('click', ()=>{
       try{
         const r = await apiGet('validarLider', { documento: currentUser.documento });
         if(r && r.codigo && r.nombre){
-         const msg = "Hola 👋🏻\n\nQuiero pedirte que apoyes a nuestro gran amigo *Jhonny Perdomo*.\n\nInstala la App y regístrate aquí 👉 " + "https://botheart911.github.io/portal-jhonny-perdomo/#instalar" + " 👈\n\nEn el campo *N° de Referido* por favor escribe el N° 👉 " + r.codigo + " 👈 (solo el número).\n\nEn esta App encontrarás muchas opciones para ayudar a tu comunidad. ¡Bendiciones!\n\nCordialmente,\n\n*" + r.nombre + "*\n> Equipo del Hacer";
+         const msg = "Hola 👋🏻\n\nQuiero pedirte que apoyes a nuestro gran amigo *Jhonny Perdomo*.\n\nInstala la App y regístrate aquí 👉 " + "https://tinyurl.com/app-jhonny-perdomo" + " 👈\n\nEn el campo *N° de Referido* por favor escribe el N° 👉 " + r.codigo + " 👈 (solo el número).\n\nEn esta App encontrarás muchas opciones para ayudar a tu comunidad. ¡Bendiciones!\n\nCordialmente,\n\n*" + r.nombre + "*\n> Equipo del Hacer";
           const textoEscapado = encodeURIComponent(msg);
           const esMovil = /android|iphone|ipad|mobile/i.test(navigator.userAgent);
           if(navigator.clipboard){ navigator.clipboard.writeText(msg).catch(()=>{}); }
@@ -1544,7 +1544,7 @@ document.getElementById('go-redes').addEventListener('click', ()=>{
 
     // COMPARTIR PORTAL
     document.getElementById('btn-compartir').addEventListener('click', ()=>{
-  const url = "https://botheart911.github.io/portal-jhonny-perdomo/#instalar";
+  const url = "https://tinyurl.com/app-jhonny-perdomo";
   const txt = "Instala la *App de Jhonny Perdomo* 📲 y regístrate con un clic:\n" + url;
   if(navigator.clipboard){ navigator.clipboard.writeText(txt).catch(()=>{}); }
   const enc = encodeURIComponent(txt);

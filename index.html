@@ -1356,35 +1356,60 @@ function stopLoading(){
   try {
     const res = await apiGet('validarDocumento', { documento });
     if (res && res.existe) {
-      currentUser = {
-        documento: res.documento,
-        nombre: res.nombre,
-        telefono: res.telefono || '',
-        residencia: res.residencia || '',
-        referencia: res.referencia || '',
-        municipio: res.municipio || '',
-        puesto: res.puesto || '',
-        mesa: res.mesa || ''
-      };
-      renderUserMenu();
-      playSoundOnce(SOUNDS.login);
-      showView('view-menu');
-    } else {
-      regCard.style.display = '';
-      Swal.fire({
-        icon: 'info',
-        title: 'Nuevo usuario',
-        text: 'Completa tu registro para continuar.'
-      });
-    }
-  } catch (e) {
-    Swal.fire({ 
-      icon: 'error', 
-      title: 'Error', 
-      text: e.message 
-    });
+  currentUser = {
+    documento: res.documento,
+    nombre: res.nombre,
+    telefono: res.telefono || '',
+    residencia: res.residencia || '',
+    referencia: res.referencia || '',
+    municipio: res.municipio || '',
+    puesto: res.puesto || '',
+    mesa: res.mesa || ''
+  };
+
+  // Guardar documento en el dispositivo
+  saveDocumentoLocal(documento);
+
+  renderUserMenu();
+  playSoundOnce(SOUNDS.login);
+  showView('view-menu');
+} else {
+  regCard.style.display = '';
+  Swal.fire({
+    icon: 'info',
+    title: 'Nuevo usuario',
+    text: 'Completa tu registro para continuar.'
+  });
+}
+
+    if (r && r.success){
+  const res = await apiGet('validarDocumento', { documento: formData.documento });
+  if(res?.existe){
+    currentUser = {
+      documento: res.documento,
+      nombre: res.nombre,
+      telefono: res.telefono || '',
+      residencia: res.residencia || '',
+      referencia: res.referencia || '',
+      municipio: res.municipio || '',
+      puesto: res.puesto || '',
+      mesa: res.mesa || ''
+    };
+
+    // Guardar documento en el dispositivo
+    saveDocumentoLocal(formData.documento);
+
+    await Swal.fire({ icon:'success', title:'Registro exitoso', timer:1800, showConfirmButton:false });
+    renderUserMenu();
+    playSoundOnce(SOUNDS.login);
+    showView('view-menu');
+    regCard.style.display='none';
+  } else {
+    Swal.fire({ icon:'error', title:'No se pudo completar el registro' });
   }
-});
+} else {
+  Swal.fire({ icon:'error', title:'Error al guardar', html: r?.message || 'Error desconocido' });
+}
 
     // Toggle Referido (registro)
     const regRefWrap = document.getElementById('reg-referido-wrap');
@@ -1521,12 +1546,13 @@ if (formData.referencia && !referenciaRegex.test(formData.referencia)) {
     document.getElementById('ovlClose').addEventListener('click', ()=> overlay.classList.remove('open'));
 
     document.getElementById('btn-logout').addEventListener('click', ()=>{
-      playSoundOnce(SOUNDS.logout);
-      currentUser = null;
-      docLogin.value = '';
-      regCard.style.display='none';
-      showView('view-login');
-    });
+  playSoundOnce(SOUNDS.logout);
+  const saved = localStorage.getItem('jp:documento');
+  currentUser = null;
+  regCard.style.display='none';
+  showView('view-login');
+  if (saved) docLogin.value = saved;
+});
 
     document.getElementById('go-asistencia').addEventListener('click', async ()=>{
       overlay.classList.remove('open');
@@ -2130,9 +2156,9 @@ document.getElementById('c-validar').addEventListener('click', async ()=>{
   };
 
   // 3) Limpiar al cerrar sesión
-  $btnLogout?.addEventListener('click', () => {
-    try { localStorage.removeItem(DOC_KEY); } catch {}
-  });
+  // $btnLogout?.addEventListener('click', () => {
+  // try { localStorage.removeItem(DOC_KEY); } catch {}
+  // });
 })();
 </script>
 </body>

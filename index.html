@@ -1355,7 +1355,7 @@ function stopLoading(){
 
   try {
     const res = await apiGet('validarDocumento', { documento });
-    if (res && res.existe) {
+   if (res && res.existe) {
   currentUser = {
     documento: res.documento,
     nombre: res.nombre,
@@ -1380,35 +1380,6 @@ function stopLoading(){
     title: 'Nuevo usuario',
     text: 'Completa tu registro para continuar.'
   });
-}
-
-    if (r && r.success){
-  const res = await apiGet('validarDocumento', { documento: formData.documento });
-  if(res?.existe){
-    currentUser = {
-      documento: res.documento,
-      nombre: res.nombre,
-      telefono: res.telefono || '',
-      residencia: res.residencia || '',
-      referencia: res.referencia || '',
-      municipio: res.municipio || '',
-      puesto: res.puesto || '',
-      mesa: res.mesa || ''
-    };
-
-    // Guardar documento en el dispositivo
-    saveDocumentoLocal(formData.documento);
-
-    await Swal.fire({ icon:'success', title:'Registro exitoso', timer:1800, showConfirmButton:false });
-    renderUserMenu();
-    playSoundOnce(SOUNDS.login);
-    showView('view-menu');
-    regCard.style.display='none';
-  } else {
-    Swal.fire({ icon:'error', title:'No se pudo completar el registro' });
-  }
-} else {
-  Swal.fire({ icon:'error', title:'Error al guardar', html: r?.message || 'Error desconocido' });
 }
 
     // Toggle Referido (registro)
@@ -1507,36 +1478,34 @@ if (formData.referencia && !referenciaRegex.test(formData.referencia)) {
 
       try{
         const r = await apiPost('guardarContactoEnServidor', formData);
-        if(r && r.success){
-          // Revalidar y pasar a menú
-          const res = await apiGet('validarDocumento', { documento: formData.documento });
-          if(res?.existe){
-            currentUser = {
-              documento: res.documento,
-              nombre: res.nombre,
-              telefono: res.telefono || '',
-              residencia: res.residencia || '',
-              referencia: res.referencia || '',
-              municipio: res.municipio || '',
-              puesto: res.puesto || '',
-              mesa: res.mesa || ''
-            };
-            // Alerta de registro exitoso
-            await Swal.fire({ icon:'success', title:'Registro exitoso', timer:1800, showConfirmButton:false });
-            renderUserMenu();
-            playSoundOnce(SOUNDS.login);
-            showView('view-menu');
-            regCard.style.display='none';
-          }else{
-            Swal.fire({ icon:'error', title:'No se pudo completar el registro' });
-          }
-        }else{
-          Swal.fire({ icon:'error', title:'Error al guardar', html: r?.message || 'Error desconocido' });
-        }
-      }catch(e){
-        Swal.fire({ icon:'error', title:'Error', text:e.message });
-      }
-    });
+        if (r && r.success){
+  const res = await apiGet('validarDocumento', { documento: formData.documento });
+  if(res?.existe){
+    currentUser = {
+      documento: res.documento,
+      nombre: res.nombre,
+      telefono: res.telefono || '',
+      residencia: res.residencia || '',
+      referencia: res.referencia || '',
+      municipio: res.municipio || '',
+      puesto: res.puesto || '',
+      mesa: res.mesa || ''
+    };
+
+    // Guardar documento en el dispositivo
+    saveDocumentoLocal(formData.documento);
+
+    await Swal.fire({ icon:'success', title:'Registro exitoso', timer:1800, showConfirmButton:false });
+    renderUserMenu();
+    playSoundOnce(SOUNDS.login);
+    showView('view-menu');
+    regCard.style.display='none';
+  } else {
+    Swal.fire({ icon:'error', title:'No se pudo completar el registro' });
+  }
+} else {
+  Swal.fire({ icon:'error', title:'Error al guardar', html: r?.message || 'Error desconocido' });
+}
 
     // MENÚ
     const overlay = document.getElementById('overlay');

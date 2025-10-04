@@ -588,8 +588,10 @@
         <input id="a-nombre" type="hidden" />
         <input id="a-telefono" type="hidden" />
 
-        <label>N° de Reunión</label>
-        <input id="a-reunion" type="tel" inputmode="numeric" placeholder="N° de Reunión" />
+        <p class="center muted spaced"><b>Escribe el N° de Evento y espera unos segundos</b></p>
+
+        <label>N° de Evento</label>
+        <input id="a-reunion" type="tel" inputmode="numeric" placeholder="N° de Evento" />
         <div id="evento-wrap" style="display:none;">
           <label>Nombre de Evento</label>
           <input id="a-evento" type="text" readonly>
@@ -624,6 +626,8 @@
         <label>Dirección</label><input id="v-direccion" readonly>
         <label>Mesa</label><input id="v-mesa" readonly>
 
+        <p class="center muted spaced"><b>Si no Guardaras estos campos, haz clic en el botón "Atrás"</b></p>
+
         <div class="btn-row spaced">
           <button class="btn-primary" id="v-guardar">Guardar</button>
           <button id="v-volver">Regresar</button>
@@ -636,10 +640,13 @@
       <div class="card narrow">
         <h2 style="color:var(--primary)">ACTUALIZA TUS DATOS</h2>
         <input id="upd-documento" type="hidden" />
-        <label>Nombre (solo lectura)</label>
+        <label>Nombre</label>
         <input id="upd-nombre" type="text" readonly>
+
+        <p class="center muted spaced"><b>Solo edita los campos que actualizarás</b></p>
+        
         <label>Whatsapp</label>
-        <input id="upd-telefono" type="tel" inputmode="numeric" placeholder="10 dígitos (opcional)" />
+        <input id="upd-telefono" type="tel" inputmode="numeric" placeholder="10 dígitos" />
         <label>Residencia</label>
         <select id="upd-residencia">
           <option value="" disabled selected>Selecciona tu Residencia</option>
@@ -789,6 +796,8 @@
           <button id="upd-ref-menos" class="hidden">No editar Referido</button>
         </div>
 
+        <p class="center muted spaced"><b>Revisa muy bien la información antes de Guardar</b></p>
+
         <div class="btn-row spaced">
           <button class="btn-primary" id="upd-guardar">Guardar</button>
           <button id="upd-volver">Regresar</button>
@@ -825,7 +834,7 @@
         <input id="s-telefono" type="hidden" />
         <input id="s-residencia" type="hidden" />
 
-        <label>Nombre (solo lectura)</label>
+        <label>Nombre</label>
         <input id="s-nombre" type="text" readonly placeholder="Tu Nombre" />
 
         <label>Servicio</label>
@@ -839,7 +848,7 @@
         </select>
 
         <label>Solicitud</label>
-        <textarea id="s-solicitud" rows="5" placeholder="Describe brevemente tu solicitud (obligatorio)"></textarea>
+        <textarea id="s-solicitud" rows="5" placeholder="Describe ampliamente tu solicitud"></textarea>
 
         <p class="center muted spaced"><b>Revisa muy bien la información antes de Guardar</b></p>
 
@@ -898,7 +907,9 @@
   <div class="install-wrap">
     <h2 style="color:var(--primary); text-shadow: 0 2px 2px #031732; margin: 0 0 8px;">JHONNY PERDOMO</h2>
     <img class="brand" alt="App" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753538807/JHONNY_PERDOMO_dn3dah.png" />
-    <p class="tagline">Siempre Presentes</p>
+    <p class="tagline">#SoyDeFlandes</p>
+    <p class="tagline">#NoParamos</p>
+    <p class="tagline">#SiemprePresentes</p>
     <div class="btn-row spaced" style="max-width:420px; width:100%; justify-content:center;">
       <button class="btn-primary" id="btn-instalar-standalone">Instalar la App 📲</button>
     </div>

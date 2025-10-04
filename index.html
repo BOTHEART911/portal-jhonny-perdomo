@@ -11,7 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-  <style>
+ <style>
 :root{
       --primary:#007BFF;
       --primary-2:#0056b3;
@@ -31,7 +31,7 @@
     /* VISTAS con transición */
     .view{ display:none; opacity:0; transform: translateY(8px);
       transition: opacity .25s ease, transform .25s ease;
-      min-height: 0; /* <--- ELIMINADO min-height extra */
+      min-height: calc(100dvh - 32px);
       box-sizing:border-box; padding:16px;
     }
     .view.active{ display:block; opacity:1; transform: translateY(0); }
@@ -42,7 +42,7 @@
       backdrop-filter: blur(3px);
       border: 2px solid #ddd; border-radius: 10px;
       box-shadow: 0 8px 18px rgba(0,0,0,.15);
-      max-width: 420px; margin: 16px auto; padding: 16px 16px 10px 16px; /* menos padding abajo */
+      max-width: 420px; margin: 16px auto; padding: 16px;
     }
     h1,h2{ margin: 8px 0 12px; text-align:center; }
     p.helper{ color:#666; font-size:.95rem; text-align:center; margin:8px 0 16px; }
@@ -79,10 +79,9 @@
     }
     .overlay .panel{
       position:absolute; top:0; left:0; width:min(360px, 90vw); height:100%;
-      background:#2f6bdb; color:#fff; padding:16px 16px 8px 16px; box-sizing:border-box;
+      background:#2f6bdb; color:#fff; padding:16px; box-sizing:border-box;
       transform: translateX(-100%); transition: transform .25s ease;
-      display:flex; flex-direction:column; gap:10px; overflow-y:auto;
-      min-height: 0;
+      display:flex; flex-direction:column; gap:12px; overflow-y:auto;
     }
     .overlay.open{ pointer-events:auto; }
     .overlay.open .scrim{ opacity:1; }
@@ -92,7 +91,7 @@
       background:#7de3ef; color:#000; border:0; font-weight:800;
       border-radius:999px; padding:12px; box-shadow: 0 6px 12px rgba(0,0,0,.18);
     }
-
+   
     /* VIDEO */
     .video-card{
       position:relative; width: min(560px, 90vw); aspect-ratio: 16 / 9;
@@ -277,6 +276,32 @@
   border-radius:4px;
   background:#fff;            /* se ve bien sobre fondos oscuros */
 }
+
+   /* Quitar espacio extra arriba/abajo en todas las vistas (menu, sede, redes, etc.) */
+.view{
+  padding: 0 16px; /* sin padding vertical; se conserva solo el lateral */
+}
+
+/* Evitar márgenes colapsados del primer y último elemento dentro de cada vista */
+.view > *:first-child{ margin-top: 0 !important; }
+.view > *:last-child{ margin-bottom: 0 !important; }
+
+/* Opcional: si quieres limitarlo sólo a las vistas mencionadas
+#view-menu > *:first-child,
+#view-sede > *:first-child,
+#view-redes > *:first-child{ margin-top: 0 !important; }
+#view-menu > *:last-child,
+#view-sede > *:last-child,
+#view-redes > *:last-child{ margin-bottom: 0 !important; }
+*/
+
+/* Panel lateral (menú deslizable): sin espacio “muerto” abajo/arriba */
+.overlay .panel{
+  padding-top: 16px;
+  padding-bottom: 0; /* quita espacio al final */
+}
+.overlay .panel > *:first-child{ margin-top: 0 !important; }
+.overlay .panel > *:last-child{ margin-bottom: 0 !important; }
 </style>
   
 </head>

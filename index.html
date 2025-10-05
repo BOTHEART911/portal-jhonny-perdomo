@@ -1088,7 +1088,7 @@ installButtons.forEach(btn=>{
     deferredPrompt = null;
     if (choice.outcome === 'accepted'){
       markInstalled();
-      Swal.fire({ icon:'success', title:'¡App instalada!', timer:1500, showConfirmButton:false });
+      Swal.fire({ icon:'success', title:'¡App instalándose!', timer:2000, showConfirmButton:false });
     }
     updateInstallButtonsVisibility();
   });

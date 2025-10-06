@@ -603,12 +603,13 @@
     <button class="chip danger" id="btn-logout">Cerrar Sesión</button>
   </div>
 
-  <div class="card">
-    <div class="image-center notif-wrap">
-      <img alt="usuario" src="https://res.cloudinary.com/dqqeavica/image/upload/v1758738139/user_zefosv.png" width="64" height="64" />
-      <img id="notif-bell" class="notif-bell" src="https://res.cloudinary.com/dqqeavica/image/upload/v1759767447/Notificaci%C3%B3n_jtptyw.webp" alt="">
-      <span id="notif-count" class="notif-count">0</span>
-    </div>
+  <div class="image-center">
+  <div class="notif-wrap">
+    <img alt="usuario" src="https://res.cloudinary.com/dqqeavica/image/upload/v1758738139/user_zefosv.png" width="64" height="64" />
+    <img id="notif-bell" class="notif-bell" src="https://res.cloudinary.com/dqqeavica/image/upload/v1759767447/Notificaci%C3%B3n_jtptyw.webp" alt="">
+    <span id="notif-count" class="notif-count">0</span>
+  </div>
+</div>
 
     <h2 id="u-nombre">Nombre</h2>
     <div class="narrow">
@@ -620,7 +621,6 @@
       <p><b>Puesto:</b> <span id="u-puesto"></span></p>
       <p><b>Mesa:</b> <span id="u-mesa"></span></p>
     </div>
-  </div>
 
   <!-- Video de Drive -->
   <div class="video-card" id="videoCard">
@@ -1379,7 +1379,7 @@ function stopLoading(){
     let currentUser = null;
 
     // Helpers de vistas
-   function showView(id){
+  function showView(id){
   for(const el of document.querySelectorAll('.view')) el.classList.remove('active');
   document.getElementById(id).classList.add('active');
   overlay.classList.remove('open');
@@ -1715,7 +1715,7 @@ document.getElementById('go-redes').addEventListener('click', ()=>{
   // Paso 2: aquí llamaremos a cargar el feed desde la API (listNotificaciones)
 });
 
-    /* ==== NOTIFICACIONES: feed, no leídas, badge, sonido ==== */
+   /* ==== NOTIFICACIONES: feed, no leídas, badge, sonido ==== */
 let FEED_CACHE = []; // último listado obtenido
 const FEED_READ_KEY = 'feedReadIds@v1';
 const FEED_SOUND_KEY = 'notifSoundPlayed@session';
@@ -1747,7 +1747,8 @@ function firstLinkThumb(url){
 }
 
 async function loadFeed(){
-  const list = await apiGet('listNotificaciones');
+  // IMPORTANTE: acción en minúsculas (el backend hace toLowerCase, pero usamos la forma definida)
+  const list = await apiGet('listnotificaciones');
   FEED_CACHE = Array.isArray(list) ? list : [];
   renderFeedList(FEED_CACHE);
 }
@@ -1836,7 +1837,7 @@ function unreadCountFrom(items){
 async function refreshNotificationsBadge(){
   try{
     // Pedimos la lista solo para contar (ligero: son 10 máx)
-    const list = await apiGet('listNotificaciones');
+    const list = await apiGet('listnotificaciones');
     const count = unreadCountFrom(list);
 
     const bell = document.getElementById('notif-bell');

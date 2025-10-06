@@ -317,6 +317,83 @@
 /* Opcional: si quieres que Sede y Redes no tengan ni 1px de “aire” arriba */
 #view-sede > *:first-child,
 #view-redes > *:first-child{ margin-top: 0 !important; }
+
+  /* ==== FEED NOTIFICACIONES (lista y detalle) ==== */
+.feed-list{
+  display:flex; flex-direction:column; gap:12px;
+}
+.feed-item{
+  display:flex; gap:12px; align-items:flex-start;
+  background: rgba(255,255,255,.9);
+  border:2px solid #ddd; border-radius:16px; padding:10px;
+  box-shadow: 0 6px 14px rgba(0,0,0,.12);
+  cursor:pointer;
+}
+.feed-thumb{
+  width:64px; height:64px; border-radius:10px; object-fit:cover; flex-shrink:0;
+  background:#eee;
+  border:1px solid #ddd;
+}
+.feed-content{ flex:1; min-width:0; }
+.feed-title{
+  font-weight:800; color:#111; margin:0 0 4px 0;
+  display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; text-overflow:ellipsis;
+}
+.feed-desc{
+  color:#333; margin:0;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; text-overflow:ellipsis;
+}
+
+/* Punto rojo (no leído) en ítem de lista */
+.feed-dot{
+  width:12px; height:12px; background:#e11; border-radius:999px; flex-shrink:0; margin-left:6px; margin-top:4px;
+  box-shadow: 0 0 0 2px #fff;
+}
+
+/* Detalle */
+.feed-detail-card{
+  background: rgba(255,255,255,.9);
+  border:2px solid #ddd; border-radius:16px; padding:16px;
+  box-shadow: 0 8px 18px rgba(0,0,0,.15);
+  max-width: 520px; margin: 12px auto;
+  text-align:center;
+}
+.feed-detail-thumb{
+  width:180px; height:180px; object-fit:cover; border-radius:12px; border:1px solid #ddd; background:#eee;
+  display:block; margin: 0 auto 10px;
+}
+.feed-detail-title{
+  margin:6px 0 10px; color:#111; font-weight:900;
+}
+.feed-detail-desc{
+  text-align:justify; color:#222; white-space:pre-line;
+}
+.feed-actions{ display:flex; gap:12px; margin-top:12px; }
+.feed-actions > *{ flex:1; }
+
+/* Badge en menú (icono con latido y contador) */
+.notif-wrap{ position:relative; display:inline-block; }
+.notif-bell{
+  position:absolute; right:-6px; top:-6px; width:28px; height:28px; display:none;
+  animation:heartbeat 1.2s infinite;
+}
+.notif-bell.active{ display:block; }
+.notif-count{
+  position:absolute; right:-2px; top:-2px;
+  background:#e11; color:#fff; border-radius:999px; min-width:18px; height:18px; line-height:18px;
+  text-align:center; padding:0 4px; font-size:12px; font-weight:800; display:none;
+  box-shadow: 0 0 0 2px #fff;
+}
+.notif-count.active{ display:inline-block; }
+
+/* Latido */
+@keyframes heartbeat{
+  0%{ transform: scale(1); }
+  20%{ transform: scale(1.15); }
+  40%{ transform: scale(1); }
+  60%{ transform: scale(1.15); }
+  100%{ transform: scale(1); }
+}
 </style>
   
 </head>
@@ -520,39 +597,42 @@
     </section>
 
     <!-- VISTA 2: MENÚ -->
-    <section id="view-menu" class="view">
-      <div class="btn-row" style="margin-bottom:12px;">
-        <button class="chip" id="btn-open-menu">MENÚ</button>
-        <button class="chip danger" id="btn-logout">Cerrar Sesión</button>
-      </div>
+<section id="view-menu" class="view">
+  <div class="btn-row" style="margin-bottom:12px;">
+    <button class="chip" id="btn-open-menu">MENÚ</button>
+    <button class="chip danger" id="btn-logout">Cerrar Sesión</button>
+  </div>
 
-      <div class="card">
-        <div class="image-center">
-          <img alt="usuario" src="https://res.cloudinary.com/dqqeavica/image/upload/v1758738139/user_zefosv.png" width="64" height="64" />
-        </div>
-        <h2 id="u-nombre">Nombre</h2>
-        <div class="narrow">
-          <p><b>C.C.:</b> <span id="u-doc"></span></p>
-          <p><b>Cel:</b> <span id="u-cel"></span></p>
-          <p><b>Residencia:</b> <span id="u-res"></span></p>
-          <p><b>Referencia:</b> <span id="u-ref"></span></p>
-          <p><b>Municipio:</b> <span id="u-mpio"></span></p>
-          <p><b>Puesto:</b> <span id="u-puesto"></span></p>
-          <p><b>Mesa:</b> <span id="u-mesa"></span></p>
-        </div>
-      </div>
+  <div class="card">
+    <div class="image-center notif-wrap">
+      <img alt="usuario" src="https://res.cloudinary.com/dqqeavica/image/upload/v1758738139/user_zefosv.png" width="64" height="64" />
+      <img id="notif-bell" class="notif-bell" src="https://res.cloudinary.com/dqqeavica/image/upload/v1759767447/Notificaci%C3%B3n_jtptyw.webp" alt="">
+      <span id="notif-count" class="notif-count">0</span>
+    </div>
 
-      <!-- Video de Drive -->
-      <div class="video-card" id="videoCard">
-        <img id="videoThumb" class="video-thumb" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753562431/ASISTENCIA_JHONNY_co6qwy.png" alt="Video miniatura">
-        <div class="play-layer" id="playLayer">▶</div>
-      </div>
+    <h2 id="u-nombre">Nombre</h2>
+    <div class="narrow">
+      <p><b>C.C.:</b> <span id="u-doc"></span></p>
+      <p><b>Cel:</b> <span id="u-cel"></span></p>
+      <p><b>Residencia:</b> <span id="u-res"></span></p>
+      <p><b>Referencia:</b> <span id="u-ref"></span></p>
+      <p><b>Municipio:</b> <span id="u-mpio"></span></p>
+      <p><b>Puesto:</b> <span id="u-puesto"></span></p>
+      <p><b>Mesa:</b> <span id="u-mesa"></span></p>
+    </div>
+  </div>
 
-      <div class="image-center">
-        <img class="brand" alt="Brand" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png" />
-      </div>
-      <p class="center muted">Copyright © <a href="#" target="https://wa.me/573103230712"><b>Oscar Polanía</b></a></p>
-    </section>
+  <!-- Video de Drive -->
+  <div class="video-card" id="videoCard">
+    <img id="videoThumb" class="video-thumb" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753562431/ASISTENCIA_JHONNY_co6qwy.png" alt="Video miniatura">
+    <div class="play-layer" id="playLayer">▶</div>
+  </div>
+
+  <div class="image-center">
+    <img class="brand" alt="Brand" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png" />
+  </div>
+  <p class="center muted">Copyright © <a href="#" target="https://wa.me/573103230712"><b>Oscar Polanía</b></a></p>
+</section>
 
     <!-- OVERLAY BANNER -->
 <div class="overlay" id="overlay">
@@ -565,6 +645,7 @@
       <img alt="banner" src="https://res.cloudinary.com/dqqeavica/image/upload/v1759696513/Jhonny_y1tslf.gif" style="max-width:180px;border-radius:10px;" />
     </div>
     <h3>Selecciona una de las opciones</h3>
+    <button class="menu-btn" id="go-feed">Ponte al día 📅</button>
     <button class="menu-btn" id="go-asistencia">Registra Asistencia a Evento ✋🏾</button>
     <button class="menu-btn" id="go-solicitud">Realiza tu Solicitud 📬</button>
     <button class="menu-btn" id="go-ideas">Suma tus Ideas 💡</button>
@@ -1169,6 +1250,33 @@ updateInstallButtonsVisibility();
   </div>
 </section>
 
+  <!-- VISTA 11: PONTE AL DÍA (lista) -->
+<section id="view-feed" class="view">
+  <div class="card narrow" style="padding-top:12px;">
+    <h2 style="color:var(--primary); text-shadow: 0 2px 2px #031732; margin-bottom:10px;">¡PONTE AL DÍA!</h2>
+    <div id="feed-list" class="feed-list">
+      <!-- Se llena por JS en el paso 2 -->
+      <!-- Placeholder para que sepas dónde aparece la lista -->
+    </div>
+    <div class="btn-row spaced">
+      <button id="feed-volver">Regresar</button>
+    </div>
+  </div>
+</section>
+
+<!-- VISTA 12: DETALLE DE NOTIFICACIÓN -->
+<section id="view-feed-detail" class="view">
+  <div class="feed-detail-card">
+    <img id="fd-thumb" class="feed-detail-thumb" src="" alt="">
+    <h3 id="fd-title" class="feed-detail-title">Título</h3>
+    <p id="fd-desc" class="feed-detail-desc">Descripción</p>
+    <div class="feed-actions">
+      <a id="fd-link" class="chip" href="#" target="_blank" rel="noopener">Visita la Noticia</a>
+      <button id="fd-volver">Regresar</button>
+    </div>
+  </div>
+</section>
+
   <script>
     // URL de tu Apps Script desplegado
     const API_BASE = 'https://script.google.com/macros/s/AKfycbzYEzUpAoXZKgkCut4HI2CgcHiwkgldjx23RXucAGx-BlTKXreJO_ZQ2MCyr8aqnOl0/exec';
@@ -1214,7 +1322,8 @@ function stopLoading(){
       login: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011577/Siri_star_g1owy4.mp3',
       logout: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011577/Siri_End_kelv02.mp3',
       menu: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011577/Namedrop_Popup_ale2zy.mp3',
-      back: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011578/Keyboard_Enter_b9k2dc.mp3'
+      back: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011578/Keyboard_Enter_b9k2dc.mp3',
+      notify: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759767435/Notificacion_d1woxv.mp3'
     };
     function playSoundOnce(url){
       try{
@@ -1270,12 +1379,16 @@ function stopLoading(){
     let currentUser = null;
 
     // Helpers de vistas
-    function showView(id){
-      for(const el of document.querySelectorAll('.view')) el.classList.remove('active');
-      document.getElementById(id).classList.add('active');
-      overlay.classList.remove('open');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+   function showView(id){
+  for(const el of document.querySelectorAll('.view')) el.classList.remove('active');
+  document.getElementById(id).classList.add('active');
+  overlay.classList.remove('open');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // Al entrar al Menú, refresca el badge (y sonido una sola vez)
+  if(id === 'view-menu'){ refreshNotificationsBadge(); }
+}
+    
     function renderUserMenu(){
       document.getElementById('u-nombre').textContent = currentUser?.nombre || '';
       document.getElementById('u-doc').textContent = currentUser?.documento || '';
@@ -1596,6 +1709,175 @@ document.getElementById('go-redes').addEventListener('click', ()=>{
       }
     });
 
+    document.getElementById('go-feed').addEventListener('click', async ()=>{
+  overlay.classList.remove('open');
+  showView('view-feed');
+  // Paso 2: aquí llamaremos a cargar el feed desde la API (listNotificaciones)
+});
+
+    /* ==== NOTIFICACIONES: feed, no leídas, badge, sonido ==== */
+let FEED_CACHE = []; // último listado obtenido
+const FEED_READ_KEY = 'feedReadIds@v1';
+const FEED_SOUND_KEY = 'notifSoundPlayed@session';
+
+function getReadMap(){
+  try{
+    const raw = localStorage.getItem(FEED_READ_KEY);
+    return raw ? JSON.parse(raw) : {};
+  }catch(_){ return {}; }
+}
+function setReadMap(map){
+  try{ localStorage.setItem(FEED_READ_KEY, JSON.stringify(map||{})); }catch(_){}
+}
+function isRead(id){
+  const m = getReadMap();
+  return !!m[id];
+}
+function markRead(id){
+  const m = getReadMap();
+  m[id] = true;
+  setReadMap(m);
+}
+
+function firstLinkThumb(url){
+  // Si es imagen directa, úsala; si no, usa un placeholder
+  if(!url) return 'https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png';
+  if (/\.(png|jpe?g|webp|gif|bmp|svg)(\?.*)?$/i.test(url)) return url;
+  return 'https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png';
+}
+
+async function loadFeed(){
+  const list = await apiGet('listNotificaciones');
+  FEED_CACHE = Array.isArray(list) ? list : [];
+  renderFeedList(FEED_CACHE);
+}
+
+function renderFeedList(items){
+  const wrap = document.getElementById('feed-list');
+  if(!wrap) return;
+  wrap.innerHTML = '';
+
+  if(!items.length){
+    const p = document.createElement('p');
+    p.className = 'muted center';
+    p.textContent = 'No hay notificaciones disponibles.';
+    wrap.appendChild(p);
+    return;
+  }
+
+  for(const it of items){
+    const item = document.createElement('div');
+    item.className = 'feed-item';
+    item.dataset.id = it.id;
+
+    const img = document.createElement('img');
+    img.className = 'feed-thumb';
+    img.alt = '';
+    img.src = firstLinkThumb(it.first_link);
+
+    const ct = document.createElement('div');
+    ct.className = 'feed-content';
+
+    const h = document.createElement('h4');
+    h.className = 'feed-title';
+    h.textContent = String(it.titulo||'');
+
+    const p = document.createElement('p');
+    p.className = 'feed-desc';
+    p.textContent = String(it.descripcion||'');
+
+    ct.appendChild(h);
+    ct.appendChild(p);
+
+    item.appendChild(img);
+    item.appendChild(ct);
+
+    if(!isRead(it.id)){
+      const dot = document.createElement('span');
+      dot.className = 'feed-dot';
+      item.appendChild(dot);
+    }
+
+    item.addEventListener('click', ()=> openFeedDetail(it));
+    wrap.appendChild(item);
+  }
+}
+
+function openFeedDetail(it){
+  // Rellenar detalle
+  const thumb = document.getElementById('fd-thumb');
+  const title = document.getElementById('fd-title');
+  const desc = document.getElementById('fd-desc');
+  const link = document.getElementById('fd-link');
+
+  if(thumb) thumb.src = firstLinkThumb(it.first_link);
+  if(title) title.textContent = String(it.titulo||'');
+  if(desc)  desc.textContent  = String(it.descripcion||'');
+  if(link){
+    if(it.first_link){ link.href = it.first_link; link.style.display=''; }
+    else { link.href = '#'; link.style.display='none'; }
+  }
+
+  // Marcar como leída y refrescar UI
+  markRead(it.id);
+  renderFeedList(FEED_CACHE);
+  refreshNotificationsBadge();
+
+  showView('view-feed-detail');
+}
+
+function unreadCountFrom(items){
+  if(!Array.isArray(items) || !items.length) return 0;
+  let n = 0;
+  for(const it of items){ if(!isRead(it.id)) n++; }
+  return n;
+}
+
+async function refreshNotificationsBadge(){
+  try{
+    // Pedimos la lista solo para contar (ligero: son 10 máx)
+    const list = await apiGet('listNotificaciones');
+    const count = unreadCountFrom(list);
+
+    const bell = document.getElementById('notif-bell');
+    const badge = document.getElementById('notif-count');
+
+    if(badge) badge.textContent = String(count);
+
+    if(count > 0){
+      bell && bell.classList.add('active');
+      badge && badge.classList.add('active');
+
+      // Sonar solo una vez por sesión mientras existan no leídas
+      const played = sessionStorage.getItem(FEED_SOUND_KEY) === '1';
+      if(!played){
+        playSoundOnce(SOUNDS.notify);
+        try{ sessionStorage.setItem(FEED_SOUND_KEY, '1'); }catch(_){}
+      }
+    }else{
+      bell && bell.classList.remove('active');
+      badge && badge.classList.remove('active');
+      try{ sessionStorage.removeItem(FEED_SOUND_KEY); }catch(_){}
+    }
+  }catch(_){
+    // En caso de error, ocultar badge
+    const bell = document.getElementById('notif-bell');
+    const badge = document.getElementById('notif-count');
+    bell && bell.classList.remove('active');
+    badge && badge.classList.remove('active');
+  }
+}
+
+// Al abrir “Ponte al día” cargamos/actualizamos la lista
+(function(){
+  const btn = document.getElementById('go-feed');
+  if(btn){
+    btn.addEventListener('click', async ()=>{
+      try{ await loadFeed(); }catch(_){}
+    }, { capture:true });
+  }
+})();
+    
     // COMPARTIR PORTAL
     document.getElementById('btn-compartir').addEventListener('click', ()=>{
   const url = "https://tinyurl.com/app-jhonny-perdomo";
@@ -2096,6 +2378,9 @@ document.getElementById('c-validar').addEventListener('click', async ()=>{
     });
     document.getElementById('i-volver').addEventListener('click', ()=> showView('view-menu'));
 
+    document.getElementById('feed-volver').addEventListener('click', ()=> showView('view-menu'));
+document.getElementById('fd-volver').addEventListener('click', ()=> showView('view-feed'));
+
     // Sonido para botones Atrás/Regresar
     ['btn-ovl-back','a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver','btn-reg-atras','sede-volver','redes-volver'].forEach(id=>{
   const el = document.getElementById(id);
@@ -2107,6 +2392,16 @@ document.getElementById('c-validar').addEventListener('click', async ()=>{
   const el = document.getElementById(id);
   if(el) el.addEventListener('click', ()=> showView('view-menu'));
 });
+
+    // + nuevos "Atrás"
+['feed-volver','fd-volver'].forEach(id=>{
+  const el = document.getElementById(id);
+  if(el) el.addEventListener('click', ()=> playSoundOnce(SOUNDS.back));
+});
+
+    
+
+    
   </script>
 </body>
 </html>

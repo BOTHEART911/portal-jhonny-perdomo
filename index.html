@@ -317,45 +317,6 @@
 /* Opcional: si quieres que Sede y Redes no tengan ni 1px de “aire” arriba */
 #view-sede > *:first-child,
 #view-redes > *:first-child{ margin-top: 0 !important; }
-
-  /* ==== NOTIFICACIONES (lista en Menú + detalle) ==== */
-.notif-card{ max-width:640px; margin: 16px auto; }
-#notif-list{ display:flex; flex-direction:column; gap:12px; }
-
-.notif-item{
-  display:flex; align-items:center; gap:12px;
-  background: rgba(255,255,255,.86);
-  border-radius:14px; border:2px solid #cfd7ff;
-  padding:10px; position:relative; cursor:pointer;
-  box-shadow: 0 8px 14px rgba(0,0,0,.12);
-}
-.notif-img{
-  width:64px; height:64px; flex:0 0 64px; border-radius:10px; object-fit:cover;
-  background:#eee; border:1px solid #ddd;
-}
-.notif-content{ flex:1; min-width:0; }
-.notif-title{
-  font-weight:800; color:#111;
-  display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden;
-}
-.notif-desc{
-  color:#333; font-size:.94rem;
-  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
-}
-.notif-dot{
-  position:absolute; right:10px; top:8px;
-  width:12px; height:12px; background:#e11; border-radius:50%;
-  box-shadow: 0 0 0 2px #fff;
-}
-.notif-dot.hidden{ display:none; }
-
-/* Detalle */
-#view-notif .cover{
-  width:160px; height:160px; object-fit:cover; border-radius:10px; border:2px solid #ddd;
-}
-#view-notif h2{ text-align:center; }
-#view-notif .body{ text-align:justify; white-space:pre-wrap; }
-  
 </style>
   
 </head>
@@ -564,12 +525,6 @@
         <button class="chip" id="btn-open-menu">MENÚ</button>
         <button class="chip danger" id="btn-logout">Cerrar Sesión</button>
       </div>
-
-      <!-- NOTIFICACIONES: lista en Menú -->
-<div class="card notif-card">
-  <h2 style="color:var(--primary);">¡PONTE AL DÍA!</h2>
-  <div id="notif-list"></div>
-</div>
 
       <div class="card">
         <div class="image-center">
@@ -1049,8 +1004,6 @@
     })();
   </script>
     </section>
-
-    
 <script>
  /* PWA: instalar + detección de instalada (Android/PC prompt; iOS instrucciones).
    Botones soportados: #btn-instalar (menú) y #btn-instalar-standalone (vista instalar). */
@@ -1212,20 +1165,6 @@ updateInstallButtonsVisibility();
 
     <div class="btn-row spaced">
       <button id="redes-volver">Atrás</button>
-    </div>
-  </div>
-</section>
-
-    
-    <!-- VISTA 11: DETALLE DE NOTIFICACIÓN -->
-<section id="view-notif" class="view">
-  <div class="card narrow">
-    <div class="image-center"><img id="nd-image" class="cover" alt=""></div>
-    <h2 id="nd-title"></h2>
-    <p id="nd-desc" class="body"></p>
-    <div class="btn-row spaced">
-      <a id="nd-link" class="btn-primary" href="#" target="_blank" rel="noopener">Visita la Noticia</a>
-      <button id="nd-back">Regresar</button>
     </div>
   </div>
 </section>
@@ -1593,14 +1532,12 @@ if (formData.referencia && !referenciaRegex.test(formData.referencia)) {
     document.getElementById('ovlClose').addEventListener('click', ()=> overlay.classList.remove('open'));
 
     document.getElementById('btn-logout').addEventListener('click', ()=>{
-  playSoundOnce(SOUNDS.logout);
-  onUserLoggedOut_Notifications(); // <--- NUEVO: detiene polling y limpia
-  currentUser = null;
-  docLogin.value = '';
-  regCard.style.display='none';
-  showView('view-login');
-});
-
+      playSoundOnce(SOUNDS.logout);
+      currentUser = null;
+      docLogin.value = '';
+      regCard.style.display='none';
+      showView('view-login');
+    });
 
     document.getElementById('go-asistencia').addEventListener('click', async ()=>{
       overlay.classList.remove('open');
@@ -1811,9 +1748,6 @@ document.addEventListener('visibilitychange', () => {
       }
     });
     document.getElementById('a-volver').addEventListener('click', ()=> showView('view-menu'));
-    
-    showView('view-menu');
-onUserLoggedIn_Notifications(); // <--- NUEVO: carga la lista y arranca el polling
 
     // VOTACIÓN (pegar fila)
     function parseFila(text){
@@ -2173,156 +2107,6 @@ document.getElementById('c-validar').addEventListener('click', async ()=>{
   const el = document.getElementById(id);
   if(el) el.addEventListener('click', ()=> showView('view-menu'));
 });
-
-    /* ==== NOTIFICACIONES: cargar al iniciar sesión y autorefrescar en Menú ==== */
-const NEW_NOTIF_SOUND = 'https://res.cloudinary.com/dqqeavica/video/upload/v1759767435/Notificacion_d1woxv.mp3';
-const NOTIF_PLACEHOLDER_IMG = 'https://res.cloudinary.com/dqqeavica/image/upload/v1759697569/Jhonny_tvexdy.png';
-
-const notifListEl = document.getElementById('notif-list');
-const ndImg = document.getElementById('nd-image');
-const ndTitle = document.getElementById('nd-title');
-const ndDesc = document.getElementById('nd-desc');
-const ndLink = document.getElementById('nd-link');
-const ndBack = document.getElementById('nd-back');
-
-let notifState = { items: [], lastTopId: null, readSet: new Set() };
-let notifPoller = null;
-
-function notifReadKey(){
-  const uid = currentUser?.documento || 'anon';
-  return 'readNotifs:' + uid;
-}
-function loadReadSet(){
-  try{
-    const raw = localStorage.getItem(notifReadKey());
-    notifState.readSet = new Set(raw ? JSON.parse(raw) : []);
-  }catch(_){ notifState.readSet = new Set(); }
-}
-function saveReadSet(){
-  try{
-    localStorage.setItem(notifReadKey(), JSON.stringify(Array.from(notifState.readSet)));
-  }catch(_){}
-}
-
-function guessPreview(link){
-  if (!link) return NOTIF_PLACEHOLDER_IMG;
-  if (/\.(png|jpe?g|webp|gif)$/i.test(link)) return link;
-  return NOTIF_PLACEHOLDER_IMG;
-}
-
-function renderNotifList(items){
-  if (!notifListEl) return;
-  if (!items || !items.length){
-    notifListEl.innerHTML = '<p class="center muted">No hay notificaciones por ahora.</p>';
-    return;
-  }
-  const html = items.map(n=>{
-    const unread = !notifState.readSet.has(n.id);
-    const img = guessPreview(n.first_link);
-    // Pequeño extracto limpio (sin salto de línea largo)
-    const extract = (n.descripcion || '').replace(/\s+/g,' ').trim();
-    return `
-      <div class="notif-item" data-id="${n.id}">
-        <img class="notif-img" loading="lazy" src="${img}" alt="">
-        <div class="notif-content">
-          <div class="notif-title">${(n.titulo || '').toUpperCase()}</div>
-          <div class="notif-desc">${extract}</div>
-        </div>
-        <span class="notif-dot ${unread ? '' : 'hidden'}"></span>
-      </div>
-    `;
-  }).join('');
-  notifListEl.innerHTML = html;
-}
-
-function openNotifDetail(n){
-  if (!n) return;
-  // marcar como leída
-  if (!notifState.readSet.has(n.id)){
-    notifState.readSet.add(n.id);
-    saveReadSet();
-    // actualizar punto rojo en la lista
-    const dot = notifListEl.querySelector(`.notif-item[data-id="${n.id}"] .notif-dot`);
-    if (dot) dot.classList.add('hidden');
-  }
-  // setear contenido
-  ndImg.src = guessPreview(n.first_link);
-  ndTitle.textContent = (n.titulo || '').toUpperCase();
-  ndDesc.textContent = n.descripcion || '';
-  // link “Visita la Noticia”
-  if (n.first_link){
-    ndLink.style.display = '';
-    ndLink.href = n.first_link;
-  }else{
-    ndLink.style.display = 'none';
-    ndLink.href = '#';
-  }
-  showView('view-notif');
-}
-if (ndBack){
-  ndBack.addEventListener('click', ()=> showView('view-menu'));
-}
-
-// Delegación de click en la lista
-if (notifListEl){
-  notifListEl.addEventListener('click', (ev)=>{
-    const item = ev.target.closest('.notif-item');
-    if (!item) return;
-    const id = item.getAttribute('data-id');
-    const n = notifState.items.find(x=> String(x.id) === String(id));
-    openNotifDetail(n);
-  });
-}
-
-async function fetchAndRenderNotifications({playIfNew=false} = {}){
-  try{
-    const items = await apiGet('listnotificaciones');
-    if (!Array.isArray(items)) return;
-
-    const prevTop = notifState.lastTopId;
-    notifState.items = items;
-    notifState.lastTopId = items[0]?.id || null;
-
-    renderNotifList(items);
-
-    if (playIfNew && prevTop && notifState.lastTopId && notifState.lastTopId !== prevTop){
-      // llegó algo nuevo
-      playSoundOnce(NEW_NOTIF_SOUND);
-    }
-  }catch(_){}
-}
-
-function startNotifPolling(){
-  if (notifPoller || !currentUser) return;
-  notifPoller = setInterval(()=> fetchAndRenderNotifications({playIfNew:true}), 30000); // cada 30s
-}
-function stopNotifPolling(){
-  if (notifPoller){ clearInterval(notifPoller); notifPoller = null; }
-}
-
-document.addEventListener('visibilitychange', ()=>{
-  if (document.hidden){
-    stopNotifPolling();
-  }else{
-    if (currentUser){
-      fetchAndRenderNotifications();
-      startNotifPolling();
-    }
-  }
-});
-
-// Llamar esto justo DESPUÉS de un login exitoso (cuando pasas a view-menu)
-async function onUserLoggedIn_Notifications(){
-  loadReadSet();
-  await fetchAndRenderNotifications(); // primera carga sin sonido
-  startNotifPolling();
-}
-// Llamar esto en logout
-function onUserLoggedOut_Notifications(){
-  stopNotifPolling();
-  notifState = { items: [], lastTopId: null, readSet: new Set() };
-  if (notifListEl) notifListEl.innerHTML = '';
-}
   </script>
 </body>
 </html>

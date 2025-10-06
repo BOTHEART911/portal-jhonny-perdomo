@@ -1735,7 +1735,7 @@ document.getElementById('go-redes').addEventListener('click', ()=>{
     document.getElementById('go-feed').addEventListener('click', async ()=>{
   overlay.classList.remove('open');
   showView('view-feed');
-  // Paso 2: aquí llamaremos a cargar el feed desde la API (listNotificaciones)
+  try { await loadFeed(); } catch(_){}
 });
 
    /* ==== NOTIFICACIONES: feed, no leídas, badge, sonido ==== */
@@ -1939,16 +1939,6 @@ async function refreshNotificationsBadge(){
     badge && badge.classList.remove('active');
   }
 }
-
-// Al abrir “Ponte al día” cargamos/actualizamos la lista
-(function(){
-  const btn = document.getElementById('go-feed');
-  if(btn){
-    btn.addEventListener('click', async ()=>{
-      try{ await loadFeed(); }catch(_){}
-    }, { capture:true });
-  }
-})();
     
     // COMPARTIR PORTAL
     document.getElementById('btn-compartir').addEventListener('click', ()=>{

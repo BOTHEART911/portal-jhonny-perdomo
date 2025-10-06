@@ -1513,9 +1513,17 @@ function stopLoading(){
         mesa: res.mesa || ''
       };
       renderUserMenu();
-      playSoundOnce(SOUNDS.login);
-      showView('view-menu');
-      refreshNotificationsBadge();
+playSoundOnce(SOUNDS.login);
+showView('view-menu');
+
+// Permitir que el sonido de notificaciones vuelva a sonar tras login
+try{ sessionStorage.removeItem(FEED_SOUND_KEY); }catch(_){}
+
+// Refresca badge de inmediato (esto hace sonar si hay no leídas)
+refreshNotificationsBadge();
+
+// Precarga la lista en segundo plano para que esté lista al abrir "Ponte al día"
+loadFeed().catch(()=>{});
     } else {
       regCard.style.display = '';
       Swal.fire({
@@ -1668,12 +1676,13 @@ if (formData.referencia && !referenciaRegex.test(formData.referencia)) {
     document.getElementById('ovlClose').addEventListener('click', ()=> overlay.classList.remove('open'));
 
     document.getElementById('btn-logout').addEventListener('click', ()=>{
-      playSoundOnce(SOUNDS.logout);
-      currentUser = null;
-      docLogin.value = '';
-      regCard.style.display='none';
-      showView('view-login');
-    });
+  playSoundOnce(SOUNDS.logout);
+  try{ sessionStorage.removeItem(FEED_SOUND_KEY); }catch(_){}
+  currentUser = null;
+  docLogin.value = '';
+  regCard.style.display='none';
+  showView('view-login');
+});
 
     document.getElementById('go-asistencia').addEventListener('click', async ()=>{
       overlay.classList.remove('open');
@@ -1740,17 +1749,20 @@ document.getElementById('go-redes').addEventListener('click', ()=>{
 
    /* ==== NOTIFICACIONES: feed, no leídas, badge, sonido ==== */
 let FEED_CACHE = []; // último listado obtenido
-const FEED_READ_KEY = 'feedReadIds@v1';
+const FEED_READ_KEY_PREFIX = 'feedReadIds@v1:';
+function feedReadKey(){
+  return FEED_READ_KEY_PREFIX + (currentUser?.documento || 'anon');
+}
 const FEED_SOUND_KEY = 'notifSoundPlayed@session';
 
 function getReadMap(){
   try{
-    const raw = localStorage.getItem(FEED_READ_KEY);
+    const raw = localStorage.getItem(feedReadKey());
     return raw ? JSON.parse(raw) : {};
   }catch(_){ return {}; }
 }
 function setReadMap(map){
-  try{ localStorage.setItem(FEED_READ_KEY, JSON.stringify(map||{})); }catch(_){}
+  try{ localStorage.setItem(feedReadKey(), JSON.stringify(map||{})); }catch(_){}
 }
 function isRead(id){
   const m = getReadMap();

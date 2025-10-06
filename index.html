@@ -376,6 +376,14 @@
   60%  { transform: scale(1.12); }
   100% { transform: scale(1); }
 }
+
+  .menu-notif-badge{
+  position:absolute; right:-6px; top:-6px;
+  min-width:18px; height:18px; padding:0 5px;
+  background:#e11; color:#fff; border-radius:999px;
+  display:flex; align-items:center; justify-content:center;
+  font-weight:800; font-size:11px; border:2px solid #fff;
+}
 </style>
   
 </head>
@@ -578,17 +586,19 @@
       </div>
     </section>
 
-    <!-- VISTA 2: MENÚ -->
+        <!-- VISTA 2: MENÚ -->
     <section id="view-menu" class="view">
       <div class="btn-row" style="margin-bottom:12px;">
         <button class="chip" id="btn-open-menu">MENÚ</button>
         <button class="chip danger" id="btn-logout">Cerrar Sesión</button>
       </div>
 
-      <div class="card">
-        <div class="image-center">
+      <div class="image-center">
+        <div class="menu-avatar" style="position:relative; display:inline-block;">
           <img alt="usuario" src="https://res.cloudinary.com/dqqeavica/image/upload/v1758738139/user_zefosv.png" width="64" height="64" />
+          <span id="menu-notif-badge" class="menu-notif-badge hidden">0</span>
         </div>
+      </div>
         <h2 id="u-nombre">Nombre</h2>
         <div class="narrow">
           <p><b>C.C.:</b> <span id="u-doc"></span></p>
@@ -2246,10 +2256,19 @@ document.getElementById('c-validar').addEventListener('click', async ()=>{
     if(!u) return false;
     return /\.(png|jpe?g|webp|gif|avif)(\?.*)?$/i.test(u);
   }
+  
   function thumbFor(item){
-    const u = item.first_link || '';
-    return isImageUrl(u) ? u : NEWS_PLACEHOLDER;
+  const u = item.first_link || '';
+  if (!u) return NEWS_PLACEHOLDER;
+  if (isImageUrl(u)) return u;
+  try{
+    const url = new URL(u);
+    // Favicon del dominio como fallback visual
+    return 'https://www.google.com/s2/favicons?domain=' + encodeURIComponent(url.hostname) + '&sz=64';
+  }catch(_){
+    return NEWS_PLACEHOLDER;
   }
+}
 
   async function fetchNews(){
     try{

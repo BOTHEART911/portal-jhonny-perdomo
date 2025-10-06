@@ -371,6 +371,18 @@
 .feed-actions{ display:flex; gap:12px; margin-top:12px; }
 .feed-actions > *{ flex:1; }
 
+  /* Feed detail: acciones en columna */
+.feed-actions{
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  gap:12px;
+  margin-top:12px;
+}
+.feed-actions > *{ flex:0 0 auto; }
+.feed-actions .chip{ text-align:center; }
+#fd-volver{ width:100%; }
+
 /* Badge en menú (icono con latido y contador) */
 .notif-wrap{ position:relative; display:inline-block; }
 .notif-bell{
@@ -394,6 +406,8 @@
   60%{ transform: scale(1.15); }
   100%{ transform: scale(1); }
 }
+
+  .image-center{ display:flex; justify-content:center; align-items:center; }
 </style>
   
 </head>
@@ -1271,7 +1285,7 @@ updateInstallButtonsVisibility();
     <h3 id="fd-title" class="feed-detail-title">Título</h3>
     <p id="fd-desc" class="feed-detail-desc">Descripción</p>
     <div class="feed-actions">
-      <a id="fd-link" class="chip" href="#" target="_blank" rel="noopener">Visita la Noticia</a>
+      <a id="fd-link" class="chip" href="#" target="_blank" rel="noopener">Ayúdanos con tu Like, Comenta y Comparte</a>
       <button id="fd-volver">Regresar</button>
     </div>
   </div>
@@ -1740,10 +1754,15 @@ function markRead(id){
 }
 
 function firstLinkThumb(url){
-  // Si es imagen directa, úsala; si no, usa un placeholder
-  if(!url) return 'https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png';
+  const placeholder = 'https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png';
+  if(!url) return placeholder;
+
+  // Si es imagen directa, úsala.
   if (/\.(png|jpe?g|webp|gif|bmp|svg)(\?.*)?$/i.test(url)) return url;
-  return 'https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png';
+
+  // Open Graph preview (tercero sin CORS desde el cliente)
+  // Opción: thum.io OG (si el sitio expone OG image)
+  return 'https://image.thum.io/get/og/' + encodeURIComponent(url);
 }
 
 async function loadFeed(){
@@ -1751,6 +1770,13 @@ async function loadFeed(){
   const list = await apiGet('listnotificaciones');
   FEED_CACHE = Array.isArray(list) ? list : [];
   renderFeedList(FEED_CACHE);
+}
+    function fallbackThumbFor(url){
+  const u = String(url||'').toLowerCase();
+  if(u.includes('facebook'))  return 'https://res.cloudinary.com/dqqeavica/image/upload/v1759166342/facebook_nezbkz.webp';
+  if(u.includes('instagram')) return 'https://res.cloudinary.com/dqqeavica/image/upload/v1759166342/instragram_uft2wl.webp';
+  if(u.includes('tiktok'))    return 'https://res.cloudinary.com/dqqeavica/image/upload/v1759166342/tiktok_tdvc2x.webp';
+  return 'https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png';
 }
 
 function renderFeedList(items){
@@ -1775,6 +1801,8 @@ function renderFeedList(items){
     img.className = 'feed-thumb';
     img.alt = '';
     img.src = firstLinkThumb(it.first_link);
+    img.loading = 'lazy';
+img.onerror = () => { img.src = fallbackThumbFor(it.first_link); };
 
     const ct = document.createElement('div');
     ct.className = 'feed-content';
@@ -1805,25 +1833,42 @@ function renderFeedList(items){
 }
 
 function openFeedDetail(it){
-  // Rellenar detalle
+  // Elementos del detalle
   const thumb = document.getElementById('fd-thumb');
   const title = document.getElementById('fd-title');
-  const desc = document.getElementById('fd-desc');
-  const link = document.getElementById('fd-link');
+  const desc  = document.getElementById('fd-desc');
+  const link  = document.getElementById('fd-link');
 
-  if(thumb) thumb.src = firstLinkThumb(it.first_link);
-  if(title) title.textContent = String(it.titulo||'');
-  if(desc)  desc.textContent  = String(it.descripcion||'');
-  if(link){
-    if(it.first_link){ link.href = it.first_link; link.style.display=''; }
-    else { link.href = '#'; link.style.display='none'; }
+  // Miniatura con OG/screenshot + fallback por dominio
+  if (thumb){
+    thumb.src = firstLinkThumb(it.first_link);
+    thumb.loading = 'lazy';
+    thumb.onerror = () => { thumb.src = fallbackThumbFor(it.first_link); };
   }
 
-  // Marcar como leída y refrescar UI
+  // Título y descripción
+  if (title) title.textContent = String(it.titulo || '');
+  if (desc)  desc.textContent  = String(it.descripcion || '');
+
+  // Link de acción (mostrar/ocultar y texto)
+  if (link){
+    if (it.first_link){
+      link.href = it.first_link;
+      link.style.display = '';
+    }else{
+      link.href = '#';
+      link.style.display = 'none';
+    }
+    // Texto del botón de acción
+    link.textContent = 'Ayúdanos con tu Like, Comenta y comparte';
+  }
+
+  // Marcar como leída y refrescar UI del listado y badge
   markRead(it.id);
   renderFeedList(FEED_CACHE);
   refreshNotificationsBadge();
 
+  // Mostrar vista detalle
   showView('view-feed-detail');
 }
 

@@ -1809,18 +1809,23 @@ function renderFeedList(items){
     const img = document.createElement('img');
     img.className = 'feed-thumb';
     img.alt = '';
+    // Base: OG de thum.io para que haya algo rápido
     img.src = firstLinkThumb(it.first_link);
-    firstLinkThumb(it.first_link);
-img.loading = 'lazy';
-img.onerror = () => {
-  const enc = encodeURIComponent(it.first_link || '');
-  if (!img.dataset.shotTried){
-    img.dataset.shotTried = '1';
-    img.src = 'https://image.thum.io/get/width/900/crop/500/noanimate/' + enc; // intento screenshot
-    return;
-  }
-  img.src = fallbackThumbFor(it.first_link); // último recurso: logo por dominio
-};
+    img.loading = 'lazy';
+    img.onerror = () => {
+      const enc = encodeURIComponent(it.first_link || '');
+      if (!img.dataset.shotTried){
+        img.dataset.shotTried = '1';
+        img.src = 'https://image.thum.io/get/width/900/crop/500/noanimate/' + enc; // intento screenshot
+        return;
+      }
+      img.src = fallbackThumbFor(it.first_link); // último recurso: logo por dominio
+    };
+
+    // Mejora progresiva: sustituir por la OG real desde tu backend cuando llegue
+    resolveOgThumb(it.first_link).then(u => {
+      if(u) { img.src = u; }
+    });
 
     const ct = document.createElement('div');
     ct.className = 'feed-content';
@@ -1859,18 +1864,23 @@ function openFeedDetail(it){
 
   // Miniatura con OG/screenshot + fallback por dominio
   if (thumb){
-  thumb.src = firstLinkThumb(it.first_link);
-  thumb.loading = 'lazy';
-  thumb.onerror = () => {
-    const enc = encodeURIComponent(it.first_link || '');
-    if (!thumb.dataset.shotTried){
-      thumb.dataset.shotTried = '1';
-      thumb.src = 'https://image.thum.io/get/width/900/crop/500/noanimate/' + enc;
-      return;
-    }
-    thumb.src = fallbackThumbFor(it.first_link);
-  };
-}
+    // Base rápida
+    thumb.src = firstLinkThumb(it.first_link);
+    thumb.loading = 'lazy';
+    thumb.onerror = () => {
+      const enc = encodeURIComponent(it.first_link || '');
+      if (!thumb.dataset.shotTried){
+        thumb.dataset.shotTried = '1';
+        thumb.src = 'https://image.thum.io/get/width/900/crop/500/noanimate/' + enc;
+        return;
+      }
+      thumb.src = fallbackThumbFor(it.first_link);
+    };
+    // Mejora progresiva desde backend (OG real)
+    resolveOgThumb(it.first_link).then(u => {
+      if (u) { thumb.src = u; }
+    });
+  }
 
   // Título y descripción
   if (title) title.textContent = String(it.titulo || '');

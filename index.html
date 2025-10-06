@@ -1300,10 +1300,10 @@ updateInstallButtonsVisibility();
 </section>
 
   <script>
-// URL de tu Apps Script desplegado
-const API_BASE = 'https://script.google.com/macros/s/AKfycbzYEzUpAoXZKgkCut4HI2CgcHiwkgldjx23RXucAGx-BlTKXreJO_ZQ2MCyr8aqnOl0/exec';
+    // URL de tu Apps Script desplegado
+    const API_BASE = 'https://script.google.com/macros/s/AKfycbzYEzUpAoXZKgkCut4HI2CgcHiwkgldjx23RXucAGx-BlTKXreJO_ZQ2MCyr8aqnOl0/exec';
 
-/* Loader centrado (smart delay) */
+   // Loader centrado (smart delay)
 const loader = document.getElementById('loader');
 let loadingCount = 0;
 let loaderTimer = null;
@@ -1311,102 +1311,97 @@ let loaderTimer = null;
 function startLoading(){
   loadingCount++;
   if (loadingCount === 1){
+    // Mostrar solo si la operación tarda más de 120ms (evita parpadeo)
     loaderTimer = setTimeout(()=>{
       loader.classList.remove('hidden');
       loaderTimer = null;
     }, 120);
   }
 }
+
 function stopLoading(){
   if (loadingCount === 0) return;
   loadingCount--;
   if (loadingCount === 0){
+    // Si nunca alcanzó a mostrarse, cancela el timer
     if (loaderTimer){
       clearTimeout(loaderTimer);
       loaderTimer = null;
     }
+    // Oculta de inmediato (fade corto definido en CSS)
     loader.classList.add('hidden');
   }
 }
 
-/* Sonidos */
-const SOUNDS = {
-  question: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011577/Pay_fail_ls2aif.mp3',
-  info: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011578/Default_notification_pkp4wr.mp3',
-  success: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011577/Pay_success_t5aawh.mp3',
-  error: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011578/Low_battery_d5qua1.mp3',
-  warning: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011578/Low_battery_d5qua1.mp3',
-  resumen: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011577/Charging_clkgcd.mp3',
-  login: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011577/Siri_star_g1owy4.mp3',
-  logout: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011577/Siri_End_kelv02.mp3',
-  menu: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011577/Namedrop_Popup_ale2zy.mp3',
-  back: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011578/Keyboard_Enter_b9k2dc.mp3',
-  notify: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759767435/Notificacion_d1woxv.mp3'
-};
-function playSoundOnce(url){
-  try{
-    const a = new Audio(url);
-    a.preload = 'auto';
-    a.play().catch(()=>{});
-  }catch(e){}
-}
-// Patch de SweetAlert2 para sonar según icono o etiqueta de resumen
-if (window.Swal && typeof Swal.fire === 'function'){
-  const __fire = Swal.fire.bind(Swal);
-  Swal.fire = function(options = {}, ...rest){
-    try{
-      if (options.soundTag === 'resumen'){
-        playSoundOnce(SOUNDS.resumen);
-      } else {
-        const icon = options.icon || options.type;
-        if (icon && SOUNDS[icon]) playSoundOnce(SOUNDS[icon]);
+    // Sonidos
+    const SOUNDS = {
+      question: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011577/Pay_fail_ls2aif.mp3',
+      info: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011578/Default_notification_pkp4wr.mp3',
+      success: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011577/Pay_success_t5aawh.mp3',
+      error: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011578/Low_battery_d5qua1.mp3',
+      warning: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011578/Low_battery_d5qua1.mp3',
+      resumen: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011577/Charging_clkgcd.mp3',
+      login: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011577/Siri_star_g1owy4.mp3',
+      logout: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011577/Siri_End_kelv02.mp3',
+      menu: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011577/Namedrop_Popup_ale2zy.mp3',
+      back: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011578/Keyboard_Enter_b9k2dc.mp3',
+      notify: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759767435/Notificacion_d1woxv.mp3'
+    };
+    function playSoundOnce(url){
+      try{
+        const a = new Audio(url);
+        a.preload = 'auto';
+        a.play().catch(()=>{});
+      }catch(e){}
+    }
+    // Patch de SweetAlert2 para sonar según icono o etiqueta de resumen
+    if (window.Swal && typeof Swal.fire === 'function'){
+      const __fire = Swal.fire.bind(Swal);
+      Swal.fire = function(options = {}, ...rest){
+        try{
+          if (options.soundTag === 'resumen'){
+            playSoundOnce(SOUNDS.resumen);
+          } else {
+            const icon = options.icon || options.type;
+            if (icon && SOUNDS[icon]) playSoundOnce(SOUNDS[icon]);
+          }
+        }catch(e){}
+        return __fire(options, ...rest);
       }
-    }catch(e){}
-    return __fire(options, ...rest);
-  };
-}
+    }
 
-/* Fetch helpers */
-async function apiGet(action, params = {}){
-  startLoading();
-  try{
-    const url = new URL(API_BASE);
-    url.search = new URLSearchParams({ action, ...params }).toString();
-    const r = await fetch(url.toString(), { method: 'GET' });
-    const j = await r.json();
-    if(!j.ok) throw new Error(j.error || 'Error');
-    return j.data;
-  } finally { stopLoading(); }
-}
-async function apiPost(action, body = {}){
-  startLoading();
-  try{
-    const url = API_BASE + '?action=' + encodeURIComponent(action);
-    const r = await fetch(url, {
-      method:'POST',
-      headers: { 'Content-Type':'text/plain;charset=utf-8' },
-      body: JSON.stringify(body)
-    });
-    const j = await r.json();
-    if(!j.ok) throw new Error(j.error || 'Error');
-    return j.data;
-  } finally { stopLoading(); }
-}
+    // Fetch helpers
+    async function apiGet(action, params = {}){
+      startLoading();
+      try{
+        const url = new URL(API_BASE);
+        url.search = new URLSearchParams({ action, ...params }).toString();
+        const r = await fetch(url.toString(), { method: 'GET' });
+        const j = await r.json();
+        if(!j.ok) throw new Error(j.error || 'Error');
+        return j.data;
+      } finally { stopLoading(); }
+    }
+    async function apiPost(action, body = {}){
+      startLoading();
+      try{
+        const url = API_BASE + '?action=' + encodeURIComponent(action);
+        const r = await fetch(url, {
+          method:'POST',
+          headers: { 'Content-Type':'text/plain;charset=utf-8' },
+          body: JSON.stringify(body)
+        });
+        const j = await r.json();
+        if(!j.ok) throw new Error(j.error || 'Error');
+        return j.data;
+      } finally { stopLoading(); }
+    }
 
-/* NUEVO: resolver miniatura OG real desde tu backend (Apps Script action=ogthumb) */
-async function resolveOgThumb(url){
-  if(!url) return null;
-  try{
-    const d = await apiGet('ogthumb', { url });
-    return d && d.image ? d.image : null;
-  }catch(_){ return null; }
-}
+    // Estado
+    let currentUser = null;
 
-/* Estado */
-let currentUser = null;
-
-/* Helpers de vistas */
-function showView(id){
+    // Helpers de vistas
+  function showView(id){
   for(const el of document.querySelectorAll('.view')) el.classList.remove('active');
   document.getElementById(id).classList.add('active');
   overlay.classList.remove('open');
@@ -1415,71 +1410,72 @@ function showView(id){
   // Al entrar al Menú, refresca el badge (y sonido una sola vez)
   if(id === 'view-menu'){ refreshNotificationsBadge(); }
 }
-
-function renderUserMenu(){
-  document.getElementById('u-nombre').textContent = currentUser?.nombre || '';
-  document.getElementById('u-doc').textContent = currentUser?.documento || '';
-  document.getElementById('u-cel').textContent = currentUser?.telefono || 'SIN REGISTRO';
-  document.getElementById('u-res').textContent = currentUser?.residencia || 'SIN REGISTRO';
-  document.getElementById('u-ref').textContent = currentUser?.referencia || 'N/A';
-  document.getElementById('u-mpio').textContent = currentUser?.municipio || 'SIN REGISTRO';
-  document.getElementById('u-puesto').textContent = currentUser?.puesto || 'SIN REGISTRO';
-  document.getElementById('u-mesa').textContent = currentUser?.mesa || 'SIN REGISTRO';
-}
-async function refreshUserFromServer(){
-  try{
-    const doc = currentUser?.documento;
-    if(!doc) return;
-    const res = await apiGet('validarDocumento', { documento: doc });
-    if(res?.existe){
-      currentUser = {
-        documento: res.documento,
-        nombre: res.nombre,
-        telefono: res.telefono || '',
-        residencia: res.residencia || '',
-        referencia: res.referencia || '',
-        municipio: res.municipio || '',
-        puesto: res.puesto || '',
-        mesa: res.mesa || ''
-      };
-      renderUserMenu();
+    
+    function renderUserMenu(){
+      document.getElementById('u-nombre').textContent = currentUser?.nombre || '';
+      document.getElementById('u-doc').textContent = currentUser?.documento || '';
+      document.getElementById('u-cel').textContent = currentUser?.telefono || 'SIN REGISTRO';
+      document.getElementById('u-res').textContent = currentUser?.residencia || 'SIN REGISTRO';
+      document.getElementById('u-ref').textContent = currentUser?.referencia || 'N/A';
+      document.getElementById('u-mpio').textContent = currentUser?.municipio || 'SIN REGISTRO';
+      document.getElementById('u-puesto').textContent = currentUser?.puesto || 'SIN REGISTRO';
+      document.getElementById('u-mesa').textContent = currentUser?.mesa || 'SIN REGISTRO';
     }
-  }catch(e){ /* silencio */ }
-}
+    async function refreshUserFromServer(){
+      try{
+        const doc = currentUser?.documento;
+        if(!doc) return;
+        const res = await apiGet('validarDocumento', { documento: doc });
+        if(res?.existe){
+          currentUser = {
+            documento: res.documento,
+            nombre: res.nombre,
+            telefono: res.telefono || '',
+            residencia: res.residencia || '',
+            referencia: res.referencia || '',
+            municipio: res.municipio || '',
+            puesto: res.puesto || '',
+            mesa: res.mesa || ''
+          };
+          renderUserMenu();
+        }
+      }catch(e){ /* silencio */ }
+    }
 
-/* Choices (select con filtro) */
-let choicesReg = null, choicesUpd = null;
-function initChoices(){
-  if(choicesReg) choicesReg.destroy();
-  if(choicesUpd) choicesUpd.destroy();
-  const regSel = document.getElementById('reg-residencia');
-  const updSel = document.getElementById('upd-residencia');
-  if(regSel){
-    choicesReg = new Choices(regSel, {
-      searchEnabled: true, itemSelectText: '', shouldSort:false,
-      placeholder: true, placeholderValue: 'Selecciona tu Residencia',
-      searchPlaceholderValue: 'Escribe para filtrar'
-    });
-  }
-  if(updSel){
-    choicesUpd = new Choices(updSel, {
-      searchEnabled: true, itemSelectText: '', shouldSort:false,
-      placeholder: true, placeholderValue: 'Selecciona tu Residencia',
-      searchPlaceholderValue: 'Escribe para filtrar'
-    });
-  }
-}
-document.addEventListener('DOMContentLoaded', initChoices);
+    // Choices (select con filtro)
+    let choicesReg = null, choicesUpd = null;
+    function initChoices(){
+      if(choicesReg) choicesReg.destroy();
+      if(choicesUpd) choicesUpd.destroy();
+      const regSel = document.getElementById('reg-residencia');
+      const updSel = document.getElementById('upd-residencia');
+      if(regSel){
+        choicesReg = new Choices(regSel, {
+          searchEnabled: true, itemSelectText: '', shouldSort:false,
+          placeholder: true, placeholderValue: 'Selecciona tu Residencia',
+          searchPlaceholderValue: 'Escribe para filtrar'
+        });
+      }
+      if(updSel){
+        choicesUpd = new Choices(updSel, {
+          searchEnabled: true, itemSelectText: '', shouldSort:false,
+          placeholder: true, placeholderValue: 'Selecciona tu Residencia',
+          searchPlaceholderValue: 'Escribe para filtrar'
+        });
+      }
+    }
+    document.addEventListener('DOMContentLoaded', initChoices);
 
-/* LOGIN */
-const btnLogin = document.getElementById('btn-login');
-const docLogin = document.getElementById('doc-login');
-const regCard = document.getElementById('registro-card');
-const btnGuardarRegistro = document.getElementById('btn-guardar-registro');
+    // LOGIN
+    const btnLogin = document.getElementById('btn-login');
+    const docLogin = document.getElementById('doc-login');
+    const regCard = document.getElementById('registro-card');
+    const btnGuardarRegistro = document.getElementById('btn-guardar-registro');
 
-btnLogin.addEventListener('click', async () => {
+    btnLogin.addEventListener('click', async () => {
   const documento = (docLogin.value || '').trim();
 
+  // Validación: campo vacío
   if (documento === '') {
     Swal.fire({
       icon: 'question',
@@ -1492,8 +1488,14 @@ btnLogin.addEventListener('click', async () => {
     });
     return;
   }
+
+  // Validación: formato (6 a 10 dígitos)
   if (!/^\d{6,10}$/.test(documento)) {
-    Swal.fire({ icon: 'warning', title: 'Documento inválido', text: 'Ingresa de 6 a 10 dígitos.' });
+    Swal.fire({ 
+      icon: 'warning', 
+      title: 'Documento inválido', 
+      text: 'Ingresa de 6 a 10 dígitos.' 
+    });
     return;
   }
 
@@ -1513,191 +1515,230 @@ btnLogin.addEventListener('click', async () => {
       renderUserMenu();
       playSoundOnce(SOUNDS.login);
       showView('view-menu');
-      refreshNotificationsBadge(); // refresca badge al entrar
+      refreshNotificationsBadge();
     } else {
       regCard.style.display = '';
-      Swal.fire({ icon: 'info', title: 'Nuevo usuario', text: 'Completa tu registro para continuar.' });
+      Swal.fire({
+        icon: 'info',
+        title: 'Nuevo usuario',
+        text: 'Completa tu registro para continuar.'
+      });
     }
   } catch (e) {
-    Swal.fire({ icon: 'error', title: 'Error', text: e.message });
+    Swal.fire({ 
+      icon: 'error', 
+      title: 'Error', 
+      text: e.message 
+    });
   }
 });
 
-/* Toggle Referido (registro) */
-const regRefWrap = document.getElementById('reg-referido-wrap');
-const btnRefMas = document.getElementById('btn-ref-mas');
-const btnRefMenos = document.getElementById('btn-ref-menos');
-btnRefMas.addEventListener('click', (ev)=>{ ev.preventDefault(); regRefWrap.style.display=''; btnRefMas.classList.add('hidden'); btnRefMenos.classList.remove('hidden'); });
-btnRefMenos.addEventListener('click', (ev)=>{ ev.preventDefault(); regRefWrap.style.display='none'; btnRefMas.classList.remove('hidden'); btnRefMenos.classList.add('hidden'); document.getElementById('reg-referencia').value=''; });
+    // Toggle Referido (registro)
+    const regRefWrap = document.getElementById('reg-referido-wrap');
+    const btnRefMas = document.getElementById('btn-ref-mas');
+    const btnRefMenos = document.getElementById('btn-ref-menos');
+    btnRefMas.addEventListener('click', (ev)=>{ ev.preventDefault(); regRefWrap.style.display=''; btnRefMas.classList.add('hidden'); btnRefMenos.classList.remove('hidden'); });
+    btnRefMenos.addEventListener('click', (ev)=>{ ev.preventDefault(); regRefWrap.style.display='none'; btnRefMas.classList.remove('hidden'); btnRefMenos.classList.add('hidden'); document.getElementById('reg-referencia').value=''; });
 
-/* Botón Atrás en registro */
-const btnRegAtras = document.getElementById('btn-reg-atras');
-if(btnRegAtras){
-  btnRegAtras.addEventListener('click', (e)=>{
-    e.preventDefault();
-    playSoundOnce(SOUNDS.back);
-    regCard.style.display='none';
-    showView('view-login');
+    // Botón Atrás en registro: vuelve a login/validación
+    const btnRegAtras = document.getElementById('btn-reg-atras');
+    if(btnRegAtras){
+      btnRegAtras.addEventListener('click', (e)=>{
+        e.preventDefault();
+        playSoundOnce(SOUNDS.back);
+        regCard.style.display='none';
+        showView('view-login');
+      });
+    }
+
+    // Guardar Registro con Resumen
+    btnGuardarRegistro.addEventListener('click', async ()=>{
+      const documento = (docLogin.value || '').trim();
+      const formData = {
+        documento,
+        nombre: document.getElementById('reg-nombre').value.trim(),
+        telefono: document.getElementById('reg-telefono').value.trim(),
+        residencia: document.getElementById('reg-residencia').value,
+        referencia: (document.getElementById('reg-referencia').value || '').trim()
+      };
+      const documentoRegex = /^(?:[0-9]{6,9}|1[0-9]{9})$/;
+      const telefonoRegex = /^[0-9]{10}$/;
+      const referenciaRegex = /^[0-9]{1,3}$/;
+
+      // Requeridos básicos
+if (!formData.nombre || !formData.documento || !formData.telefono) {
+  return Swal.fire({
+    icon: 'warning',
+    title: 'Faltan campos Requeridos',
+    text: 'Completa Nombre, Documento y Whatsapp.'
   });
 }
 
-/* Guardar Registro con Resumen */
-btnGuardarRegistro.addEventListener('click', async ()=>{
-  const documento = (docLogin.value || '').trim();
-  const formData = {
-    documento,
-    nombre: document.getElementById('reg-nombre').value.trim(),
-    telefono: document.getElementById('reg-telefono').value.trim(),
-    residencia: document.getElementById('reg-residencia').value,
-    referencia: (document.getElementById('reg-referencia').value || '').trim()
-  };
-  const documentoRegex = /^(?:[0-9]{6,9}|1[0-9]{9})$/;
-  const telefonoRegex = /^[0-9]{10}$/;
-  const referenciaRegex = /^[0-9]{1,3}$/;
-
-  if (!formData.nombre || !formData.documento || !formData.telefono) {
-    return Swal.fire({ icon: 'warning', title: 'Faltan campos Requeridos', text: 'Completa Nombre, Documento y Whatsapp.' });
-  }
-  const nombrePalabras = formData.nombre.split(/\s+/).filter(Boolean);
-  if (nombrePalabras.length < 2) {
-    return Swal.fire({ icon: 'warning', title: 'Nombre incompleto', text: 'Ingresa tu nombre completo (mínimo nombre y apellido).' });
-  }
-  if (!documentoRegex.test(formData.documento)) {
-    return Swal.fire({ icon: 'warning', title: 'Documento inválido', text: 'Revisa el número de documento.' });
-  }
-  if (!telefonoRegex.test(formData.telefono)) {
-    return Swal.fire({ icon: 'warning', title: 'Whatsapp inválido', text: 'Debe tener exactamente 10 dígitos.' });
-  }
-  if (formData.referencia && !referenciaRegex.test(formData.referencia)) {
-    return Swal.fire({ icon: 'warning', title: 'Referido inválido', text: 'Debe tener 1 a 3 dígitos.' });
-  }
-
-  const resumenHtml = `
-    <b>Nombre:</b> ${formData.nombre}<br>
-    <b>N° Documento:</b> ${formData.documento}<br>
-    <b>Whatsapp:</b> ${formData.telefono}<br>
-    <b>Residencia:</b> ${formData.residencia}<br>
-    <b>Referido:</b> ${formData.referencia || 'No Registras'}<br><br>
-    <img class="brand" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png" alt="">
-  `;
-  const rs = await Swal.fire({
-    icon:'info', title:'Resumen de Registro', html:resumenHtml,
-    showCancelButton:true, confirmButtonText:'Confirmar', cancelButtonText:'Editar',
-    width:'80%', customClass:{ popup:'swal2-responsive-popup' },
-    soundTag:'resumen'
+// Validar que el nombre tenga al menos 2 palabras
+const nombrePalabras = formData.nombre.split(/\s+/).filter(Boolean);
+if (nombrePalabras.length < 2) {
+  return Swal.fire({
+    icon: 'warning',
+    title: 'Nombre incompleto',
+    text: 'Ingresa tu nombre completo (mínimo nombre y apellido).'
   });
-  if(!rs.isConfirmed) return;
+}
 
-  try{
-    const r = await apiPost('guardarContactoEnServidor', formData);
-    if(r && r.success){
-      const res = await apiGet('validarDocumento', { documento: formData.documento });
-      if(res?.existe){
-        currentUser = {
-          documento: res.documento,
-          nombre: res.nombre,
-          telefono: res.telefono || '',
-          residencia: res.residencia || '',
-          referencia: res.referencia || '',
-          municipio: res.municipio || '',
-          puesto: res.puesto || '',
-          mesa: res.mesa || ''
-        };
-        await Swal.fire({ icon:'success', title:'Registro exitoso', timer:1800, showConfirmButton:false });
-        renderUserMenu();
-        playSoundOnce(SOUNDS.login);
-        showView('view-menu');
-        regCard.style.display='none';
-      }else{
-        Swal.fire({ icon:'error', title:'No se pudo completar el registro' });
+// Documento
+if (!documentoRegex.test(formData.documento)) {
+  return Swal.fire({
+    icon: 'warning',
+    title: 'Documento inválido',
+    text: 'Revisa el número de documento.'
+  });
+}
+
+// Whatsapp / Teléfono
+if (!telefonoRegex.test(formData.telefono)) {
+  return Swal.fire({
+    icon: 'warning',
+    title: 'Whatsapp inválido',
+    text: 'Debe tener exactamente 10 dígitos.'
+  });
+}
+
+// Referido (opcional)
+if (formData.referencia && !referenciaRegex.test(formData.referencia)) {
+  return Swal.fire({
+    icon: 'warning',
+    title: 'Referido inválido',
+    text: 'Debe tener 1 a 3 dígitos.'
+  });
+}
+
+      const resumenHtml = `
+        <b>Nombre:</b> ${formData.nombre}<br>
+        <b>N° Documento:</b> ${formData.documento}<br>
+        <b>Whatsapp:</b> ${formData.telefono}<br>
+        <b>Residencia:</b> ${formData.residencia}<br>
+        <b>Referido:</b> ${formData.referencia || 'No Registras'}<br><br>
+        <img class="brand" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png" alt="">
+      `;
+      const rs = await Swal.fire({
+        icon:'info', title:'Resumen de Registro', html:resumenHtml,
+        showCancelButton:true, confirmButtonText:'Confirmar', cancelButtonText:'Editar',
+        width:'80%', customClass:{ popup:'swal2-responsive-popup' },
+        soundTag:'resumen'
+      });
+      if(!rs.isConfirmed) return;
+
+      try{
+        const r = await apiPost('guardarContactoEnServidor', formData);
+        if(r && r.success){
+          // Revalidar y pasar a menú
+          const res = await apiGet('validarDocumento', { documento: formData.documento });
+          if(res?.existe){
+            currentUser = {
+              documento: res.documento,
+              nombre: res.nombre,
+              telefono: res.telefono || '',
+              residencia: res.residencia || '',
+              referencia: res.referencia || '',
+              municipio: res.municipio || '',
+              puesto: res.puesto || '',
+              mesa: res.mesa || ''
+            };
+            // Alerta de registro exitoso
+            await Swal.fire({ icon:'success', title:'Registro exitoso', timer:1800, showConfirmButton:false });
+            renderUserMenu();
+            playSoundOnce(SOUNDS.login);
+            showView('view-menu');
+            regCard.style.display='none';
+          }else{
+            Swal.fire({ icon:'error', title:'No se pudo completar el registro' });
+          }
+        }else{
+          Swal.fire({ icon:'error', title:'Error al guardar', html: r?.message || 'Error desconocido' });
+        }
+      }catch(e){
+        Swal.fire({ icon:'error', title:'Error', text:e.message });
       }
-    }else{
-      Swal.fire({ icon:'error', title:'Error al guardar', html: r?.message || 'Error desconocido' });
-    }
-  }catch(e){
-    Swal.fire({ icon:'error', title:'Error', text:e.message });
-  }
-});
+    });
 
-/* MENÚ (overlay) */
-const overlay = document.getElementById('overlay');
-document.getElementById('btn-open-menu').addEventListener('click', ()=> { playSoundOnce(SOUNDS.menu); });
-document.getElementById('btn-open-menu').addEventListener('click', ()=> overlay.classList.add('open'));
-document.getElementById('btn-ovl-back').addEventListener('click', ()=> overlay.classList.remove('open'));
-document.getElementById('ovlClose').addEventListener('click', ()=> overlay.classList.remove('open'));
+    // MENÚ
+    const overlay = document.getElementById('overlay');
+    document.getElementById('btn-open-menu').addEventListener('click', ()=> { playSoundOnce(SOUNDS.menu); });
+    document.getElementById('btn-open-menu').addEventListener('click', ()=> overlay.classList.add('open'));
+    document.getElementById('btn-ovl-back').addEventListener('click', ()=> overlay.classList.remove('open'));
+    document.getElementById('ovlClose').addEventListener('click', ()=> overlay.classList.remove('open'));
 
-document.getElementById('btn-logout').addEventListener('click', ()=>{
-  playSoundOnce(SOUNDS.logout);
-  currentUser = null;
-  docLogin.value = '';
-  regCard.style.display='none';
-  showView('view-login');
-});
+    document.getElementById('btn-logout').addEventListener('click', ()=>{
+      playSoundOnce(SOUNDS.logout);
+      currentUser = null;
+      docLogin.value = '';
+      regCard.style.display='none';
+      showView('view-login');
+    });
 
-document.getElementById('go-asistencia').addEventListener('click', async ()=>{
-  overlay.classList.remove('open');
-  await prepararAsistencia();
-  showView('view-asistencia');
-});
-document.getElementById('go-actualizacion').addEventListener('click', async ()=>{
-  overlay.classList.remove('open');
-  await prepararActualizacion();
-  showView('view-actualizacion');
-});
-document.getElementById('go-consultar').addEventListener('click', ()=>{
-  overlay.classList.remove('open');
-  document.getElementById('c-documento').value = currentUser?.documento || '';
-  showView('view-consultar');
-});
-// NUEVO: SOLICITUD
-document.getElementById('go-solicitud').addEventListener('click', async ()=>{
-  overlay.classList.remove('open');
-  await prepararSolicitud();
-  showView('view-solicitud');
-});
-// NUEVO: IDEAS
-document.getElementById('go-ideas').addEventListener('click', async ()=>{
-  overlay.classList.remove('open');
-  await prepararIdeas();
-  showView('view-ideas');
-});
-// INSERT: NUEVO - CASA SOCIAL
-document.getElementById('go-sede').addEventListener('click', ()=>{
-  overlay.classList.remove('open');
-  showView('view-sede');
-});
+    document.getElementById('go-asistencia').addEventListener('click', async ()=>{
+      overlay.classList.remove('open');
+      await prepararAsistencia();
+      showView('view-asistencia');
+    });
+    document.getElementById('go-actualizacion').addEventListener('click', async ()=>{
+      overlay.classList.remove('open');
+      await prepararActualizacion();
+      showView('view-actualizacion');
+    });
+    document.getElementById('go-consultar').addEventListener('click', ()=>{
+      overlay.classList.remove('open');
+      document.getElementById('c-documento').value = currentUser?.documento || '';
+      showView('view-consultar');
+    });
+    // NUEVO: SOLICITUD
+    document.getElementById('go-solicitud').addEventListener('click', async ()=>{
+      overlay.classList.remove('open');
+      await prepararSolicitud();
+      showView('view-solicitud');
+    });
+    // NUEVO: IDEAS
+    document.getElementById('go-ideas').addEventListener('click', async ()=>{
+      overlay.classList.remove('open');
+      await prepararIdeas();
+      showView('view-ideas');
+    });
+    // INSERT: NUEVO - CASA SOCIAL
+    document.getElementById('go-sede').addEventListener('click', ()=>{
+      overlay.classList.remove('open');
+      showView('view-sede');
+    });
 
-// NUEVO: REDES SOCIALES
+    // NUEVO: REDES SOCIALES
 document.getElementById('go-redes').addEventListener('click', ()=>{
   overlay.classList.remove('open');
   showView('view-redes');
 });
 
-document.getElementById('go-lider').addEventListener('click', async ()=>{
-  if(!currentUser){ return; }
-  try{
-    const r = await apiGet('validarLider', { documento: currentUser.documento });
-    if(r && r.codigo && r.nombre){
-      const msg = "Hola 👋🏻\n\nQuiero pedirte que apoyes a nuestro gran amigo *Jhonny Perdomo*.\n\nInstala la App y regístrate aquí 👉 " + "https://tinyurl.com/app-jhonny-perdomo" + " 👈\n\nEn el campo *N° de Referido* por favor escribe el N° 👉 " + r.codigo + " 👈 (solo el número).\n\nEn esta App encontrarás muchas opciones para ayudar a tu comunidad. ¡Bendiciones!\n\nCordialmente,\n\n*" + r.nombre + "*\n> Equipo del Hacer";
-      const textoEscapado = encodeURIComponent(msg);
-      const esMovil = /android|iphone|ipad|mobile/i.test(navigator.userAgent);
-      if(navigator.clipboard){ navigator.clipboard.writeText(msg).catch(()=>{}); }
-      window.open((esMovil ? "whatsapp://send?text=" : "https://api.whatsapp.com/send?text=") + textoEscapado, "_blank");
-    }else{
-      Swal.fire({ icon:'info', title:'No estás en registros de Líderes' });
-    }
-  }catch(e){
-    Swal.fire({ icon:'error', title:'Error', text:e.message });
-  }
-});
+    document.getElementById('go-lider').addEventListener('click', async ()=>{
+      if(!currentUser){ return; }
+      try{
+        const r = await apiGet('validarLider', { documento: currentUser.documento });
+        if(r && r.codigo && r.nombre){
+         const msg = "Hola 👋🏻\n\nQuiero pedirte que apoyes a nuestro gran amigo *Jhonny Perdomo*.\n\nInstala la App y regístrate aquí 👉 " + "https://tinyurl.com/app-jhonny-perdomo" + " 👈\n\nEn el campo *N° de Referido* por favor escribe el N° 👉 " + r.codigo + " 👈 (solo el número).\n\nEn esta App encontrarás muchas opciones para ayudar a tu comunidad. ¡Bendiciones!\n\nCordialmente,\n\n*" + r.nombre + "*\n> Equipo del Hacer";
+          const textoEscapado = encodeURIComponent(msg);
+          const esMovil = /android|iphone|ipad|mobile/i.test(navigator.userAgent);
+          if(navigator.clipboard){ navigator.clipboard.writeText(msg).catch(()=>{}); }
+          window.open((esMovil ? "whatsapp://send?text=" : "https://api.whatsapp.com/send?text=") + textoEscapado, "_blank");
+        }else{
+          Swal.fire({ icon:'info', title:'No estás en registros de Líderes' });
+        }
+      }catch(e){
+        Swal.fire({ icon:'error', title:'Error', text:e.message });
+      }
+    });
 
-document.getElementById('go-feed').addEventListener('click', async ()=>{
+    document.getElementById('go-feed').addEventListener('click', async ()=>{
   overlay.classList.remove('open');
   showView('view-feed');
-  try{ await loadFeed(); }catch(_){}
+  // Paso 2: aquí llamaremos a cargar el feed desde la API (listNotificaciones)
 });
 
-/* ==== NOTIFICACIONES: feed, no leídas, badge, sonido ==== */
+   /* ==== NOTIFICACIONES: feed, no leídas, badge, sonido ==== */
 let FEED_CACHE = []; // último listado obtenido
 const FEED_READ_KEY = 'feedReadIds@v1';
 const FEED_SOUND_KEY = 'notifSoundPlayed@session';
@@ -1724,20 +1765,22 @@ function markRead(id){
 function firstLinkThumb(url){
   const placeholder = 'https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png';
   if(!url) return placeholder;
+
   // Si es imagen directa, úsala.
   if (/\.(png|jpe?g|webp|gif|bmp|svg)(\?.*)?$/i.test(url)) return url;
+
   // Open Graph preview (tercero sin CORS desde el cliente)
   // Opción: thum.io OG (si el sitio expone OG image)
   return 'https://image.thum.io/get/og/' + encodeURIComponent(url);
 }
 
 async function loadFeed(){
-  const list = await apiGet('listnotificaciones'); // acción en minúsculas (coincide con backend)
+  // IMPORTANTE: acción en minúsculas (el backend hace toLowerCase, pero usamos la forma definida)
+  const list = await apiGet('listnotificaciones');
   FEED_CACHE = Array.isArray(list) ? list : [];
   renderFeedList(FEED_CACHE);
 }
-
-function fallbackThumbFor(url){
+    function fallbackThumbFor(url){
   const u = String(url||'').toLowerCase();
   if(u.includes('facebook'))  return 'https://res.cloudinary.com/dqqeavica/image/upload/v1759166342/facebook_nezbkz.webp';
   if(u.includes('instagram')) return 'https://res.cloudinary.com/dqqeavica/image/upload/v1759166342/instragram_uft2wl.webp';
@@ -1766,22 +1809,18 @@ function renderFeedList(items){
     const img = document.createElement('img');
     img.className = 'feed-thumb';
     img.alt = '';
-    // Base: OG de thum.io (rápida)
     img.src = firstLinkThumb(it.first_link);
-    img.loading = 'lazy';
-    img.onerror = () => {
-      const enc = encodeURIComponent(it.first_link || '');
-      if (!img.dataset.shotTried){
-        img.dataset.shotTried = '1';
-        img.src = 'https://image.thum.io/get/width/900/crop/500/noanimate/' + enc; // intento screenshot
-        return;
-      }
-      img.src = fallbackThumbFor(it.first_link); // último recurso: logo por dominio
-    };
-    // Mejora progresiva: sustituir por la OG real desde tu backend cuando llegue
-    resolveOgThumb(it.first_link).then(u => {
-      if(u) { img.src = u; }
-    });
+    firstLinkThumb(it.first_link);
+img.loading = 'lazy';
+img.onerror = () => {
+  const enc = encodeURIComponent(it.first_link || '');
+  if (!img.dataset.shotTried){
+    img.dataset.shotTried = '1';
+    img.src = 'https://image.thum.io/get/width/900/crop/500/noanimate/' + enc; // intento screenshot
+    return;
+  }
+  img.src = fallbackThumbFor(it.first_link); // último recurso: logo por dominio
+};
 
     const ct = document.createElement('div');
     ct.className = 'feed-content';
@@ -1820,23 +1859,18 @@ function openFeedDetail(it){
 
   // Miniatura con OG/screenshot + fallback por dominio
   if (thumb){
-    // Base rápida
-    thumb.src = firstLinkThumb(it.first_link);
-    thumb.loading = 'lazy';
-    thumb.onerror = () => {
-      const enc = encodeURIComponent(it.first_link || '');
-      if (!thumb.dataset.shotTried){
-        thumb.dataset.shotTried = '1';
-        thumb.src = 'https://image.thum.io/get/width/900/crop/500/noanimate/' + enc;
-        return;
-      }
-      thumb.src = fallbackThumbFor(it.first_link);
-    };
-    // Mejora progresiva desde backend (OG real)
-    resolveOgThumb(it.first_link).then(u => {
-      if (u) { thumb.src = u; }
-    });
-  }
+  thumb.src = firstLinkThumb(it.first_link);
+  thumb.loading = 'lazy';
+  thumb.onerror = () => {
+    const enc = encodeURIComponent(it.first_link || '');
+    if (!thumb.dataset.shotTried){
+      thumb.dataset.shotTried = '1';
+      thumb.src = 'https://image.thum.io/get/width/900/crop/500/noanimate/' + enc;
+      return;
+    }
+    thumb.src = fallbackThumbFor(it.first_link);
+  };
+}
 
   // Título y descripción
   if (title) title.textContent = String(it.titulo || '');
@@ -1906,19 +1940,18 @@ async function refreshNotificationsBadge(){
   }
 }
 
-// Refrescar badge al cargar y al abrir menú (ayuda a habilitar audio en móviles)
-window.addEventListener('load', ()=> {
-  try{ refreshNotificationsBadge(); }catch(_){}
-});
-const btnOpenMenu = document.getElementById('btn-open-menu');
-if (btnOpenMenu){
-  btnOpenMenu.addEventListener('click', ()=> {
-    try{ refreshNotificationsBadge(); }catch(_){}
-  }, { capture:true });
-}
-
-/* COMPARTIR PORTAL */
-document.getElementById('btn-compartir').addEventListener('click', ()=>{
+// Al abrir “Ponte al día” cargamos/actualizamos la lista
+(function(){
+  const btn = document.getElementById('go-feed');
+  if(btn){
+    btn.addEventListener('click', async ()=>{
+      try{ await loadFeed(); }catch(_){}
+    }, { capture:true });
+  }
+})();
+    
+    // COMPARTIR PORTAL
+    document.getElementById('btn-compartir').addEventListener('click', ()=>{
   const url = "https://tinyurl.com/app-jhonny-perdomo";
   const txt = "Instala la *App de Jhonny Perdomo* 📲 y regístrate con un clic:\n" + url;
   if(navigator.clipboard){ navigator.clipboard.writeText(txt).catch(()=>{}); }
@@ -1927,7 +1960,7 @@ document.getElementById('btn-compartir').addEventListener('click', ()=>{
   window.open((esMovil ? "whatsapp://send?text=" : "https://api.whatsapp.com/send?text=") + enc, "_blank");
 });
 
-/* VIDEO (con miniatura, Cloudinary MP4, 1 clic) */
+   // VIDEO (con miniatura, Cloudinary MP4, 1 clic)
 const videoCard = document.getElementById('videoCard');
 const playLayer = document.getElementById('playLayer');
 const videoThumb = document.getElementById('videoThumb');
@@ -1935,21 +1968,24 @@ const videoThumb = document.getElementById('videoThumb');
 let currentVideo = null; // referencia al <video> creado
 
 function playVideo(){
+  // Evita crear el video más de una vez
   if (videoCard.querySelector('video')) return;
 
   const src = 'https://res.cloudinary.com/dqqeavica/video/upload/v1746906083/Firma_bmcatv.mp4';
 
   const video = document.createElement('video');
   video.src = src;
-  video.autoplay = true;
-  video.muted = false;
-  video.playsInline = true;
-  video.controls = true;
+  video.autoplay = true;     // autoplay en el primer clic
+  video.muted = false;       // reproducción con audio (puede requerir interacción en algunos navegadores)
+  video.playsInline = true;  // iOS: evita fullscreen automático
+  video.controls = true;     // controles visibles
   video.preload = 'auto';
   video.setAttribute('title', 'Video');
 
+  // Miniatura como poster mientras carga
   if (videoThumb && videoThumb.src) video.poster = videoThumb.src;
 
+  // Ajuste visual al contenedor
   video.style.width = '100%';
   video.style.height = '100%';
   video.style.display = 'block';
@@ -1960,6 +1996,8 @@ function playVideo(){
 
   currentVideo = video;
 
+  // Intentar reproducir y, si falla por políticas de autoplay con sonido,
+  // como fallback silencia y vuelve a intentar (manteniendo 1 clic)
   const p = video.play();
   if (p && typeof p.then === 'function') {
     p.catch(() => {
@@ -1968,9 +2006,11 @@ function playVideo(){
     });
   }
 
+  // Limpieza al finalizar
   video.addEventListener('ended', stopVideoPlayback);
 }
 
+// Detener y limpiar el video (se llama al cambiar de vista/menú, logout, etc.)
 function stopVideoPlayback(){
   const v = currentVideo || videoCard.querySelector('video');
   if (!v) {
@@ -1979,17 +2019,22 @@ function stopVideoPlayback(){
   }
   try {
     v.pause();
+    // liberar recursos de la descarga
     v.removeAttribute('src');
     v.load();
   } catch(_){}
+  // quitar del DOM
   v.remove();
   currentVideo = null;
+  // restaurar estado visual (mostrar miniatura y capa play)
   videoCard.classList.remove('playing');
 }
 
+// Un solo clic en imagen o capa de play
 if (playLayer) playLayer.addEventListener('click', playVideo);
 if (videoThumb) videoThumb.addEventListener('click', playVideo);
 
+// Detener si la pestaña pierde foco (opcional pero recomendado)
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) stopVideoPlayback();
 });
@@ -1998,88 +2043,92 @@ document.addEventListener('visibilitychange', () => {
 ['go-asistencia','go-actualizacion','go-consultar','go-solicitud','go-ideas','go-sede','go-redes','btn-logout','go-feed']
   .forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.addEventListener('click', () => stopVideoPlayback(), { capture: true });
+    if (el) {
+      // capture:true asegura que pare antes de que se cambie la vista
+      el.addEventListener('click', () => stopVideoPlayback(), { capture: true });
+    }
   });
-
-/* ASISTENCIA */
-async function prepararAsistencia(){
-  if(!currentUser) return;
-  document.getElementById('a-documento').value = currentUser.documento;
-  try{
-    const d = await apiGet('validarDocumento4', { documento: currentUser.documento });
-    if(d){
-      document.getElementById('a-nombre').value = d.nombre || '';
-      document.getElementById('a-telefono').value = d.telefono || '';
+    
+    // ASISTENCIA
+    async function prepararAsistencia(){
+      if(!currentUser) return;
+      document.getElementById('a-documento').value = currentUser.documento;
+      try{
+        const d = await apiGet('validarDocumento4', { documento: currentUser.documento });
+        if(d){
+          document.getElementById('a-nombre').value = d.nombre || '';
+          document.getElementById('a-telefono').value = d.telefono || '';
+        }
+      }catch{}
+      document.getElementById('a-reunion').value = '';
+      document.getElementById('a-evento').value = '';
+      document.getElementById('evento-wrap').style.display='none';
     }
-  }catch{}
-  document.getElementById('a-reunion').value = '';
-  document.getElementById('a-evento').value = '';
-  document.getElementById('evento-wrap').style.display='none';
-}
-document.getElementById('a-reunion').addEventListener('input', async (e)=>{
-  const val = (e.target.value||'').trim();
-  if(!val){ document.getElementById('evento-wrap').style.display='none'; return; }
-  try{
-    const r = await apiGet('validarReunion', { reunion: val });
-    document.getElementById('a-evento').value = r?.evento || '';
-    document.getElementById('evento-wrap').style.display='';
-  }catch{}
-});
-document.getElementById('a-guardar').addEventListener('click', async ()=>{
-  const body = {
-    documento: document.getElementById('a-documento').value.trim(),
-    nombre: document.getElementById('a-nombre').value.trim(),
-    telefono: document.getElementById('a-telefono').value.trim(),
-    reunion: document.getElementById('a-reunion').value.trim(),
-    evento: document.getElementById('a-evento').value.trim()
-  };
-  const documentoRegex = /^[0-9]{6,10}$/;
-  const reunionRegex = /^[0-9]{1,3}$/;
-  if(!documentoRegex.test(body.documento)){
-    return Swal.fire({icon:'warning',title:'Documento inválido'});
-  }
-  if(!reunionRegex.test(body.reunion)){
-    return Swal.fire({icon:'warning',title:'N° de Evento inválido'});
-  }
-  try{
-    const r = await apiPost('guardarAsistenciaEnServidor', body);
-    if(r && r.success){
-      await Swal.fire({ icon:'success', title:'Asistencia registrada', timer:1500, showConfirmButton:false });
-      showView('view-menu');
-    }else{
-      Swal.fire({ icon:'info', title:'Atención', html: r?.message || 'No se pudo registrar' });
-    }
-  }catch(e){
-    Swal.fire({ icon:'info', title:'Atención', text:e.message });
-  }
-});
-document.getElementById('a-volver').addEventListener('click', ()=> showView('view-menu'));
+    document.getElementById('a-reunion').addEventListener('input', async (e)=>{
+      const val = (e.target.value||'').trim();
+      if(!val){ document.getElementById('evento-wrap').style.display='none'; return; }
+      try{
+        const r = await apiGet('validarReunion', { reunion: val });
+        document.getElementById('a-evento').value = r?.evento || '';
+        document.getElementById('evento-wrap').style.display='';
+      }catch{}
+    });
+    document.getElementById('a-guardar').addEventListener('click', async ()=>{
+      const body = {
+        documento: document.getElementById('a-documento').value.trim(),
+        nombre: document.getElementById('a-nombre').value.trim(),
+        telefono: document.getElementById('a-telefono').value.trim(),
+        reunion: document.getElementById('a-reunion').value.trim(),
+        evento: document.getElementById('a-evento').value.trim()
+      };
+      const documentoRegex = /^[0-9]{6,10}$/;
+      const reunionRegex = /^[0-9]{1,3}$/;
+      if(!documentoRegex.test(body.documento)){
+        return Swal.fire({icon:'warning',title:'Documento inválido'});
+      }
+      if(!reunionRegex.test(body.reunion)){
+        return Swal.fire({icon:'warning',title:'N° de Evento inválido'});
+      }
+      try{
+        const r = await apiPost('guardarAsistenciaEnServidor', body);
+        if(r && r.success){
+          await Swal.fire({ icon:'success', title:'Asistencia registrada', timer:1500, showConfirmButton:false });
+          showView('view-menu');
+        }else{
+          Swal.fire({ icon:'info', title:'Atención', html: r?.message || 'No se pudo registrar' });
+        }
+      }catch(e){
+        Swal.fire({ icon:'info', title:'Atención', text:e.message });
+      }
+    });
+    document.getElementById('a-volver').addEventListener('click', ()=> showView('view-menu'));
 
-/* VOTACIÓN (pegar fila) */
-function parseFila(text){
-  const ENC = ["NUIP","DEPARTAMENTO","MUNICIPIO","PUESTO","DIRECCIÓN","MESA"];
-  let p = (text||'').split(/[\t\n\r]+/).map(s=>s.trim()).filter(Boolean);
-  if(p.length>=6 && ENC.every(e => p.slice(0,6).join(' ').toUpperCase().includes(e))) p = p.slice(6);
-  p = p.filter(x => !ENC.includes(x.toUpperCase()));
-  if(p.length>6) p[5] = p.slice(5).join(' ');
-  if(p.length>6) p = p.slice(0,6);
-  return p;
-}
-function intentarAutocompletar(){
-  const t = document.getElementById('v-row').value.trim();
-  const p = parseFila(t);
-  if(p.length===6){
-    document.getElementById('v-nuip').value = p[0];
-    document.getElementById('v-departamento').value = p[1];
-    document.getElementById('v-municipio').value = p[2];
-    document.getElementById('v-puesto').value = p[3];
-    document.getElementById('v-direccion').value = p[4];
-    document.getElementById('v-mesa').value = p[5];
-  }
-}
-['paste','input','blur'].forEach(evt=>{
-  document.getElementById('v-row').addEventListener(evt, ()=> setTimeout(intentarAutocompletar, 80));
-});
+    // VOTACIÓN (pegar fila)
+    function parseFila(text){
+      const ENC = ["NUIP","DEPARTAMENTO","MUNICIPIO","PUESTO","DIRECCIÓN","MESA"];
+      let p = (text||'').split(/[\t\n\r]+/).map(s=>s.trim()).filter(Boolean);
+      if(p.length>=6 && ENC.every(e => p.slice(0,6).join(' ').toUpperCase().includes(e))) p = p.slice(6);
+      p = p.filter(x => !ENC.includes(x.toUpperCase()));
+      if(p.length>6) p[5] = p.slice(5).join(' ');
+      if(p.length>6) p = p.slice(0,6);
+      return p;
+    }
+    function intentarAutocompletar(){
+      const t = document.getElementById('v-row').value.trim();
+      const p = parseFila(t);
+      if(p.length===6){
+        document.getElementById('v-nuip').value = p[0];
+        document.getElementById('v-departamento').value = p[1];
+        document.getElementById('v-municipio').value = p[2];
+        document.getElementById('v-puesto').value = p[3];
+        document.getElementById('v-direccion').value = p[4];
+        document.getElementById('v-mesa').value = p[5];
+      }
+    }
+    ['paste','input','blur'].forEach(evt=>{
+      document.getElementById('v-row').addEventListener(evt, ()=> setTimeout(intentarAutocompletar, 80));
+    });
+    // VOTACIÓN (pegar fila)
 document.getElementById('v-guardar').addEventListener('click', async ()=>{
   const body = {
     nuip: document.getElementById('v-nuip').value.trim(),
@@ -2096,6 +2145,7 @@ document.getElementById('v-guardar').addEventListener('click', async ()=>{
     const r = await apiPost('guardarVotacionEnServidor', body);
     if(r && r.success){
       await Swal.fire({ icon:'success', title:'Información guardada', timer:1800, showConfirmButton:false });
+      // Actualiza los datos del usuario para reflejar municipio/puesto/mesa recién guardados
       try{ await refreshUserFromServer(); }catch(_){}
       showView('view-menu');
     }else{
@@ -2105,83 +2155,85 @@ document.getElementById('v-guardar').addEventListener('click', async ()=>{
     Swal.fire({ icon:'error', title:'Error al guardar', text:e.message });
   }
 });
-document.getElementById('v-volver').addEventListener('click', ()=> showView('view-menu'));
+    document.getElementById('v-volver').addEventListener('click', ()=> showView('view-menu'));
 
-/* ACTUALIZACIÓN */
-async function prepararActualizacion(){
-  if(!currentUser) return;
-  document.getElementById('upd-documento').value = currentUser.documento;
-  try{
-    const r = await apiGet('validarDocumento3',{ documento: currentUser.documento });
-    document.getElementById('upd-nombre').value = r?.existe ? (r.nombre || '') : (currentUser.nombre || '');
-  }catch{
-    document.getElementById('upd-nombre').value = currentUser.nombre || '';
-  }
-  document.getElementById('upd-telefono').value = '';
-  document.getElementById('upd-residencia').value = '';
-  document.getElementById('upd-referencia').value = '';
-  if(choicesUpd) choicesUpd.setChoiceByValue('');
-}
-// Toggle Referido en Actualización
-const updRefWrap = document.getElementById('upd-referido-wrap');
-const updRefMas = document.getElementById('upd-ref-mas');
-const updRefMenos = document.getElementById('upd-ref-menos');
-updRefMas.addEventListener('click', (ev)=>{ ev.preventDefault(); updRefWrap.style.display=''; updRefMas.classList.add('hidden'); updRefMenos.classList.remove('hidden'); });
-updRefMenos.addEventListener('click', (ev)=>{ ev.preventDefault(); updRefWrap.style.display='none'; updRefMas.classList.remove('hidden'); updRefMenos.classList.add('hidden'); document.getElementById('upd-referencia').value=''; });
-
-document.getElementById('upd-guardar').addEventListener('click', async ()=>{
-  const body = {
-    documento: document.getElementById('upd-documento').value.trim(),
-    nombre: document.getElementById('upd-nombre').value.trim(),
-    telefono: document.getElementById('upd-telefono').value.trim(),
-    residencia: document.getElementById('upd-residencia').value,
-    referencia: document.getElementById('upd-referencia').value.trim()
-  };
-  const documentoRegex = /^[0-9]{6,10}$/;
-  const telefonoRegex = /^[0-9]{10}$/;
-  const referenciaRegex = /^[0-9]{1,3}$/;
-
-  if(!documentoRegex.test(body.documento)){
-    return Swal.fire({ icon:'warning', title:'Documento inválido' });
-  }
-  if(body.telefono && !telefonoRegex.test(body.telefono)){
-    return Swal.fire({ icon:'warning', title:'Whatsapp inválido' });
-  }
-  if(body.referencia && !referenciaRegex.test(body.referencia)){
-    return Swal.fire({ icon:'warning', title:'Referido inválido', text:'Debe tener 1 a 3 dígitos.' });
-  }
-
-  const resumenHtml = `
-    <b>N° Documento:</b> ${body.documento}<br>
-    <b>Whatsapp:</b> ${body.telefono || 'Sin cambios'}<br>
-    <b>Residencia:</b> ${body.residencia || 'Sin cambios'}<br>
-    <b>Referido:</b> ${body.referencia || 'Sin cambios'}<br><br>
-    <img class="brand" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png" alt="">
-  `;
-  const rs = await Swal.fire({
-    icon:'info', title:'Resumen de Actualización', html:resumenHtml,
-    showCancelButton:true, confirmButtonText:'Confirmar', cancelButtonText:'Editar',
-    width:'80%', customClass:{ popup:'swal2-responsive-popup' },
-    soundTag:'resumen'
-  });
-  if(!rs.isConfirmed) return;
-
-  try{
-    const r = await apiPost('guardarActualizacionEnServidor', body);
-    if(r && r.success){
-      await Swal.fire({ icon:'success', title:'Actualización Exitosa', timer:1600, showConfirmButton:false });
-      await refreshUserFromServer();
-      showView('view-menu');
-    }else{
-      Swal.fire({ icon:'error', title:'Error al guardar', text:r?.message || 'Error desconocido' });
+    // ACTUALIZACIÓN (con Resumen)
+    async function prepararActualizacion(){
+      if(!currentUser) return;
+      document.getElementById('upd-documento').value = currentUser.documento;
+      try{
+        const r = await apiGet('validarDocumento3',{ documento: currentUser.documento });
+        document.getElementById('upd-nombre').value = r?.existe ? (r.nombre || '') : (currentUser.nombre || '');
+      }catch{
+        document.getElementById('upd-nombre').value = currentUser.nombre || '';
+      }
+      document.getElementById('upd-telefono').value = '';
+      document.getElementById('upd-residencia').value = '';
+      document.getElementById('upd-referencia').value = '';
+      if(choicesUpd) choicesUpd.setChoiceByValue('');
     }
-  }catch(e){
-    Swal.fire({ icon:'error', title:'Error', text:e.message });
-  }
-});
-document.getElementById('upd-volver').addEventListener('click', ()=> showView('view-menu'));
+    // Toggle Referido en Actualización
+    const updRefWrap = document.getElementById('upd-referido-wrap');
+    const updRefMas = document.getElementById('upd-ref-mas');
+    const updRefMenos = document.getElementById('upd-ref-menos');
+    updRefMas.addEventListener('click', (ev)=>{ ev.preventDefault(); updRefWrap.style.display=''; updRefMas.classList.add('hidden'); updRefMenos.classList.remove('hidden'); });
+    updRefMenos.addEventListener('click', (ev)=>{ ev.preventDefault(); updRefWrap.style.display='none'; updRefMas.classList.remove('hidden'); updRefMenos.classList.add('hidden'); document.getElementById('upd-referencia').value=''; });
 
-/* CONSULTAR (requisitos de alertas y botones) */
+    document.getElementById('upd-guardar').addEventListener('click', async ()=>{
+      const body = {
+        documento: document.getElementById('upd-documento').value.trim(),
+        nombre: document.getElementById('upd-nombre').value.trim(),
+        telefono: document.getElementById('upd-telefono').value.trim(),
+        residencia: document.getElementById('upd-residencia').value,
+        referencia: document.getElementById('upd-referencia').value.trim()
+      };
+      const documentoRegex = /^[0-9]{6,10}$/;
+      const telefonoRegex = /^[0-9]{10}$/;
+      const referenciaRegex = /^[0-9]{1,3}$/;
+
+      if(!documentoRegex.test(body.documento)){
+        return Swal.fire({ icon:'warning', title:'Documento inválido' });
+      }
+      if(body.telefono && !telefonoRegex.test(body.telefono)){
+        return Swal.fire({ icon:'warning', title:'Whatsapp inválido' });
+      }
+      if(body.referencia && !referenciaRegex.test(body.referencia)){
+        return Swal.fire({ icon:'warning', title:'Referido inválido', text:'Debe tener 1 a 3 dígitos.' });
+      }
+
+      const resumenHtml = `
+        <b>N° Documento:</b> ${body.documento}<br>
+        <b>Whatsapp:</b> ${body.telefono || 'Sin cambios'}<br>
+        <b>Residencia:</b> ${body.residencia || 'Sin cambios'}<br>
+        <b>Referido:</b> ${body.referencia || 'Sin cambios'}<br><br>
+        <img class="brand" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png" alt="">
+      `;
+      const rs = await Swal.fire({
+        icon:'info', title:'Resumen de Actualización', html:resumenHtml,
+        showCancelButton:true, confirmButtonText:'Confirmar', cancelButtonText:'Editar',
+        width:'80%', customClass:{ popup:'swal2-responsive-popup' },
+        soundTag:'resumen'
+      });
+      if(!rs.isConfirmed) return;
+
+      try{
+        const r = await apiPost('guardarActualizacionEnServidor', body);
+        if(r && r.success){
+          await Swal.fire({ icon:'success', title:'Actualización Exitosa', timer:1600, showConfirmButton:false });
+          // Refrescar datos en menú automáticamente
+          await refreshUserFromServer();
+          showView('view-menu');
+        }else{
+          Swal.fire({ icon:'error', title:'Error al guardar', text:r?.message || 'Error desconocido' });
+        }
+      }catch(e){
+        Swal.fire({ icon:'error', title:'Error', text:e.message });
+      }
+    });
+    document.getElementById('upd-volver').addEventListener('click', ()=> showView('view-menu'));
+
+
+    // CONSULTAR (requisitos de alertas y botones)
 document.getElementById('c-validar').addEventListener('click', async ()=>{
   const documento = (document.getElementById('c-documento').value || '').trim();
   if(!/^\d{6,10}$/.test(documento)){
@@ -2208,6 +2260,7 @@ document.getElementById('c-validar').addEventListener('click', async ()=>{
         confirmButtonText:'Consultar'
       });
       if(rs.isConfirmed){
+        // Copiar el documento al portapapeles y abrir la vista de votación
         try{
           if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function'){
             await navigator.clipboard.writeText(documento);
@@ -2215,8 +2268,10 @@ document.getElementById('c-validar').addEventListener('click', async ()=>{
         }catch(_){}
         showView('view-votacion');
       }
+      // si es Deny, solo cerrar
       return;
     }
+    // Mostrar resultados
     document.getElementById('c-dep').textContent = r.departamento;
     document.getElementById('c-mun').textContent = r.municipio;
     document.getElementById('c-pue').textContent = r.puesto;
@@ -2228,185 +2283,195 @@ document.getElementById('c-validar').addEventListener('click', async ()=>{
     Swal.fire({ icon:'error', title:'Error', text:e.message });
   }
 });
-document.getElementById('c-volver').addEventListener('click', ()=> showView('view-menu'));
+    document.getElementById('c-volver').addEventListener('click', ()=> showView('view-menu'));
 
-/* SOLICITUD (con Resumen) */
-async function prepararSolicitud(){
-  if(!currentUser) return;
-  document.getElementById('s-documento').value = currentUser.documento || '';
-  document.getElementById('s-nombre').value = '';
-  document.getElementById('s-telefono').value = '';
-  document.getElementById('s-residencia').value = '';
-  document.getElementById('s-servicio').value = '';
-  document.getElementById('s-solicitud').value = '';
+    // SOLICITUD (con Resumen)
+    async function prepararSolicitud(){
+      if(!currentUser) return;
+      document.getElementById('s-documento').value = currentUser.documento || '';
+      // Limpiar campos
+      document.getElementById('s-nombre').value = '';
+      document.getElementById('s-telefono').value = '';
+      document.getElementById('s-residencia').value = '';
+      document.getElementById('s-servicio').value = '';
+      document.getElementById('s-solicitud').value = '';
 
-  try{
-    const r = await apiGet('validarDocumento5', { documento: currentUser.documento });
-    if(r && r.existe){
-      document.getElementById('s-nombre').value = r.nombre || '';
-      document.getElementById('s-telefono').value = r.telefono || '';
-      document.getElementById('s-residencia').value = r.residencia || '';
-    }else{
-      document.getElementById('s-nombre').value = currentUser.nombre || '';
-      document.getElementById('s-telefono').value = currentUser.telefono || '';
-      document.getElementById('s-residencia').value = currentUser.residencia || '';
+      try{
+        const r = await apiGet('validarDocumento5', { documento: currentUser.documento });
+        if(r && r.existe){
+          document.getElementById('s-nombre').value = r.nombre || '';
+          document.getElementById('s-telefono').value = r.telefono || '';
+          document.getElementById('s-residencia').value = r.residencia || '';
+        }else{
+          // Si no existe, usar los datos del currentUser
+          document.getElementById('s-nombre').value = currentUser.nombre || '';
+          document.getElementById('s-telefono').value = currentUser.telefono || '';
+          document.getElementById('s-residencia').value = currentUser.residencia || '';
+        }
+      }catch(_){
+        document.getElementById('s-nombre').value = currentUser.nombre || '';
+        document.getElementById('s-telefono').value = currentUser.telefono || '';
+        document.getElementById('s-residencia').value = currentUser.residencia || '';
+      }
     }
-  }catch(_){
-    document.getElementById('s-nombre').value = currentUser.nombre || '';
-    document.getElementById('s-telefono').value = currentUser.telefono || '';
-    document.getElementById('s-residencia').value = currentUser.residencia || '';
-  }
-}
-document.getElementById('s-guardar').addEventListener('click', async ()=>{
-  const body = {
-    documento: (document.getElementById('s-documento').value || '').trim(),
-    nombre: (document.getElementById('s-nombre').value || '').trim(),
-    telefono: (document.getElementById('s-telefono').value || '').trim(),
-    residencia: (document.getElementById('s-residencia').value || '').trim(),
-    servicio: document.getElementById('s-servicio').value,
-    solicitud: (document.getElementById('s-solicitud').value || '').trim()
-  };
-  const docRegex = /^[0-9]{6,10}$/;
-  if(!docRegex.test(body.documento)){
-    return Swal.fire({ icon:'warning', title:'Documento inválido', text:'Documento no válido en sesión.' });
-  }
-  if(!body.servicio){
-    return Swal.fire({ icon:'warning', title:'Servicio requerido', text:'Selecciona un servicio.' });
-  }
-  if(!body.solicitud){
-    return Swal.fire({ icon:'warning', title:'Solicitud requerida', text:'Describe brevemente tu solicitud.' });
-  }
 
-  const resumenHtml = `
-    <b>Nombre:</b> ${body.nombre}<br>
-    <b>N° Documento:</b> ${body.documento}<br>
-    <b>Whatsapp:</b> ${body.telefono || 'N/A'}<br>
-    <b>Residencia:</b> ${body.residencia || 'N/A'}<br>
-    <b>Servicio:</b> ${body.servicio}<br>
-    <b>Solicitud:</b> ${body.solicitud}<br><br>
-    <img class="brand" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png" alt="">
-  `;
-  const rs = await Swal.fire({
-    icon:'info', title:'Resumen de Solicitud', html:resumenHtml,
-    showCancelButton:true, confirmButtonText:'Confirmar', cancelButtonText:'Editar',
-    width:'80%', customClass:{ popup:'swal2-responsive-popup' },
-    soundTag:'resumen'
-  });
-  if(!rs.isConfirmed) return;
+    document.getElementById('s-guardar').addEventListener('click', async ()=>{
+      const body = {
+        documento: (document.getElementById('s-documento').value || '').trim(),
+        nombre: (document.getElementById('s-nombre').value || '').trim(),
+        telefono: (document.getElementById('s-telefono').value || '').trim(),
+        residencia: (document.getElementById('s-residencia').value || '').trim(),
+        servicio: document.getElementById('s-servicio').value,
+        solicitud: (document.getElementById('s-solicitud').value || '').trim()
+      };
+      const docRegex = /^[0-9]{6,10}$/;
+      if(!docRegex.test(body.documento)){
+        return Swal.fire({ icon:'warning', title:'Documento inválido', text:'Documento no válido en sesión.' });
+      }
+      if(!body.servicio){
+        return Swal.fire({ icon:'warning', title:'Servicio requerido', text:'Selecciona un servicio.' });
+      }
+      if(!body.solicitud){
+        return Swal.fire({ icon:'warning', title:'Solicitud requerida', text:'Describe brevemente tu solicitud.' });
+      }
 
-  try{
-    const r = await apiPost('guardarSolicitudEnServidor', body);
-    if(r && r.success){
-      await Swal.fire({ icon:'success', title:'Solicitud enviada', timer:1700, showConfirmButton:false });
-      showView('view-menu');
-    }else{
-      Swal.fire({ icon:'error', title:'Error al guardar', text:r?.message || 'Error desconocido' });
+      const resumenHtml = `
+        <b>Nombre:</b> ${body.nombre}<br>
+        <b>N° Documento:</b> ${body.documento}<br>
+        <b>Whatsapp:</b> ${body.telefono || 'N/A'}<br>
+        <b>Residencia:</b> ${body.residencia || 'N/A'}<br>
+        <b>Servicio:</b> ${body.servicio}<br>
+        <b>Solicitud:</b> ${body.solicitud}<br><br>
+        <img class="brand" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png" alt="">
+      `;
+      const rs = await Swal.fire({
+        icon:'info', title:'Resumen de Solicitud', html:resumenHtml,
+        showCancelButton:true, confirmButtonText:'Confirmar', cancelButtonText:'Editar',
+        width:'80%', customClass:{ popup:'swal2-responsive-popup' },
+        soundTag:'resumen'
+      });
+      if(!rs.isConfirmed) return;
+
+      try{
+        const r = await apiPost('guardarSolicitudEnServidor', body);
+        if(r && r.success){
+          await Swal.fire({ icon:'success', title:'Solicitud enviada', timer:1700, showConfirmButton:false });
+          showView('view-menu');
+        }else{
+          Swal.fire({ icon:'error', title:'Error al guardar', text:r?.message || 'Error desconocido' });
+        }
+      }catch(e){
+        Swal.fire({ icon:'error', title:'Error', text:e.message });
+      }
+    });
+    document.getElementById('s-volver').addEventListener('click', ()=> showView('view-menu'));
+
+    // IDEAS (con Resumen)
+    async function prepararIdeas(){
+      if(!currentUser) return;
+      document.getElementById('i-documento').value = currentUser.documento || '';
+      // Limpiar campos
+      document.getElementById('i-nombre').value = '';
+      document.getElementById('i-telefono').value = '';
+      document.getElementById('i-residencia').value = '';
+      document.getElementById('i-social').value = '';
+      document.getElementById('i-institucional').value = '';
+      document.getElementById('i-economico').value = '';
+      document.getElementById('i-ambiental').value = '';
+      document.getElementById('i-otros').value = '';
+
+      try{
+        const r = await apiGet('validarDocumento6', { documento: currentUser.documento });
+        if(r && r.existe){
+          document.getElementById('i-nombre').value = r.nombre || '';
+          document.getElementById('i-telefono').value = r.telefono || '';
+          document.getElementById('i-residencia').value = r.residencia || '';
+        }else{
+          document.getElementById('i-nombre').value = currentUser.nombre || '';
+          document.getElementById('i-telefono').value = currentUser.telefono || '';
+          document.getElementById('i-residencia').value = currentUser.residencia || '';
+        }
+      }catch(_){
+        document.getElementById('i-nombre').value = currentUser.nombre || '';
+        document.getElementById('i-telefono').value = currentUser.telefono || '';
+        document.getElementById('i-residencia').value = currentUser.residencia || '';
+      }
     }
-  }catch(e){
-    Swal.fire({ icon:'error', title:'Error', text:e.message });
-  }
-});
-document.getElementById('s-volver').addEventListener('click', ()=> showView('view-menu'));
 
-/* IDEAS (con Resumen) */
-async function prepararIdeas(){
-  if(!currentUser) return;
-  document.getElementById('i-documento').value = currentUser.documento || '';
-  document.getElementById('i-nombre').value = '';
-  document.getElementById('i-telefono').value = '';
-  document.getElementById('i-residencia').value = '';
-  document.getElementById('i-social').value = '';
-  document.getElementById('i-institucional').value = '';
-  document.getElementById('i-economico').value = '';
-  document.getElementById('i-ambiental').value = '';
-  document.getElementById('i-otros').value = '';
+    document.getElementById('i-guardar').addEventListener('click', async ()=>{
+      const body = {
+        documento: (document.getElementById('i-documento').value || '').trim(),
+        nombre: (document.getElementById('i-nombre').value || '').trim(),
+        telefono: (document.getElementById('i-telefono').value || '').trim(),
+        residencia: (document.getElementById('i-residencia').value || '').trim(),
+        social: (document.getElementById('i-social').value || '').trim(),
+        institucional: (document.getElementById('i-institucional').value || '').trim(),
+        economico: (document.getElementById('i-economico').value || '').trim(),
+        ambiental: (document.getElementById('i-ambiental').value || '').trim(),
+        otros: (document.getElementById('i-otros').value || '').trim()
+      };
+      const docRegex = /^[0-9]{6,10}$/;
+      if(!docRegex.test(body.documento)){
+        return Swal.fire({ icon:'warning', title:'Documento inválido', text:'Documento no válido en sesión.' });
+      }
 
-  try{
-    const r = await apiGet('validarDocumento6', { documento: currentUser.documento });
-    if(r && r.existe){
-      document.getElementById('i-nombre').value = r.nombre || '';
-      document.getElementById('i-telefono').value = r.telefono || '';
-      document.getElementById('i-residencia').value = r.residencia || '';
-    }else{
-      document.getElementById('i-nombre').value = currentUser.nombre || '';
-      document.getElementById('i-telefono').value = currentUser.telefono || '';
-      document.getElementById('i-residencia').value = currentUser.residencia || '';
-    }
-  }catch(_){
-    document.getElementById('i-nombre').value = currentUser.nombre || '';
-    document.getElementById('i-telefono').value = currentUser.telefono || '';
-    document.getElementById('i-residencia').value = currentUser.residencia || '';
-  }
-}
-document.getElementById('i-guardar').addEventListener('click', async ()=>{
-  const body = {
-    documento: (document.getElementById('i-documento').value || '').trim(),
-    nombre: (document.getElementById('i-nombre').value || '').trim(),
-    telefono: (document.getElementById('i-telefono').value || '').trim(),
-    residencia: (document.getElementById('i-residencia').value || '').trim(),
-    social: (document.getElementById('i-social').value || '').trim(),
-    institucional: (document.getElementById('i-institucional').value || '').trim(),
-    economico: (document.getElementById('i-economico').value || '').trim(),
-    ambiental: (document.getElementById('i-ambiental').value || '').trim(),
-    otros: (document.getElementById('i-otros').value || '').trim()
-  };
-  const docRegex = /^[0-9]{6,10}$/;
-  if(!docRegex.test(body.documento)){
-    return Swal.fire({ icon:'warning', title:'Documento inválido', text:'Documento no válido en sesión.' });
-  }
+      const resumenHtml = `
+        <b>Nombre:</b> ${body.nombre}<br>
+        <b>N° Documento:</b> ${body.documento}<br>
+        <b>Whatsapp:</b> ${body.telefono || 'N/A'}<br>
+        <b>Residencia:</b> ${body.residencia || 'N/A'}<br>
+        <hr>
+        <b>Aspecto Social:</b><br>${(body.social||'').replace(/\n/g,'<br>') || '<i>Sin ideas</i>'}<br><br>
+        <b>Aspecto Institucional:</b><br>${(body.institucional||'').replace(/\n/g,'<br>') || '<i>Sin ideas</i>'}<br><br>
+        <b>Aspecto Económico:</b><br>${(body.economico||'').replace(/\n/g,'<br>') || '<i>Sin ideas</i>'}<br><br>
+        <b>Aspecto Ambiental:</b><br>${(body.ambiental||'').replace(/\n/g,'<br>') || '<i>Sin ideas</i>'}<br><br>
+        <b>Otros:</b><br>${(body.otros||'').replace(/\n/g,'<br>') || '<i>Sin ideas</i>'}<br><br>
+        <img class="brand" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png" alt="">
+      `;
+      const rs = await Swal.fire({
+        icon:'info', title:'Resumen de Ideas', html:resumenHtml,
+        showCancelButton:true, confirmButtonText:'Confirmar', cancelButtonText:'Editar',
+        width:'80%', customClass:{ popup:'swal2-responsive-popup' },
+        soundTag:'resumen'
+      });
+      if(!rs.isConfirmed) return;
 
-  const resumenHtml = `
-    <b>Nombre:</b> ${body.nombre}<br>
-    <b>N° Documento:</b> ${body.documento}<br>
-    <b>Whatsapp:</b> ${body.telefono || 'N/A'}<br>
-    <b>Residencia:</b> ${body.residencia || 'N/A'}<br>
-    <hr>
-    <b>Aspecto Social:</b><br>${(body.social||'').replace(/\n/g,'<br>') || '<i>Sin ideas</i>'}<br><br>
-    <b>Aspecto Institucional:</b><br>${(body.institucional||'').replace(/\n/g,'<br>') || '<i>Sin ideas</i>'}<br><br>
-    <b>Aspecto Económico:</b><br>${(body.economico||'').replace(/\n/g,'<br>') || '<i>Sin ideas</i>'}<br><br>
-    <b>Aspecto Ambiental:</b><br>${(body.ambiental||'').replace(/\n/g,'<br>') || '<i>Sin ideas</i>'}<br><br>
-    <b>Otros:</b><br>${(body.otros||'').replace(/\n/g,'<br>') || '<i>Sin ideas</i>'}<br><br>
-    <img class="brand" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png" alt="">
-  `;
-  const rs = await Swal.fire({
-    icon:'info', title:'Resumen de Ideas', html:resumenHtml,
-    showCancelButton:true, confirmButtonText:'Confirmar', cancelButtonText:'Editar',
-    width:'80%', customClass:{ popup:'swal2-responsive-popup' },
-    soundTag:'resumen'
-  });
-  if(!rs.isConfirmed) return;
+      try{
+        const r = await apiPost('guardarIdeasEnServidor', body);
+        if(r && r.success){
+          await Swal.fire({ icon:'success', title:'¡Gracias por tus Ideas!', timer:1700, showConfirmButton:false });
+          showView('view-menu');
+        }else{
+          Swal.fire({ icon:'error', title:'Error al guardar', text:r?.message || 'Error desconocido' });
+        }
+      }catch(e){
+        Swal.fire({ icon:'error', title:'Error', text:e.message });
+      }
+    });
+    document.getElementById('i-volver').addEventListener('click', ()=> showView('view-menu'));
 
-  try{
-    const r = await apiPost('guardarIdeasEnServidor', body);
-    if(r && r.success){
-      await Swal.fire({ icon:'success', title:'¡Gracias por tus Ideas!', timer:1700, showConfirmButton:false });
-      showView('view-menu');
-    }else{
-      Swal.fire({ icon:'error', title:'Error al guardar', text:r?.message || 'Error desconocido' });
-    }
-  }catch(e){
-    Swal.fire({ icon:'error', title:'Error', text:e.message });
-  }
-});
-document.getElementById('i-volver').addEventListener('click', ()=> showView('view-menu'));
-
-/* Volver y sonidos */
-document.getElementById('feed-volver').addEventListener('click', ()=> showView('view-menu'));
+    document.getElementById('feed-volver').addEventListener('click', ()=> showView('view-menu'));
 document.getElementById('fd-volver').addEventListener('click', ()=> showView('view-feed'));
 
-['btn-ovl-back','a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver','btn-reg-atras','sede-volver','redes-volver'].forEach(id=>{
+    // Sonido para botones Atrás/Regresar
+    ['btn-ovl-back','a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver','btn-reg-atras','sede-volver','redes-volver'].forEach(id=>{
   const el = document.getElementById(id);
   if(el) el.addEventListener('click', ()=> playSoundOnce(SOUNDS.back));
 });
-['a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver','sede-volver','redes-volver'].forEach(id=>{
+
+    // Volver genéricos
+    ['a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver','sede-volver','redes-volver'].forEach(id=>{
   const el = document.getElementById(id);
   if(el) el.addEventListener('click', ()=> showView('view-menu'));
 });
+
+    // + nuevos "Atrás"
 ['feed-volver','fd-volver'].forEach(id=>{
   const el = document.getElementById(id);
   if(el) el.addEventListener('click', ()=> playSoundOnce(SOUNDS.back));
 });
-</script>
+
     
+  </script>
 </body>
 </html>

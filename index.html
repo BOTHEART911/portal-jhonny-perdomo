@@ -318,7 +318,23 @@
 #view-sede > *:first-child,
 #view-redes > *:first-child{ margin-top: 0 !important; }
 </style>
-  
+
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "88af48e7-f62a-45c4-ba61-4196b30ddcbc"
+      // Nota: al haber importScripts en sw.js, OneSignal usará tu SW para manejar los push
+    });
+
+    // (Opcional) log básico para verificar que cargó
+    try {
+      const permission = await OneSignal.Notifications.getPermission();
+      console.debug('[OneSignal] Permiso:', permission);
+    } catch(_) {}
+  });
+</script>
 </head>
 <body>
  <!-- Loader centrado (efecto iOS, sin imagen) -->

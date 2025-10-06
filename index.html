@@ -317,6 +317,65 @@
 /* Opcional: si quieres que Sede y Redes no tengan ni 1px de “aire” arriba */
 #view-sede > *:first-child,
 #view-redes > *:first-child{ margin-top: 0 !important; }
+
+  /* ========== NOTIFICACIONES ========== */
+/* Lista */
+.news-list{ display:flex; flex-direction:column; gap:12px; }
+.news-item{
+  display:flex; align-items:flex-start; gap:10px;
+  padding:10px; border-radius:12px; border:2px solid #ddd;
+  background: rgba(255,255,255,.85);
+  box-shadow: 0 6px 14px rgba(0,0,0,.12);
+  text-align:left;
+  position:relative;
+}
+.news-item:hover{ border-color:var(--primary); }
+.news-thumb{
+  width:64px; height:64px; border-radius:10px; flex:0 0 64px;
+  object-fit:cover; background:#eee; border:1px solid #ccc;
+}
+.news-content{ flex:1; min-width:0; }
+.news-title{
+  font-weight:800; margin:0 0 4px 0; color:#111;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-transform:uppercase;
+}
+.news-desc{
+  margin:0; color:#555;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+.news-unread-dot{
+  position:absolute; right:10px; top:10px; width:12px; height:12px;
+  background:#e11; border-radius:999px; border:2px solid #fff;
+}
+
+/* Detalle */
+.news-detail-thumb{
+  width:140px; height:140px; object-fit:cover;
+  border-radius:12px; border:2px solid #ddd; background:#eee;
+}
+.justify{ text-align:justify; }
+
+/* Indicador en login (latido + badge) */
+.notif-alert{
+  position:relative; display:flex; justify-content:center; align-items:center; margin-top:10px;
+}
+.notif-alert img{ width:56px; height:56px; display:block; }
+.notif-alert .badge{
+  position:absolute; right: -4px; top:-4px;
+  min-width:20px; height:20px; padding:0 6px;
+  background:#e11; color:#fff; border-radius:999px;
+  display:flex; align-items:center; justify-content:center;
+  font-weight:800; font-size:12px; border:2px solid #fff;
+}
+.beat{ animation: heartbeat 1.2s ease-in-out infinite; transform-origin:center; }
+
+@keyframes heartbeat{
+  0%   { transform: scale(1); }
+  20%  { transform: scale(1.12); }
+  40%  { transform: scale(1); }
+  60%  { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
 </style>
   
 </head>
@@ -565,6 +624,10 @@
       <img alt="banner" src="https://res.cloudinary.com/dqqeavica/image/upload/v1759696513/Jhonny_y1tslf.gif" style="max-width:180px;border-radius:10px;" />
     </div>
     <h3>Selecciona una de las opciones</h3>
+
+    <!-- NUEVO: primera opción -->
+    <button class="menu-btn" id="go-news">Ponte al día 📅</button>
+
     <button class="menu-btn" id="go-asistencia">Registra Asistencia a Evento ✋🏾</button>
     <button class="menu-btn" id="go-solicitud">Realiza tu Solicitud 📬</button>
     <button class="menu-btn" id="go-ideas">Suma tus Ideas 💡</button>
@@ -1169,6 +1232,38 @@ updateInstallButtonsVisibility();
   </div>
 </section>
 
+    <!-- VISTA 11: NOTIFICACIONES - LISTA -->
+<section id="view-news" class="view">
+  <div class="card narrow">
+    <div class="btn-row">
+      <button id="news-back">Regresar</button>
+    </div>
+    <h2 style="color:var(--primary);">¡PONTE AL DÍA!</h2>
+    <div id="news-list" class="news-list"></div>
+  </div>
+</section>
+
+<!-- VISTA 12: NOTIFICACIONES - DETALLE -->
+<section id="view-news-detail" class="view">
+  <div class="card narrow">
+    <div class="btn-row">
+      <button id="newsd-back">Regresar</button>
+    </div>
+
+    <div class="image-center" style="margin-top:8px;">
+      <img id="newsd-thumb" class="news-detail-thumb" alt="Noticia">
+    </div>
+
+    <h2 id="newsd-title" style="color:#111; text-align:center;"></h2>
+
+    <p id="newsd-desc" class="justify"></p>
+
+    <div class="btn-row spaced">
+      <a id="newsd-link" class="btn-primary" href="#" target="_blank" rel="noopener">Visita la Noticia</a>
+    </div>
+  </div>
+</section>
+    
   <script>
     // URL de tu Apps Script desplegado
     const API_BASE = 'https://script.google.com/macros/s/AKfycbzYEzUpAoXZKgkCut4HI2CgcHiwkgldjx23RXucAGx-BlTKXreJO_ZQ2MCyr8aqnOl0/exec';
@@ -2108,5 +2203,158 @@ document.getElementById('c-validar').addEventListener('click', async ()=>{
   if(el) el.addEventListener('click', ()=> showView('view-menu'));
 });
   </script>
+
+    
+    <script>
+(function(){
+  // Sonido de notificación (solo una vez por sesión)
+  window.SOUNDS = window.SOUNDS || {};
+  if (!SOUNDS.notif){
+    SOUNDS.notif = 'https://res.cloudinary.com/dqqeavica/video/upload/v1759767435/Notificacion_d1woxv.mp3';
+  }
+
+  // Elementos
+  const newsListEl = document.getElementById('news-list');
+  const loginNotif = document.getElementById('login-notif');
+  const loginNotifCount = document.getElementById('login-notif-count');
+  const NEWS_PLACEHOLDER = 'https://res.cloudinary.com/dqqeavica/image/upload/v1759767447/Notificaci%C3%B3n_jtptyw.webp';
+
+  // Namespace de "leídas": por usuario o invitado (en Login)
+  function readKey(){
+    try{
+      return 'news:read:' + (window.currentUser?.documento || 'guest');
+    }catch(_){
+      return 'news:read:guest';
+    }
+  }
+  function getReadSet(){
+    try{
+      const raw = localStorage.getItem(readKey());
+      const arr = raw ? JSON.parse(raw) : [];
+      return new Set(arr);
+    }catch(_){ return new Set(); }
+  }
+  function saveReadSet(set){
+    try{ localStorage.setItem(readKey(), JSON.stringify(Array.from(set))); }catch(_){}
+  }
+  function markRead(id){
+    const s = getReadSet();
+    s.add(String(id));
+    saveReadSet(s);
+  }
+  function isImageUrl(u){
+    if(!u) return false;
+    return /\.(png|jpe?g|webp|gif|avif)(\?.*)?$/i.test(u);
+  }
+  function thumbFor(item){
+    const u = item.first_link || '';
+    return isImageUrl(u) ? u : NEWS_PLACEHOLDER;
+  }
+
+  async function fetchNews(){
+    try{
+      return await apiGet('listNotificaciones');
+    }catch(_){ return []; }
+  }
+  function computeUnreadCount(list){
+    const s = getReadSet();
+    return (list||[]).filter(n => !s.has(String(n.id))).length;
+  }
+
+  // Render de la lista
+  async function openNewsList(){
+    overlay.classList.remove('open');
+    const list = await fetchNews();
+    renderNewsList(list);
+    showView('view-news');
+  }
+  function renderNewsList(list){
+    const s = getReadSet();
+    newsListEl.innerHTML = '';
+    if (!list || !list.length){
+      newsListEl.innerHTML = '<p class="muted center" style="margin:8px 0;">No hay notificaciones por ahora.</p>';
+      updateLoginIndicator(0);
+      return;
+    }
+    for(const n of list){
+      const li = document.createElement('button');
+      li.type = 'button';
+      li.className = 'news-item';
+      li.innerHTML = `
+        <img class="news-thumb" alt="" src="${thumbFor(n)}">
+        <div class="news-content">
+          <p class="news-title">${escapeHtml(n.titulo || '')}</p>
+          <p class="news-desc">${escapeHtml(n.descripcion || '')}</p>
+        </div>
+      `;
+      if(!s.has(String(n.id))){
+        const dot = document.createElement('span');
+        dot.className = 'news-unread-dot';
+        li.appendChild(dot);
+      }
+      li.addEventListener('click', ()=> openNewsDetail(n));
+      newsListEl.appendChild(li);
+    }
+    updateLoginIndicator(computeUnreadCount(list));
+  }
+
+  // Detalle
+  function openNewsDetail(n){
+    markRead(n.id);
+    document.getElementById('newsd-thumb').src = thumbFor(n);
+    document.getElementById('newsd-title').textContent = String(n.titulo || '').toUpperCase();
+    document.getElementById('newsd-desc').innerHTML = linkify(escapeHtml(n.descripcion || ''));
+    const a = document.getElementById('newsd-link');
+    if(n.first_link){
+      a.href = n.first_link; a.style.display = '';
+    }else{
+      a.removeAttribute('href'); a.style.display = 'none';
+    }
+    showView('view-news-detail');
+
+    // Refrescar lista en background para que desaparezca el punto rojo
+    fetchNews().then(renderNewsList);
+  }
+
+  // Indicador en Login (latido + badge, sonido 1 sola vez por sesión)
+  let notifSoundPlayed = false;
+  try{ notifSoundPlayed = sessionStorage.getItem('notifSoundPlayed') === '1'; }catch(_){}
+  function updateLoginIndicator(unread){
+    if (!loginNotif || !loginNotifCount) return;
+    if (unread > 0){
+      loginNotif.classList.remove('hidden');
+      loginNotifCount.textContent = unread;
+      if (!notifSoundPlayed){
+        playSoundOnce(SOUNDS.notif);
+        notifSoundPlayed = true;
+        try{ sessionStorage.setItem('notifSoundPlayed', '1'); }catch(_){}
+      }
+    }else{
+      loginNotif.classList.add('hidden');
+    }
+  }
+
+  // Utils
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+  function linkify(s){
+    return s.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+  }
+
+  // Eventos
+  const goNews = document.getElementById('go-news');
+  if (goNews) goNews.addEventListener('click', openNewsList);
+
+  const btnBackNews = document.getElementById('news-back');
+  if (btnBackNews) btnBackNews.addEventListener('click', ()=> showView('view-menu'));
+
+  const btnBackDetail = document.getElementById('newsd-back');
+  if (btnBackDetail) btnBackDetail.addEventListener('click', ()=> showView('view-news'));
+
+  // Al cargar, consulta para mostrar indicador en Login (modo invitado si no hay sesión)
+  fetchNews().then(list => updateLoginIndicator(computeUnreadCount(list)));
+})();
+</script>
 </body>
 </html>

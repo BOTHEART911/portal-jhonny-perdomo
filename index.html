@@ -317,46 +317,47 @@
 /* Opcional: si quieres que Sede y Redes no tengan ni 1px de “aire” arriba */
 #view-sede > *:first-child,
 #view-redes > *:first-child{ margin-top: 0 !important; }
+
+  /* ---- NOTIFICACIONES (lista) ---- */
+.menu-btn{ position: relative; }
+.badge{
+  position:absolute; top:-6px; right:-6px;
+  min-width:20px; height:20px; padding:0 6px;
+  background:#e11; color:#fff; border-radius:999px; border:2px solid #fff;
+  font-size:12px; line-height:16px; display:flex; align-items:center; justify-content:center;
+  box-shadow: 0 2px 6px rgba(0,0,0,.25);
+}
+.notifs-wrap{ max-width: 640px; margin: 0 auto; }
+.notif-item{
+  display:flex; align-items:center; gap:10px;
+  background: rgba(255,255,255,.85);
+  border: 2px solid #ddd; border-radius: 14px;
+  padding: 10px; margin: 10px 0;
+  box-shadow: 0 6px 14px rgba(0,0,0,.15);
+  cursor: pointer;
+}
+.notif-check{
+  width:20px; height:20px; flex: 0 0 20px;
+}
+.notif-img{
+  width:64px; height:64px; object-fit:cover; border-radius:10px; border:1px solid #ccc; flex: 0 0 64px;
+  background:#f3f3f3;
+}
+.notif-text{ flex:1 1 auto; min-width:0; }
+.notif-title{
+  font-weight:800; color:#111; margin:0 0 4px; 
+  display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden;
+}
+.notif-desc{
+  color:#444; margin:0;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+.notif-dot{
+  width:14px; height:14px; background:#e11; border:2px solid #fff; border-radius:50%;
+  flex: 0 0 14px; box-shadow: 0 1px 4px rgba(0,0,0,.2);
+}
 </style>
 
-  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({
-      appId: "88af48e7-f62a-45c4-ba61-4196b30ddcbc"
-      // Nota: al haber importScripts en sw.js, OneSignal usará tu SW para manejar los push
-    });
-
-    // (Opcional) log básico para verificar que cargó
-    try {
-      const permission = await OneSignal.Notifications.getPermission();
-      console.debug('[OneSignal] Permiso:', permission);
-    } catch(_) {}
-  });
-</script>
-  <script>
-  // Utilidad: pedir permiso solo si no está concedido, en respuesta a un clic
-  window.requestPushIfNeeded = async function(){
-    try{
-      if (!window.OneSignal) return;
-      // Espera a que el SDK esté listo
-      await new Promise(res => {
-        (window.OneSignalDeferred = window.OneSignalDeferred || []).push(async () => res());
-      });
-      const status = await OneSignal.Notifications.getPermission();
-      if (status !== 'granted') {
-        // IMPORTANTE: esta llamada debe ocurrir dentro de un manejador de clic
-        await OneSignal.Notifications.requestPermission();
-      }
-      // Debug útil
-      // OneSignal.Debug.setLogLevel('trace');
-      // console.log('[OneSignal] Permiso actual:', await OneSignal.Notifications.getPermission());
-    }catch(e){
-      console.warn('No se pudo solicitar permiso de push:', e);
-    }
-  };
-</script>
 </head>
 <body>
  <!-- Loader centrado (efecto iOS, sin imagen) -->
@@ -603,6 +604,9 @@
       <img alt="banner" src="https://res.cloudinary.com/dqqeavica/image/upload/v1759696513/Jhonny_y1tslf.gif" style="max-width:180px;border-radius:10px;" />
     </div>
     <h3>Selecciona una de las opciones</h3>
+    <button class="menu-btn" id="go-notificaciones">Ponte al día 📅
+    <span id="badge-notifs" class="badge" style="display:none;">0</span>
+    </button>
     <button class="menu-btn" id="go-asistencia">Registra Asistencia a Evento ✋🏾</button>
     <button class="menu-btn" id="go-solicitud">Realiza tu Solicitud 📬</button>
     <button class="menu-btn" id="go-ideas">Suma tus Ideas 💡</button>
@@ -1207,6 +1211,18 @@ updateInstallButtonsVisibility();
   </div>
 </section>
 
+    <!-- VISTA 11: ¡PONTE AL DÍA! -->
+    
+    <section id="view-notifs" class="view">
+  <div class="card notifs-wrap">
+    <h2 style="color:var(--primary)">¡PONTE AL DÍA!</h2>
+    <div id="notifs-list"></div>
+    <div class="btn-row spaced">
+      <button id="n-volver">Regresar</button>
+    </div>
+  </div>
+</section>
+
   <script>
     // URL de tu Apps Script desplegado
     const API_BASE = 'https://script.google.com/macros/s/AKfycbzYEzUpAoXZKgkCut4HI2CgcHiwkgldjx23RXucAGx-BlTKXreJO_ZQ2MCyr8aqnOl0/exec';
@@ -1375,14 +1391,8 @@ function stopLoading(){
     const regCard = document.getElementById('registro-card');
     const btnGuardarRegistro = document.getElementById('btn-guardar-registro');
 
-    btnLogin.addEventListener('click', async () => {
-  // 1) Solicita permiso de notificaciones en el clic
-  await window.requestPushIfNeeded();
-
-  // 2) …tu lógica actual de login (no cambies nada más)
+   btnLogin.addEventListener('click', async () => {
   const documento = (docLogin.value || '').trim();
-  // resto de tu código...
-});
 
   // Validación: campo vacío
   if (documento === '') {
@@ -1621,6 +1631,126 @@ document.getElementById('go-redes').addEventListener('click', ()=>{
   overlay.classList.remove('open');
   showView('view-redes');
 });
+
+    /* ===== NOTIFICACIONES (sin push): estado local + render ===== */
+
+// Cache en memoria
+let notifsCache = [];
+
+// Clave de almacenamiento (si luego quieres por-usuario, concatena currentUser?.documento)
+function getReadStorageKey(){
+  try{
+    const doc = (currentUser && currentUser.documento) ? String(currentUser.documento) : '';
+    return doc ? ('notifs_read_' + doc) : 'notifs_read';
+  }catch(_){ return 'notifs_read'; }
+}
+
+function loadReadSet(){
+  try{
+    const raw = localStorage.getItem(getReadStorageKey());
+    const arr = raw ? JSON.parse(raw) : [];
+    return new Set(Array.isArray(arr) ? arr : []);
+  }catch(_){
+    return new Set();
+  }
+}
+function saveReadSet(set){
+  try{
+    localStorage.setItem(getReadStorageKey(), JSON.stringify(Array.from(set)));
+  }catch(_){}
+}
+
+let readIds = loadReadSet();
+
+function isRead(id){ return readIds.has(String(id)); }
+function markRead(id){
+  id = String(id);
+  if(!readIds.has(id)){
+    readIds.add(id);
+    saveReadSet(readIds);
+    updateNotifBadge();
+  }
+}
+
+function getPreviewFromLink(link){
+  const url = String(link||'');
+  if(!url) return 'https://res.cloudinary.com/dqqeavica/image/upload/v1759166342/instragram_uft2wl.webp'; // placeholder ligera
+  // Si parece imagen directa
+  if(/\.(png|jpe?g|webp|gif)(\?.*)?$/i.test(url)) return url;
+  // YouTube: miniatura por id
+  const yt = url.match(/(?:v=|youtu\.be\/)([A-Za-z0-9_\-]+)/);
+  if(yt) return 'https://img.youtube.com/vi/' + yt[1] + '/hqdefault.jpg';
+  // Fallback
+  return 'https://res.cloudinary.com/dqqeavica/image/upload/v1759166342/instragram_uft2wl.webp';
+}
+
+// Llama al backend y actualiza cache
+async function fetchNotifs(){
+  const list = await apiGet('listnotificaciones', {});
+  // Asegurar array
+  notifsCache = Array.isArray(list) ? list : [];
+}
+
+// Render de la lista
+function renderNotifsList(){
+  const cont = document.getElementById('notifs-list');
+  if(!cont) return;
+  if(!notifsCache.length){
+    cont.innerHTML = '<p class="center muted">No hay notificaciones disponibles.</p>';
+    updateNotifBadge();
+    return;
+  }
+
+  const html = notifsCache.map(n=>{
+    const read = isRead(n.id);
+    const img = getPreviewFromLink(n.first_link);
+    return `
+      <div class="notif-item" data-id="${n.id}">
+        <input type="checkbox" class="notif-check" ${read ? 'checked' : ''} disabled>
+        <img class="notif-img" src="${img}" alt="">
+        <div class="notif-text">
+          <p class="notif-title">${escapeHtml(n.titulo || '')}</p>
+          <p class="notif-desc">${escapeHtml((n.descripcion || '').replace(/\s+/g,' ').trim())}</p>
+        </div>
+        ${read ? '' : '<span class="notif-dot" title="No leída"></span>'}
+      </div>
+    `;
+  }).join('');
+  cont.innerHTML = html;
+
+  // Click en ítems (por ahora solo marcan como leída y actualizan UI; el detalle viene en el Paso 3)
+  cont.querySelectorAll('.notif-item').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const id = el.getAttribute('data-id');
+      markRead(id);
+      // actualizar la tarjeta en caliente
+      const check = el.querySelector('.notif-check'); if(check) check.checked = true;
+      const dot = el.querySelector('.notif-dot'); if(dot) dot.remove();
+      // En el Paso 3 abriremos el detalle. Por ahora, feedback breve:
+      Swal.fire({ icon:'info', title:'Notificación abierta', timer:900, showConfirmButton:false });
+    });
+  });
+
+  updateNotifBadge();
+}
+
+// Badge en el botón del menú
+function updateNotifBadge(){
+  const badge = document.getElementById('badge-notifs');
+  if(!badge) return;
+  const unread = notifsCache.filter(n=>!isRead(n.id)).length;
+  if(unread > 0){
+    badge.textContent = String(unread);
+    badge.style.display = '';
+  }else{
+    badge.style.display = 'none';
+  }
+}
+
+// Pequeño helper para evitar inyectar HTML
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, (m)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+}
 
     document.getElementById('go-lider').addEventListener('click', async ()=>{
       if(!currentUser){ return; }
@@ -2140,14 +2270,49 @@ document.getElementById('c-validar').addEventListener('click', async ()=>{
     });
     document.getElementById('i-volver').addEventListener('click', ()=> showView('view-menu'));
 
+    // Abrir "Ponte al día" desde el menú
+document.getElementById('go-notificaciones').addEventListener('click', async ()=>{
+  overlay.classList.remove('open');
+  try{
+    await fetchNotifs();
+  }catch(e){
+    // si falla la API, dejar lista vacía
+  }
+  renderNotifsList();
+  showView('view-notifs');
+});
+
+// Botón Regresar de la vista de notificaciones
+document.getElementById('n-volver').addEventListener('click', ()=> showView('view-menu'));
+
+// Soporte de hash #notificaciones para abrir directo
+async function handleHashNav(){
+  if(location.hash === '#notificaciones'){
+    try{ overlay.classList.remove('open'); }catch(_){}
+    try{ await fetchNotifs(); }catch(_){}
+    renderNotifsList();
+    showView('view-notifs');
+  }
+}
+window.addEventListener('hashchange', handleHashNav);
+window.addEventListener('load', handleHashNav);
+
+// Al loguear o regresar al menú, refresca el badge (por si cambió el usuario)
+async function refreshNotifsBadgeOnMenuOpen(){
+  try{ await fetchNotifs(); }catch(_){}
+  updateNotifBadge();
+}
+// Opcional: cuando se abre el menú, refrescar el badge
+document.getElementById('btn-open-menu').addEventListener('click', refreshNotifsBadgeOnMenuOpen);
+
     // Sonido para botones Atrás/Regresar
-    ['btn-ovl-back','a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver','btn-reg-atras','sede-volver','redes-volver'].forEach(id=>{
+    ['btn-ovl-back','a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver','btn-reg-atras','sede-volver','redes-volver','n-volver'].forEach(id=>{
   const el = document.getElementById(id);
   if(el) el.addEventListener('click', ()=> playSoundOnce(SOUNDS.back));
 });
 
     // Volver genéricos
-    ['a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver','sede-volver','redes-volver'].forEach(id=>{
+    ['a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver','sede-volver','redes-volver','n-volver'].forEach(id=>{
   const el = document.getElementById(id);
   if(el) el.addEventListener('click', ()=> showView('view-menu'));
 });

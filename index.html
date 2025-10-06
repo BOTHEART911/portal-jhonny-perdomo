@@ -335,6 +335,28 @@
     } catch(_) {}
   });
 </script>
+  <script>
+  // Utilidad: pedir permiso solo si no está concedido, en respuesta a un clic
+  window.requestPushIfNeeded = async function(){
+    try{
+      if (!window.OneSignal) return;
+      // Espera a que el SDK esté listo
+      await new Promise(res => {
+        (window.OneSignalDeferred = window.OneSignalDeferred || []).push(async () => res());
+      });
+      const status = await OneSignal.Notifications.getPermission();
+      if (status !== 'granted') {
+        // IMPORTANTE: esta llamada debe ocurrir dentro de un manejador de clic
+        await OneSignal.Notifications.requestPermission();
+      }
+      // Debug útil
+      // OneSignal.Debug.setLogLevel('trace');
+      // console.log('[OneSignal] Permiso actual:', await OneSignal.Notifications.getPermission());
+    }catch(e){
+      console.warn('No se pudo solicitar permiso de push:', e);
+    }
+  };
+</script>
 </head>
 <body>
  <!-- Loader centrado (efecto iOS, sin imagen) -->
@@ -1354,7 +1376,13 @@ function stopLoading(){
     const btnGuardarRegistro = document.getElementById('btn-guardar-registro');
 
     btnLogin.addEventListener('click', async () => {
+  // 1) Solicita permiso de notificaciones en el clic
+  await window.requestPushIfNeeded();
+
+  // 2) …tu lógica actual de login (no cambies nada más)
   const documento = (docLogin.value || '').trim();
+  // resto de tu código...
+});
 
   // Validación: campo vacío
   if (documento === '') {

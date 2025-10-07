@@ -1906,17 +1906,22 @@ function openFeedDetail(it){
   if (title) title.textContent = String(it.titulo || '');
   if (desc)  desc.textContent  = String(it.descripcion || '');
 
-  if (link){
-    if (it.first_link){
-      link.href = it.first_link; 
-      link.style.display = '';
-    }else{
-      link.href = '#'; 
-      link.style.display = 'none';
-    }
-    link.textContent = 'Ayúdanos con tu Like, Comenta y comparte';
-  }
+  // Link de acción (mostrar/ocultar y texto)
+if (link){
+  // 1) intenta extraer el primer vínculo de la descripción
+  const urlFromDesc = extractFirstUrl(it.descripcion);
+  // 2) si no hay en la descripción, usa el proporcionado por el backend (si existe)
+  const firstUrl = urlFromDesc || it.first_link || '';
 
+  if (firstUrl){
+    link.href = firstUrl;
+    link.style.display = '';
+  } else {
+    link.href = '#';
+    link.style.display = 'none';
+  }
+  link.textContent = 'Ayúdanos con tu Like, Comenta y comparte';
+}
   // Marcar como leída y refrescar UI del listado y badge
   markRead(it.id);
   renderFeedList(FEED_CACHE);
@@ -1924,6 +1929,15 @@ function openFeedDetail(it){
 
   // Mostrar vista detalle
   showView('view-feed-detail');
+}
+
+function extractFirstUrl(text){
+  if(!text) return null;
+  const m = String(text).match(/(https?:\/\/[^\s'"<>]+|www\.[^\s'"<>]+)/i);
+  if(!m) return null;
+  let u = m[0];
+  if(u.startsWith('www.')) u = 'https://' + u; // normaliza www. -> https://
+  return u;
 }
     
 function unreadCountFrom(items){

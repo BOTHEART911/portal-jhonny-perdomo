@@ -1542,6 +1542,7 @@ renderUserMenu();
 playSoundOnce(SOUNDS.login);
 showView('view-menu');
 
+      
 // Permitir que el sonido de notificaciones vuelva a sonar tras login
 try{ sessionStorage.removeItem(FEED_SOUND_KEY); }catch(_){}
 
@@ -1845,18 +1846,21 @@ function renderFeedList(items){
     item.dataset.id = it.id;
 
     const img = document.createElement('img');
-    img.className = 'feed-thumb';
-    img.alt = '';
-    firstLinkThumb(it.first_link);
+img.className = 'feed-thumb';
+img.alt = '';
+
+
+img.src = firstLinkThumb(it.first_link);
+
 img.loading = 'lazy';
 img.onerror = () => {
   const enc = encodeURIComponent(it.first_link || '');
   if (!img.dataset.shotTried){
     img.dataset.shotTried = '1';
-    img.src = 'https://image.thum.io/get/width/900/crop/500/noanimate/' + enc; // intento screenshot
+    img.src = 'https://image.thum.io/get/width/900/crop/500/noanimate/' + enc;
     return;
   }
-  img.src = fallbackThumbFor(it.first_link); // último recurso: logo por dominio
+  img.src = fallbackThumbFor(it.first_link);
 };
 
     const ct = document.createElement('div');
@@ -1904,33 +1908,12 @@ function openFeedDetail(it){
 
   if (link){
     if (it.first_link){
-      link.href = it.first_link; link.style.display = '';
-    }else{
-      link.href = '#'; link.style.display = 'none';
-    }
-    link.textContent = 'Ayúdanos con tu Like, Comenta y comparte';
-  }
-
-  markRead(it.id);
-  renderFeedList(FEED_CACHE);
-  refreshNotificationsBadge();
-  showView('view-feed-detail');
-}
-
-  // Título y descripción
-  if (title) title.textContent = String(it.titulo || '');
-  if (desc)  desc.textContent  = String(it.descripcion || '');
-
-  // Link de acción (mostrar/ocultar y texto)
-  if (link){
-    if (it.first_link){
-      link.href = it.first_link;
+      link.href = it.first_link; 
       link.style.display = '';
     }else{
-      link.href = '#';
+      link.href = '#'; 
       link.style.display = 'none';
     }
-    // Texto del botón de acción
     link.textContent = 'Ayúdanos con tu Like, Comenta y comparte';
   }
 
@@ -1942,7 +1925,7 @@ function openFeedDetail(it){
   // Mostrar vista detalle
   showView('view-feed-detail');
 }
-
+    
 function unreadCountFrom(items){
   if(!Array.isArray(items) || !items.length) return 0;
   let n = 0;

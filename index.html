@@ -436,6 +436,8 @@
   animation:heartbeat 1.2s infinite; /* mismo efecto que la campana */
 }
 .notif-label.active{ display:inline-block; }
+
+  .notif-label{ cursor: pointer; }
   
 </style>
   
@@ -2510,7 +2512,28 @@ document.getElementById('fd-volver').addEventListener('click', ()=> showView('vi
   if(el) el.addEventListener('click', ()=> playSoundOnce(SOUNDS.back));
 });
 
-    
+document.addEventListener('DOMContentLoaded', () => {
+  const label = document.getElementById('notif-label');
+  const goFeedBtn = document.getElementById('go-feed');
+  if (!label || !goFeedBtn) return;
+
+  const openFeed = () => { goFeedBtn.click(); };
+
+  // Click con mouse
+  label.addEventListener('click', openFeed);
+
+  // Accesibilidad: permitir Enter/Espacio como botón
+  label.setAttribute('role', 'button');
+  label.setAttribute('tabindex', '0');
+  label.setAttribute('aria-label', 'Abrir notificaciones');
+  label.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      openFeed();
+    }
+  });
+});
+
   </script>
 </body>
 </html>

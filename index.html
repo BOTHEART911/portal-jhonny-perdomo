@@ -415,6 +415,27 @@
   word-break:break-word;    /* respaldo */
   max-width:100%;
 }
+
+  /* Badge del botón "Ponte al día" en el menú lateral */
+.menu-btn{ position:relative; }
+.btn-badge{
+  position:absolute; right:-6px; top:-6px;
+  background:#e11; color:#fff; border-radius:999px;
+  min-width:18px; height:18px; line-height:18px; text-align:center;
+  padding:0 4px; font-size:12px; font-weight:800; display:none;
+  box-shadow: 0 0 0 2px #fff;
+}
+.btn-badge.active{ display:inline-block; }
+
+/* Etiqueta "Ponte al día" junto a la campana, con el mismo latido */
+.notif-label{
+  position:absolute; left:calc(100% + 6px); top:-6px;
+  height:28px; line-height:28px; padding:0 10px;
+  background:#7de3ef; color:#000; border-radius:999px;
+  font-weight:800; font-size:14px; white-space:nowrap; display:none;
+  animation:heartbeat 1.2s infinite; /* mismo efecto que la campana */
+}
+.notif-label.active{ display:inline-block; }
   
 </style>
   
@@ -627,10 +648,11 @@
 
   <div class="image-center">
   <div class="notif-wrap">
-    <img alt="usuario" src="https://res.cloudinary.com/dqqeavica/image/upload/v1758738139/user_zefosv.png" width="64" height="64" />
-    <img id="notif-bell" class="notif-bell" src="https://res.cloudinary.com/dqqeavica/image/upload/v1759767447/Notificaci%C3%B3n_jtptyw.webp" alt="">
-    <span id="notif-count" class="notif-count">0</span>
-  </div>
+  <img alt="usuario" src="https://res.cloudinary.com/dqqeavica/image/upload/v1758738139/user_zefosv.png" width="64" height="64" />
+  <img id="notif-bell" class="notif-bell" src="https://res.cloudinary.com/dqqeavica/image/upload/v1759767447/Notificaci%C3%B3n_jtptyw.webp" alt="">
+  <span id="notif-count" class="notif-count">0</span>
+  <span id="notif-label" class="notif-label">Ponte al día</span>
+</div>
 </div>
 
     <h2 id="u-nombre">Nombre</h2>
@@ -667,7 +689,10 @@
       <img alt="banner" src="https://res.cloudinary.com/dqqeavica/image/upload/v1759696513/Jhonny_y1tslf.gif" style="max-width:180px;border-radius:10px;" />
     </div>
     <h3>Selecciona una de las opciones</h3>
-    <button class="menu-btn" id="go-feed">Ponte al día 📅</button>
+    <button class="menu-btn" id="go-feed">
+      Ponte al día 📅
+      <span id="go-feed-badge" class="btn-badge">0</span>
+    </button>
     <button class="menu-btn" id="go-asistencia">Registra Asistencia a Evento ✋🏾</button>
     <button class="menu-btn" id="go-solicitud">Realiza tu Solicitud 📬</button>
     <button class="menu-btn" id="go-ideas">Suma tus Ideas 💡</button>
@@ -1502,28 +1527,30 @@ function stopLoading(){
   try {
     const res = await apiGet('validarDocumento', { documento });
     if (res && res.existe) {
-      currentUser = {
-        documento: res.documento,
-        nombre: res.nombre,
-        telefono: res.telefono || '',
-        residencia: res.residencia || '',
-        referencia: res.referencia || '',
-        municipio: res.municipio || '',
-        puesto: res.puesto || '',
-        mesa: res.mesa || ''
-      };
-      renderUserMenu();
+      // Login exitoso
+currentUser = {
+  documento: res.documento,
+  nombre: res.nombre,
+  telefono: res.telefono || '',
+  residencia: res.residencia || '',
+  referencia: res.referencia || '',
+  municipio: res.municipio || '',
+  puesto: res.puesto || '',
+  mesa: res.mesa || ''
+};
+renderUserMenu();
 playSoundOnce(SOUNDS.login);
 showView('view-menu');
 
 // Permitir que el sonido de notificaciones vuelva a sonar tras login
 try{ sessionStorage.removeItem(FEED_SOUND_KEY); }catch(_){}
 
-// Refresca badge de inmediato (esto hace sonar si hay no leídas)
-refreshNotificationsBadge();
+// Cargar la lista SOLO aquí, al iniciar sesión
+try{ await loadFeed(); }catch(_){}
 
-// Precarga la lista en segundo plano para que esté lista al abrir "Ponte al día"
-loadFeed().catch(()=>{});
+// Refresca indicadores (icono + badge del botón), ahora basados en FEED_CACHE
+refreshNotificationsBadge();
+      
     } else {
       regCard.style.display = '';
       Swal.fire({
@@ -1741,10 +1768,9 @@ document.getElementById('go-redes').addEventListener('click', ()=>{
       }
     });
 
-    document.getElementById('go-feed').addEventListener('click', async ()=>{
+    document.getElementById('go-feed').addEventListener('click', ()=>{
   overlay.classList.remove('open');
   showView('view-feed');
-  try { await loadFeed(); } catch(_){}
 });
 
    /* ==== NOTIFICACIONES: feed, no leídas, badge, sonido ==== */
@@ -1821,7 +1847,6 @@ function renderFeedList(items){
     const img = document.createElement('img');
     img.className = 'feed-thumb';
     img.alt = '';
-    img.src = firstLinkThumb(it.first_link);
     firstLinkThumb(it.first_link);
 img.loading = 'lazy';
 img.onerror = () => {
@@ -1863,25 +1888,33 @@ img.onerror = () => {
 }
 
 function openFeedDetail(it){
-  // Elementos del detalle
   const thumb = document.getElementById('fd-thumb');
   const title = document.getElementById('fd-title');
   const desc  = document.getElementById('fd-desc');
   const link  = document.getElementById('fd-link');
 
-  // Miniatura con OG/screenshot + fallback por dominio
+  // Imagen fija para el detalle
   if (thumb){
-  thumb.src = firstLinkThumb(it.first_link);
-  thumb.loading = 'lazy';
-  thumb.onerror = () => {
-    const enc = encodeURIComponent(it.first_link || '');
-    if (!thumb.dataset.shotTried){
-      thumb.dataset.shotTried = '1';
-      thumb.src = 'https://image.thum.io/get/width/900/crop/500/noanimate/' + enc;
-      return;
+    thumb.src = 'https://res.cloudinary.com/dqqeavica/image/upload/v1759798601/noticias_dax8sd.jpg';
+    thumb.loading = 'lazy';
+  }
+
+  if (title) title.textContent = String(it.titulo || '');
+  if (desc)  desc.textContent  = String(it.descripcion || '');
+
+  if (link){
+    if (it.first_link){
+      link.href = it.first_link; link.style.display = '';
+    }else{
+      link.href = '#'; link.style.display = 'none';
     }
-    thumb.src = fallbackThumbFor(it.first_link);
-  };
+    link.textContent = 'Ayúdanos con tu Like, Comenta y comparte';
+  }
+
+  markRead(it.id);
+  renderFeedList(FEED_CACHE);
+  refreshNotificationsBadge();
+  showView('view-feed-detail');
 }
 
   // Título y descripción
@@ -1919,18 +1952,23 @@ function unreadCountFrom(items){
 
 async function refreshNotificationsBadge(){
   try{
-    // Pedimos la lista solo para contar (ligero: son 10 máx)
-    const list = await apiGet('listnotificaciones');
-    const count = unreadCountFrom(list);
+    // Usar el cache en memoria (FEED_CACHE) para contar no leídas
+    const count = unreadCountFrom(FEED_CACHE);
 
     const bell = document.getElementById('notif-bell');
-    const badge = document.getElementById('notif-count');
+    const label = document.getElementById('notif-label');
+    const btnBadge = document.getElementById('go-feed-badge');
 
-    if(badge) badge.textContent = String(count);
+    // Actualizar badge del botón del menú
+    if(btnBadge){
+      btnBadge.textContent = String(count);
+      if(count > 0) btnBadge.classList.add('active');
+      else btnBadge.classList.remove('active');
+    }
 
     if(count > 0){
       bell && bell.classList.add('active');
-      badge && badge.classList.add('active');
+      label && label.classList.add('active');
 
       // Sonar solo una vez por sesión mientras existan no leídas
       const played = sessionStorage.getItem(FEED_SOUND_KEY) === '1';
@@ -1940,15 +1978,17 @@ async function refreshNotificationsBadge(){
       }
     }else{
       bell && bell.classList.remove('active');
-      badge && badge.classList.remove('active');
+      label && label.classList.remove('active');
       try{ sessionStorage.removeItem(FEED_SOUND_KEY); }catch(_){}
     }
   }catch(_){
-    // En caso de error, ocultar badge
+    // Si algo falla, oculta los indicadores
     const bell = document.getElementById('notif-bell');
-    const badge = document.getElementById('notif-count');
+    const label = document.getElementById('notif-label');
+    const btnBadge = document.getElementById('go-feed-badge');
     bell && bell.classList.remove('active');
-    badge && badge.classList.remove('active');
+    label && label.classList.remove('active');
+    btnBadge && btnBadge.classList.remove('active');
   }
 }
     

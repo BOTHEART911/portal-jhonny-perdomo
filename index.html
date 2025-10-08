@@ -438,6 +438,40 @@
 .notif-label.active{ display:inline-block; }
 
   .notif-label{ cursor: pointer; }
+
+  /* ==== LIBRETA DE CONTACTOS ==== */
+.contact-list{
+  display:flex; flex-direction:column; gap:12px;
+}
+.contact-item{
+  display:flex; align-items:center; gap:12px;
+  background: rgba(255,255,255,.9);
+  border:2px solid #ddd; border-radius:16px; padding:10px 12px;
+  box-shadow: 0 6px 14px rgba(0,0,0,.12);
+}
+.contact-name{
+  font-weight:900; color:#1b2a6b; /* afín al estilo del portal */
+  flex:1; min-width:0;            /* permite crecer si el nombre es largo */
+  text-transform:uppercase;
+}
+.contact-actions{
+  display:flex; gap:10px; flex-shrink:0;
+}
+.contact-actions a{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:48px; height:48px; border-radius:12px; border:2px solid var(--primary);
+  background:#fff; box-shadow: 0 6px 12px rgba(0,0,0,.18);
+}
+.contact-actions img{
+  width:26px; height:26px; object-fit:contain; border-radius:6px; background:#fff;
+}
+
+/* Texto guía bajo el título */
+.contact-hint{
+  text-align:center; color:#333; margin-top:0; margin-bottom:12px;
+}
+.contact-hint img{ width:20px; height:20px; vertical-align:middle; border-radius:4px; background:#fff; }
+
   
 </style>
   
@@ -695,14 +729,15 @@
       Ponte al día 📅
       <span id="go-feed-badge" class="btn-badge">0</span>
     </button>
-    <button class="menu-btn" id="go-asistencia">Registra Asistencia a Evento ✋🏾</button>
     <button class="menu-btn" id="go-solicitud">Realiza tu Solicitud 📬</button>
     <button class="menu-btn" id="go-ideas">Suma tus Ideas 💡</button>
+    <button class="menu-btn" id="go-libretacontactos">Libreta de Contactos 📒</button>
+    <button class="menu-btn" id="go-sede">Visita Nuestra Casa Social 📍</button>
+    <button class="menu-btn" id="go-redes">Conoce Nuestras Redes Sociales 🌐</button>
+    <button class="menu-btn" id="go-asistencia">Registra Asistencia a Evento ✋🏾</button>
     <button class="menu-btn" id="go-actualizacion">Actualiza tus Datos Personales 🔁</button>
     <button class="menu-btn" id="go-consultar">Consulta tu Puesto de Votación 🗳</button>
     <button class="menu-btn" id="go-lider">Si eres Líder, Refiere con un solo Clic 📤</button>
-    <button class="menu-btn" id="go-sede">Visita Nuestra Casa Social 📍</button>
-    <button class="menu-btn" id="go-redes">Conoce Nuestras Redes Sociales 🌐</button>
     <button class="menu-btn" id="btn-instalar" style="display:none;">Instalar la App 📲</button>
     <div style="height:24px"></div>
     <img class="brand" alt="Brand" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png" />
@@ -1299,6 +1334,26 @@ updateInstallButtonsVisibility();
   </div>
 </section>
 
+     <!-- VISTA 12: LIBRETA DE CONTACTOS -->
+    <section id="view-libretacontactos" class="view">
+  <div class="card narrow">
+    <h2 style="color:var(--primary)">LIBRETA DE CONTACTOS</h2>
+    <p class="contact-hint">
+      Para ir al chat, haz clic en
+      <img src="https://res.cloudinary.com/dqqeavica/image/upload/v1759166341/WhatsApp_mljaqm.webp" alt="WhatsApp" aria-hidden="true">
+      <br>
+      Para llamar, haz clic en
+      <img src="https://res.cloudinary.com/dqqeavica/image/upload/v1759952569/Llamada_hra2ch.webp" alt="Llamar" aria-hidden="true">
+    </p>
+
+    <div id="lc-list" class="contact-list"></div>
+
+    <div class="btn-row spaced">
+      <button id="lc-volver">Regresar</button>
+    </div>
+  </div>
+</section>
+
   <!-- VISTA 11: PONTE AL DÍA (lista) -->
 <section id="view-feed" class="view">
   <div class="card narrow" style="padding-top:12px;">
@@ -1753,6 +1808,13 @@ document.getElementById('go-redes').addEventListener('click', ()=>{
   showView('view-redes');
 });
 
+    // listeners LIBRETA DE CONTACTOS
+    document.getElementById('go-libretacontactos').addEventListener('click', async ()=>{
+  overlay.classList.remove('open');
+  try{ await loadLibretaContactos(); }catch(_){}
+  showView('view-libretacontactos');
+});
+
     document.getElementById('go-lider').addEventListener('click', async ()=>{
       if(!currentUser){ return; }
       try{
@@ -1990,6 +2052,75 @@ async function refreshNotificationsBadge(){
     btnBadge && btnBadge.classList.remove('active');
   }
 }
+
+    /* ==== LIBRETA DE CONTACTOS (cargar y pintar) ==== */
+async function loadLibretaContactos(){
+  const list = await apiGet('listcontactos');   // acción en minúsculas
+  renderContactos(Array.isArray(list) ? list : []);
+}
+
+function renderContactos(items){
+  const wrap = document.getElementById('lc-list');
+  if(!wrap) return;
+  wrap.innerHTML = '';
+
+  if(!items.length){
+    const p = document.createElement('p');
+    p.className = 'muted center';
+    p.textContent = 'No hay contactos disponibles.';
+    wrap.appendChild(p);
+    return;
+  }
+
+  for(const it of items){
+    const name = String(it.nombre || '').trim();
+    const waRaw = String(it.whatsapp || '').trim();
+    const telRaw = String(it.telefono || '').trim();
+    const waDigits = waRaw.replace(/\D/g, '');  // esperado como 57XXXXXXXXXX
+    const telDigits = telRaw.replace(/\D/g, ''); // 310... o 601...
+
+    // Enlaces solicitados: wa.me/columnaC o wa.me/columnaC/send?text=
+    const waLink = waDigits ? ('https://wa.me/' + waDigits + '/send?text=') : '#';
+    const telLink = telDigits ? ('tel:' + telDigits) : '#';
+
+    const item = document.createElement('div');
+    item.className = 'contact-item';
+
+    const title = document.createElement('div');
+    title.className = 'contact-name';
+    title.textContent = name || 'Contacto';
+
+    const actions = document.createElement('div');
+    actions.className = 'contact-actions';
+
+    const aWa = document.createElement('a');
+    aWa.href = waLink;
+    aWa.target = '_blank';
+    aWa.rel = 'noopener';
+    aWa.setAttribute('aria-label', 'Abrir chat de WhatsApp');
+
+    const imgWa = document.createElement('img');
+    imgWa.src = 'https://res.cloudinary.com/dqqeavica/image/upload/v1759166341/WhatsApp_mljaqm.webp';
+    imgWa.alt = '';
+    aWa.appendChild(imgWa);
+
+    const aTel = document.createElement('a');
+    aTel.href = telLink;
+    aTel.setAttribute('aria-label', 'Llamar al contacto');
+
+    const imgTel = document.createElement('img');
+    imgTel.src = 'https://res.cloudinary.com/dqqeavica/image/upload/v1759952569/Llamada_hra2ch.webp';
+    imgTel.alt = '';
+    aTel.appendChild(imgTel);
+
+    actions.appendChild(aWa);
+    actions.appendChild(aTel);
+
+    item.appendChild(title);
+    item.appendChild(actions);
+    wrap.appendChild(item);
+  }
+}
     
     // COMPARTIR PORTAL
     document.getElementById('btn-compartir').addEventListener('click', ()=>{
@@ -2081,11 +2212,10 @@ document.addEventListener('visibilitychange', () => {
 });
 
 // Detener al navegar desde el menú a cualquier otra vista
-['go-asistencia','go-actualizacion','go-consultar','go-solicitud','go-ideas','go-sede','go-redes','btn-logout','go-feed']
+['go-asistencia','go-actualizacion','go-consultar','go-solicitud','go-ideas','go-sede','go-redes','btn-logout','go-feed','go-libretacontactos']
   .forEach(id => {
     const el = document.getElementById(id);
     if (el) {
-      // capture:true asegura que pare antes de que se cambie la vista
       el.addEventListener('click', () => stopVideoPlayback(), { capture: true });
     }
   });
@@ -2495,13 +2625,13 @@ document.getElementById('c-validar').addEventListener('click', async ()=>{
 document.getElementById('fd-volver').addEventListener('click', ()=> showView('view-feed'));
 
     // Sonido para botones Atrás/Regresar
-    ['btn-ovl-back','a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver','btn-reg-atras','sede-volver','redes-volver'].forEach(id=>{
+    ['btn-ovl-back','a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver','btn-reg-atras','sede-volver','redes-volver','lc-volver'].forEach(id=>{
   const el = document.getElementById(id);
   if(el) el.addEventListener('click', ()=> playSoundOnce(SOUNDS.back));
 });
 
     // Volver genéricos
-    ['a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver','sede-volver','redes-volver'].forEach(id=>{
+    ['a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver','sede-volver','redes-volver','lc-volver'].forEach(id=>{
   const el = document.getElementById(id);
   if(el) el.addEventListener('click', ()=> showView('view-menu'));
 });

@@ -2080,7 +2080,7 @@ function renderContactos(items){
     const telDigits = telRaw.replace(/\D/g, ''); // 310... o 601...
 
     // Enlaces solicitados: wa.me/columnaC o wa.me/columnaC/send?text=
-    const waLink = waDigits ? ('https://wa.me/' + waDigits + '/send?text=') : '#';
+    const waLink = waDigits ? ('https://wa.me/' + waDigits) : '#';
     const telLink = telDigits ? ('tel:' + telDigits) : '#';
 
     const item = document.createElement('div');

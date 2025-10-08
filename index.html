@@ -2074,48 +2074,61 @@ function renderContactos(items){
 
   for(const it of items){
     const name = String(it.nombre || '').trim();
-    const waRaw = String(it.whatsapp || '').trim();
-    const telRaw = String(it.telefono || '').trim();
-    const waDigits = waRaw.replace(/\D/g, '');  // esperado como 57XXXXXXXXXX
-    const telDigits = telRaw.replace(/\D/g, ''); // 310... o 601...
+    const waRaw = String(it.whatsapp || '').trim();   // Columna C
+    const telRaw = String(it.telefono || '').trim();  // Columna D
 
-    // Enlaces solicitados: wa.me/columnaC o wa.me/columnaC/send?text=
-    const waLink = waDigits ? ('https://wa.me/' + waDigits) : '#';
-    const telLink = telDigits ? ('tel:' + telDigits) : '#';
+    // Normaliza a solo dígitos
+    const waDigits = waRaw.replace(/\D/g, '');   // esperado tipo 57XXXXXXXXXX
+    const telDigits = telRaw.replace(/\D/g, ''); // puede ser 310... o 601...
 
+    // Enlaces
+    const waLink = 'https://wa.me/' + waDigits;
+    const telLink = 'tel:' + telDigits;
+
+    // Contenedor de ítem
     const item = document.createElement('div');
     item.className = 'contact-item';
 
+    // Nombre (crece si es largo por CSS)
     const title = document.createElement('div');
     title.className = 'contact-name';
     title.textContent = name || 'Contacto';
 
+    // Acciones
     const actions = document.createElement('div');
     actions.className = 'contact-actions';
 
-    const aWa = document.createElement('a');
-    aWa.href = waLink;
-    aWa.target = '_blank';
-    aWa.rel = 'noopener';
-    aWa.setAttribute('aria-label', 'Abrir chat de WhatsApp');
+    // Botón WhatsApp (solo si hay dato)
+    if (waDigits){
+      const aWa = document.createElement('a');
+      aWa.href = waLink;
+      aWa.target = '_blank';
+      aWa.rel = 'noopener';
+      aWa.setAttribute('aria-label', 'Abrir chat de WhatsApp');
 
-    const imgWa = document.createElement('img');
-    imgWa.src = 'https://res.cloudinary.com/dqqeavica/image/upload/v1759166341/WhatsApp_mljaqm.webp';
-    imgWa.alt = '';
-    aWa.appendChild(imgWa);
+      const imgWa = document.createElement('img');
+      imgWa.src = 'https://res.cloudinary.com/dqqeavica/image/upload/v1759166341/WhatsApp_mljaqm.webp';
+      imgWa.alt = '';
+      aWa.appendChild(imgWa);
 
-    const aTel = document.createElement('a');
-    aTel.href = telLink;
-    aTel.setAttribute('aria-label', 'Llamar al contacto');
+      actions.appendChild(aWa);
+    }
 
-    const imgTel = document.createElement('img');
-    imgTel.src = 'https://res.cloudinary.com/dqqeavica/image/upload/v1759952569/Llamada_hra2ch.webp';
-    imgTel.alt = '';
-    aTel.appendChild(imgTel);
+    // Botón Llamada (solo si hay dato)
+    if (telDigits){
+      const aTel = document.createElement('a');
+      aTel.href = telLink;
+      aTel.setAttribute('aria-label', 'Llamar al contacto');
 
-    actions.appendChild(aWa);
-    actions.appendChild(aTel);
+      const imgTel = document.createElement('img');
+      imgTel.src = 'https://res.cloudinary.com/dqqeavica/image/upload/v1759952569/Llamada_hra2ch.webp';
+      imgTel.alt = '';
+      aTel.appendChild(imgTel);
 
+      actions.appendChild(aTel);
+    }
+
+    // Armar tarjeta
     item.appendChild(title);
     item.appendChild(actions);
     wrap.appendChild(item);

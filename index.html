@@ -1591,69 +1591,79 @@ function stopLoading(){
 
   try {
     const res = await apiGet('validarDocumento', { documento });
+
     if (res && res.existe) {
-  // 1) Validar estado en columna O: si INACTIVO, bloquear login con alerta
-  try{
-    const est = await apiGet('validarestado', { documento });
-    const estado = String(est?.estado || '').toUpperCase();
-    if (estado === 'INACTIVO'){
-      await Swal.fire({
+      // 1) Validar estado en columna O: si INACTIVO, bloquear login con alerta
+      try{
+        const est = await apiGet('validarestado', { documento });
+        const estado = String(est?.estado || '').toUpperCase();
+        if (estado === 'INACTIVO'){
+          await Swal.fire({
+            icon: 'info',
+            title: 'No tienes acceso',
+            text: 'Dirigete a la sede Frente al parque La Victoria para corroborar tu identidad',
+            timer: 5000,
+            showConfirmButton: false
+          });
+          return; // No inicia sesión
+        }
+        // Si está ACTIVO o sin estado, continúa
+      }catch(_){
+        // Si quieres BLOQUEAR ante error de estado, reemplaza este bloque por:
+        // await Swal.fire({
+        //   icon: 'info',
+        //   title: 'No pudimos verificar tu estado',
+        //   text: 'Intenta de nuevo en unos minutos o acércate a la sede.',
+        //   timer: 5000,
+        //   showConfirmButton: false
+        // });
+        // return;
+      }
+
+      // 2) Login exitoso (como estaba)
+      currentUser = {
+        documento: res.documento,
+        nombre: res.nombre,
+        telefono: res.telefono || '',
+        residencia: res.residencia || '',
+        referencia: res.referencia || '',
+        municipio: res.municipio || '',
+        puesto: res.puesto || '',
+        mesa: res.mesa || ''
+      };
+      renderUserMenu();
+
+      // 3) Consultar si es líder y ajustar visibilidad del botón “go-lider”
+      try{
+        const rL = await apiGet('validarLider', { documento });
+        const isLeader = !!(rL && rL.codigo && rL.nombre);
+        updateLeaderUI(isLeader);
+      }catch(_){
+        updateLeaderUI(false);
+      }
+
+      playSoundOnce(SOUNDS.login);
+      showView('view-menu');
+
+      try{ sessionStorage.removeItem(FEED_SOUND_KEY); }catch(_){}
+      try{ await loadFeed(); }catch(_){}
+      refreshNotificationsBadge();
+
+    } else {
+      regCard.style.display = '';
+      Swal.fire({
         icon: 'info',
-        title: 'No tienes acceso',
-        text: 'Dirigete a la sede Frente al parque La Victoria para corroborar tu identidad',
-        timer: 5000,
-        showConfirmButton: false
+        title: 'Nuevo usuario',
+        text: 'Completa tu registro para continuar.'
       });
-      return; // No inicia sesión
     }
-    // Si está ACTIVO o sin estado, continúa
-  }catch(_){
-    // Si falla la consulta de estado, por seguridad permitimos continuar.
-    // Cambia este comportamiento si prefieres bloquear ante error.
+  } catch (e) {
+    Swal.fire({ 
+      icon: 'error', 
+      title: 'Error', 
+      text: e.message 
+    });
   }
-
-  // 2) Login exitoso (como estaba)
-  currentUser = {
-    documento: res.documento,
-    nombre: res.nombre,
-    telefono: res.telefono || '',
-    residencia: res.residencia || '',
-    referencia: res.referencia || '',
-    municipio: res.municipio || '',
-    puesto: res.puesto || '',
-    mesa: res.mesa || ''
-  };
-  renderUserMenu();
-
-  // 3) Consultar si es líder y ajustar visibilidad del botón “go-lider”
-  try{
-    const rL = await apiGet('validarLider', { documento });
-    const isLeader = !!(rL && rL.codigo && rL.nombre);
-    updateLeaderUI(isLeader);
-  }catch(_){
-    updateLeaderUI(false);
-  }
-
-  playSoundOnce(SOUNDS.login);
-  showView('view-menu');
-
-  // Permitir que el sonido de notificaciones vuelva a sonar tras login
-  try{ sessionStorage.removeItem(FEED_SOUND_KEY); }catch(_){}
-
-  // Cargar la lista SOLO aquí, al iniciar sesión
-  try{ await loadFeed(); }catch(_){}
-
-  // Refresca indicadores (icono + badge del botón), basados en FEED_CACHE
-  refreshNotificationsBadge();
-
-} else {
-  regCard.style.display = '';
-  Swal.fire({
-    icon: 'info',
-    title: 'Nuevo usuario',
-    text: 'Completa tu registro para continuar.'
-  });
-}
 });
 
     // Toggle Referido (registro)

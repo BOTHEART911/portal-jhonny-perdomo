@@ -1565,62 +1565,37 @@ function stopLoading(){
     btnLogin.addEventListener('click', async () => {
   const documento = (docLogin.value || '').trim();
 
-  // Validación: campo vacío
   if (documento === '') {
-    Swal.fire({
-      icon: 'question',
-      title: '¿Deseas comenzar?',
-      text: 'Ingresa un Documento para validar.',
-      timer: 3000,
-      width: '80%',
-      padding: '1rem',
-      customClass: { popup: 'swal2-responsive-popup' }
-    });
+    Swal.fire({ icon:'question', title:'¿Deseas comenzar?', text:'Ingresa un Documento para validar.', timer:3000, width:'80%', padding:'1rem', customClass:{ popup:'swal2-responsive-popup' } });
     return;
   }
-
-  // Validación: formato (6 a 10 dígitos)
   if (!/^\d{6,10}$/.test(documento)) {
-    Swal.fire({ 
-      icon: 'warning', 
-      title: 'Documento inválido', 
-      text: 'Ingresa de 6 a 10 dígitos.' 
-    });
+    Swal.fire({ icon:'warning', title:'Documento inválido', text:'Ingresa de 6 a 10 dígitos.' });
     return;
   }
 
   try {
-    const res = await apiGet('validarDocumento', { documento });
+    // 1) validarDocumento + validarestado EN PARALELO
+    const [res, est] = await Promise.all([
+      apiGet('validarDocumento', { documento }),
+      apiGet('validarestado', { documento })
+    ]);
 
     if (res && res.existe) {
-      // 1) Validar estado en columna O: si INACTIVO, bloquear login con alerta
-      try{
-        const est = await apiGet('validarestado', { documento });
-        const estado = String(est?.estado || '').toUpperCase();
-        if (estado === 'INACTIVO'){
-          await Swal.fire({
-            icon: 'info',
-            title: 'No tienes acceso',
-            text: 'Dirigete a la sede Frente al parque La Victoria para corroborar tu identidad',
-            timer: 5000,
-            showConfirmButton: false
-          });
-          return; // No inicia sesión
-        }
-        // Si está ACTIVO o sin estado, continúa
-      }catch(_){
-        // Si quieres BLOQUEAR ante error de estado, reemplaza este bloque por:
-        // await Swal.fire({
-        //   icon: 'info',
-        //   title: 'No pudimos verificar tu estado',
-        //   text: 'Intenta de nuevo en unos minutos o acércate a la sede.',
-        //   timer: 5000,
-        //   showConfirmButton: false
-        // });
-        // return;
+      // 2) Restringir si INACTIVO
+      const estado = String(est?.estado || '').toUpperCase();
+      if (estado === 'INACTIVO'){
+        await Swal.fire({
+          icon: 'info',
+          title: 'No tienes acceso',
+          text: 'Dirigete a la sede Frente al parque La Victoria para corroborar tu identidad',
+          timer: 5000,
+          showConfirmButton: false
+        });
+        return;
       }
 
-      // 2) Login exitoso (como estaba)
+      // 3) Crear sesión y mostrar menú de inmediato
       currentUser = {
         documento: res.documento,
         nombre: res.nombre,
@@ -1632,37 +1607,28 @@ function stopLoading(){
         mesa: res.mesa || ''
       };
       renderUserMenu();
-
-      // 3) Consultar si es líder y ajustar visibilidad del botón “go-lider”
-      try{
-        const rL = await apiGet('validarLider', { documento });
-        const isLeader = !!(rL && rL.codigo && rL.nombre);
-        updateLeaderUI(isLeader);
-      }catch(_){
-        updateLeaderUI(false);
-      }
-
       playSoundOnce(SOUNDS.login);
       showView('view-menu');
 
+      // 4) En segundo plano: notificaciones + badge
       try{ sessionStorage.removeItem(FEED_SOUND_KEY); }catch(_){}
-      try{ await loadFeed(); }catch(_){}
-      refreshNotificationsBadge();
+      loadFeed()
+        .then(()=> refreshNotificationsBadge())
+        .catch(()=> { /* silencioso */ });
+
+      // 5) En segundo plano: validar líder y mostrar/ocultar botón
+      updateLeaderUI(false); // oculto por defecto, aparece si aplica
+      apiGet('validarLider', { documento })
+        .then(rL => updateLeaderUI(!!(rL && rL.codigo && rL.nombre)))
+        .catch(()=> updateLeaderUI(false));
 
     } else {
       regCard.style.display = '';
-      Swal.fire({
-        icon: 'info',
-        title: 'Nuevo usuario',
-        text: 'Completa tu registro para continuar.'
-      });
+      Swal.fire({ icon:'info', title:'Nuevo usuario', text:'Completa tu registro para continuar.' });
     }
   } catch (e) {
-    Swal.fire({ 
-      icon: 'error', 
-      title: 'Error', 
-      text: e.message 
-    });
+    // Si prefieres BLOQUEAR ante error de estado/doc, puedes personalizar aquí
+    Swal.fire({ icon:'error', title:'Error', text:e.message });
   }
 });
 

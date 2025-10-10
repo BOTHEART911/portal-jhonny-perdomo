@@ -545,7 +545,26 @@
 .com-card-actions img{
   width:24px; height:24px; object-fit:contain; border-radius:6px; background:#fff;
 }
-  
+
+  /* Centrar únicamente el chip con la categoría seleccionada */
+.com-spec #com-cat-chip{
+  display: table;           /* permite centrar con margin:auto aunque el contenedor esté justificado */
+  margin: 0 auto 8px;       /* centrado horizontal + separación inferior */
+  text-align: center;       /* por si el texto se parte en 2 líneas */
+}
+
+/* Asegurar justificación del bloque de especificación (texto largo) */
+.com-spec{
+  text-align: justify;
+}
+
+/* Asegurar que la descripción dentro de cada tarjeta esté justificada */
+.com-card-desc{
+  color:#666;
+  font-size:.8rem;          /* mismo tamaño que el subtítulo */
+  margin:0 0 10px;
+  text-align: justify;
+}
 </style>
   
 </head>

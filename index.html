@@ -472,6 +472,79 @@
 }
 .contact-hint img{ width:20px; height:20px; vertical-align:middle; border-radius:4px; background:#fff; }
 
+  /* ==== Comerciantes Amigos ==== */
+.com-top{
+  text-align:center;
+  margin: 0 auto 10px;
+  max-width: 560px;
+}
+.com-top .tagline-strong{ font-weight:900; }
+.com-icons{
+  display:flex; gap:10px; justify-content:center; align-items:center;
+  margin: 8px 0 0;
+}
+.com-icons img{ width:22px; height:22px; border-radius:6px; background:#fff; }
+
+.com-cat-wrap{ max-width: 520px; margin: 10px auto; }
+.com-spec{
+  max-width: 720px; margin: 10px auto;
+  text-align:justify; color:#222;
+}
+.com-spec .chip{ margin: 0 0 8px 0; display:inline-block; }
+.com-cat-chip{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:6px 10px; border-radius:999px; border:2px solid var(--primary);
+  background:#fff; color:#000; font-weight:800;
+}
+
+.com-list{
+  display:grid; gap:12px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 860px){
+  .com-list{ grid-template-columns: 1fr 1fr; }
+}
+
+.com-card{
+  background: rgba(255,255,255,.9);
+  border:2px solid #5e60ce;
+  border-radius:16px;
+  padding:12px;
+  box-shadow: 0 6px 16px rgba(0,0,0,.12);
+}
+.com-card-title{
+  text-align:center; font-weight:900; color:var(--primary);
+  margin:4px 0 2px; font-size:1.15rem; text-transform:uppercase;
+}
+.com-card-sub{
+  text-align:center; color:#666; margin:0 0 8px;
+  font-size:.8rem; font-weight:600;
+}
+.com-card-img{
+  width:100%; aspect-ratio: 4/3; object-fit:cover;
+  border-radius:14px; border:1px solid #ddd; background:#eee;
+  display:block; margin: 6px 0 10px;
+}
+.com-card-desc{
+  color:#666; font-size:.8rem; margin:0 0 10px; text-align:justify; /* mismo tamaño y color que subtítulo */
+}
+.com-card-hi{
+  background:#c6f6d5; color:#000; border:2px solid #16a34a;
+  border-radius:12px; padding:10px; font-weight:800;
+  text-align:center; margin: 0 0 10px;
+}
+.com-card-actions{
+  display:flex; justify-content:center; gap:10px; flex-wrap:wrap;
+}
+.com-card-actions a{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:42px; height:42px; border-radius:10px;
+  border:2px solid var(--primary);
+  background:#fff; box-shadow: 0 6px 12px rgba(0,0,0,.18);
+}
+.com-card-actions img{
+  width:24px; height:24px; object-fit:contain; border-radius:6px; background:#fff;
+}
   
 </style>
   
@@ -732,6 +805,7 @@
     <button class="menu-btn" id="go-solicitud">Realiza tu Solicitud 📬</button>
     <button class="menu-btn" id="go-ideas">Suma tus Ideas 💡</button>
     <button class="menu-btn" id="go-libretacontactos">Libreta de Contactos 📒</button>
+    <button class="menu-btn" id="go-comerciantes">Comerciantes Amigos 🛍️</button>
     <button class="menu-btn" id="go-sede">Visita Nuestra Casa Social 📍</button>
     <button class="menu-btn" id="go-redes">Conoce Nuestras Redes Sociales 🌐</button>
     <button class="menu-btn" id="go-asistencia">Registra Asistencia a Evento ✋🏾</button>
@@ -1354,6 +1428,44 @@ updateInstallButtonsVisibility();
   </div>
 </section>
 
+         <!-- VISTA 13: COMERCIANTES AMIGOS -->
+    <section id="view-comerciantes" class="view">
+  <div class="card narrow" style="padding-top:12px;">
+    <h2 style="color:var(--primary); text-shadow: 0 2px 2px #031732; margin-bottom:6px;">COMERCIANTES AMIGOS</h2>
+
+    <div class="com-top">
+      <div class="tagline-strong">Apoyemos a nuestros comerciantes</div>
+      <div>Cuando filtres una categoría, haz clic en los iconos para explorar cada comercio</div>
+      <div class="com-icons">
+        <img src="https://res.cloudinary.com/dqqeavica/image/upload/v1760108968/ubicacion_zicnod.png" alt="">
+        <img src="https://res.cloudinary.com/dqqeavica/image/upload/v1759166342/facebook_nezbkz.webp" alt="">
+        <img src="https://res.cloudinary.com/dqqeavica/image/upload/v1759166342/instragram_uft2wl.webp" alt="">
+        <img src="https://res.cloudinary.com/dqqeavica/image/upload/v1759166342/tiktok_tdvc2x.webp" alt="">
+        <img src="https://res.cloudinary.com/dqqeavica/image/upload/v1759166341/WhatsApp_mljaqm.webp" alt="">
+        <img src="https://res.cloudinary.com/dqqeavica/image/upload/v1759952569/Llamada_hra2ch.webp" alt="">
+      </div>
+    </div>
+
+    <div class="btn-row spaced">
+      <button id="com-volver">Regresar</button>
+    </div>
+
+    <div class="com-cat-wrap">
+      <label>Categoría</label>
+      <select id="com-cat">
+        <option value="" selected disabled>Selecciona la Categoría</option>
+      </select>
+    </div>
+
+    <div id="com-spec" class="com-spec" style="display:none;">
+      <div id="com-cat-chip" class="com-cat-chip"></div>
+      <div id="com-spec-text"></div>
+    </div>
+
+    <div id="com-list" class="com-list"></div>
+  </div>
+</section>
+
   <!-- VISTA 11: PONTE AL DÍA (lista) -->
 <section id="view-feed" class="view">
   <div class="card narrow" style="padding-top:12px;">
@@ -1533,7 +1645,7 @@ function stopLoading(){
 }
     
     // Choices (select con filtro)
-    let choicesReg = null, choicesUpd = null;
+    let choicesReg = null, choicesUpd = null, choicesCom = null;
     function initChoices(){
       if(choicesReg) choicesReg.destroy();
       if(choicesUpd) choicesUpd.destroy();
@@ -2244,7 +2356,7 @@ document.addEventListener('visibilitychange', () => {
 });
 
 // Detener al navegar desde el menú a cualquier otra vista
-['go-asistencia','go-actualizacion','go-consultar','go-solicitud','go-ideas','go-sede','go-redes','btn-logout','go-feed','go-libretacontactos']
+['go-asistencia','go-actualizacion','go-consultar','go-solicitud','go-ideas','go-sede','go-redes','btn-logout','go-feed','go-libretacontactos','go-comerciantes']
   .forEach(id => {
     const el = document.getElementById(id);
     if (el) {
@@ -2656,14 +2768,205 @@ document.getElementById('c-validar').addEventListener('click', async ()=>{
     document.getElementById('feed-volver').addEventListener('click', ()=> showView('view-menu'));
 document.getElementById('fd-volver').addEventListener('click', ()=> showView('view-feed'));
 
+    // ==== Comerciantes Amigos ====
+
+// Iconos (incluye el faltante de ubicación)
+const ICON_UBIC = 'https://res.cloudinary.com/dqqeavica/image/upload/v1760108968/ubicacion_zicnod.png';
+const ICON_FB   = 'https://res.cloudinary.com/dqqeavica/image/upload/v1759166342/facebook_nezbkz.webp';
+const ICON_IG   = 'https://res.cloudinary.com/dqqeavica/image/upload/v1759166342/instragram_uft2wl.webp';
+const ICON_TT   = 'https://res.cloudinary.com/dqqeavica/image/upload/v1759166342/tiktok_tdvc2x.webp';
+const ICON_WA   = 'https://res.cloudinary.com/dqqeavica/image/upload/v1759166341/WhatsApp_mljaqm.webp';
+const ICON_TEL  = 'https://res.cloudinary.com/dqqeavica/image/upload/v1759952569/Llamada_hra2ch.webp';
+
+document.getElementById('go-comerciantes').addEventListener('click', async ()=>{
+  overlay.classList.remove('open');
+  await prepararComerciantes();
+  showView('view-comerciantes');
+});
+
+function driveThumb(url){
+  const m = String(url||'').match(/[-\w]{25,}/);
+  return m ? `https://drive.google.com/thumbnail?sz=w1000&id=${m[0]}` : String(url||'');
+}
+
+async function prepararComerciantes(){
+  // Limpia UI
+  const sel = document.getElementById('com-cat');
+  const spec = document.getElementById('com-spec');
+  const specText = document.getElementById('com-spec-text');
+  const specChip = document.getElementById('com-cat-chip');
+  const list = document.getElementById('com-list');
+  if(!sel || !list) return;
+
+  // Si ya había un Choices, destrúyelo antes de repoblar
+  if (choicesCom) {
+    try { choicesCom.destroy(); } catch(_) {}
+    choicesCom = null;
+  }
+
+  sel.innerHTML = '<option value="" selected disabled>Selecciona la Categoría</option>';
+  spec.style.display = 'none';
+  specText.textContent = '';
+  specChip.textContent = '';
+  list.innerHTML = '';
+
+  // Carga categorías desde el GS
+  try{
+    const cats = await apiGet('listcategoriascomercio');
+
+    // Choices SIN caja de búsqueda (solo lista para seleccionar)
+    choicesCom = new Choices(sel, {
+      searchEnabled: false,     // el usuario NO escribe, solo selecciona
+      itemSelectText: '',
+      shouldSort: true,
+      placeholder: true,
+      placeholderValue: 'Selecciona la Categoría'
+    });
+
+    // Poblamos usando setChoices
+    choicesCom.setChoices(
+      (Array.isArray(cats) ? cats : []).map(c => ({
+        value: c, label: c, selected:false, disabled:false
+      })),
+      'value', 'label', true
+    );
+
+  }catch(_){
+    // Fallback sin Choices si algo falla
+    try{
+      const cats = await apiGet('listcategoriascomercio');
+      if(Array.isArray(cats)){
+        for(const c of cats){
+          const opt = document.createElement('option');
+          opt.value = c; opt.textContent = c;
+          sel.appendChild(opt);
+        }
+      }
+    }catch(__){}
+  }
+}
+
+document.getElementById('com-cat')?.addEventListener('change', async (e)=>{
+  const categoria = e.target.value;
+  if(!categoria) return;
+  try{
+    const data = await apiGet('comercioporcategoria', { categoria });
+    renderComercioSpec(data?.categoria || categoria, data?.especificaciones || '');
+    renderComercioList(Array.isArray(data?.items) ? data.items : []);
+  }catch(err){
+    Swal.fire({ icon:'error', title:'Error', text:String(err?.message||err) });
+  }
+});
+
+function renderComercioSpec(cat, txt){
+  const spec = document.getElementById('com-spec');
+  const specText = document.getElementById('com-spec-text');
+  const specChip = document.getElementById('com-cat-chip');
+  if(!spec || !specText || !specChip) return;
+  specChip.textContent = cat || '';
+  specText.textContent = txt || '';
+  spec.style.display = (cat || txt) ? '' : 'none';
+}
+
+function renderComercioList(items){
+  const wrap = document.getElementById('com-list');
+  if(!wrap) return;
+  wrap.innerHTML = '';
+
+  if(!items.length){
+    const p = document.createElement('p');
+    p.className = 'muted center';
+    p.textContent = 'No hay comercios para esta categoría.';
+    wrap.appendChild(p);
+    return;
+  }
+
+  for(const it of items){
+    // Normaliza teléfonos (misma lógica de "Libreta de contactos")
+    let waDigits = String(it.whatsapp||'').replace(/\D/g,'');
+    if(/^3\d{9}$/.test(waDigits)) waDigits = '57' + waDigits;
+    const telDigits = String(it.llamada||'').replace(/\D/g,'');
+
+    const card = document.createElement('div');
+    card.className = 'com-card';
+
+    const title = document.createElement('div');
+    title.className = 'com-card-title';
+    title.textContent = it.titulo || '';
+
+    const sub = document.createElement('div');
+    sub.className = 'com-card-sub';
+    sub.textContent = it.subtitulo || '';
+
+    const img = document.createElement('img');
+    img.className = 'com-card-img';
+    img.alt = '';
+    img.loading = 'lazy';
+    img.src = driveThumb(it.imagen || '');
+
+    const desc = document.createElement('div');
+    desc.className = 'com-card-desc';
+    desc.textContent = it.descripcion || '';
+
+    const hi = document.createElement('div');
+    hi.className = 'com-card-hi';
+    hi.textContent = it.cuadro || '';
+
+    const actions = document.createElement('div');
+    actions.className = 'com-card-actions';
+
+    function addIcon(href, icon){
+      if(!href) return;
+      const a = document.createElement('a');
+      a.href = href; a.target = '_blank'; a.rel = 'noopener';
+      const i = document.createElement('img');
+      i.src = icon; i.alt = '';
+      a.appendChild(i);
+      actions.appendChild(a);
+    }
+
+    addIcon(it.ubicacion || '', ICON_UBIC);
+    addIcon(it.facebook  || '', ICON_FB);
+    addIcon(it.instagram || '', ICON_IG);
+    addIcon(it.tiktok    || '', ICON_TT);
+    addIcon(waDigits ? ('https://wa.me/' + waDigits) : '', ICON_WA);
+    addIcon(telDigits ? ('tel:' + telDigits) : '', ICON_TEL);
+
+    // Armar tarjeta
+    card.appendChild(title);
+    if(sub.textContent) card.appendChild(sub);
+    if(img.src) card.appendChild(img);
+    if(desc.textContent) card.appendChild(desc);
+    if(hi.textContent) card.appendChild(hi);
+    card.appendChild(actions);
+
+    wrap.appendChild(card);
+  }
+}
+
+// Botón regresar de la vista de comercios
+document.getElementById('com-volver')?.addEventListener('click', ()=> showView('view-menu'));
+
+// Sonido de "Atrás" para esta vista
+(function(){
+  const el = document.getElementById('com-volver');
+  if(el) el.addEventListener('click', ()=> playSoundOnce(SOUNDS.back));
+})();
+
+// Asegurar detener el video al abrir esta vista
+(function(){
+  const el = document.getElementById('go-comerciantes');
+  if(el){ el.addEventListener('click', ()=> stopVideoPlayback(), { capture:true }); }
+})();
+
     // Sonido para botones Atrás/Regresar
-    ['btn-ovl-back','a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver','btn-reg-atras','sede-volver','redes-volver','lc-volver'].forEach(id=>{
+    ['btn-ovl-back','a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver','btn-reg-atras','sede-volver','redes-volver','lc-volver','com-volver'].forEach(id=>{
   const el = document.getElementById(id);
   if(el) el.addEventListener('click', ()=> playSoundOnce(SOUNDS.back));
 });
 
     // Volver genéricos
-    ['a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver','sede-volver','redes-volver','lc-volver'].forEach(id=>{
+    ['a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver','sede-volver','redes-volver','lc-volver','com-volver'].forEach(id=>{
   const el = document.getElementById(id);
   if(el) el.addEventListener('click', ()=> showView('view-menu'));
 });

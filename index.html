@@ -533,6 +533,26 @@
   border-radius:12px; padding:10px; font-weight:800;
   text-align:center; margin: 0 0 10px;
 }
+  /* Etiqueta pequeña centrada encima de cada oferta */
+.com-offer-label{
+  font-size:.75rem;
+  text-align:center;
+  font-weight:700;
+  color:#0a0;
+  margin: 4px 0 6px;
+}
+
+/* Recuadro Estándar (verde más traslúcido) */
+.com-card-std{
+  background: rgba(22,163,74,.08);
+  color:#000;
+  border: 2px solid rgba(22,163,74,.35);
+  border-radius:12px;
+  padding:10px;
+  font-weight:800;
+  text-align:center;
+  margin: 0 0 10px;
+}
 .com-card-actions{
   display:flex; justify-content:center; gap:10px; flex-wrap:wrap;
 }
@@ -782,6 +802,8 @@
   <span id="notif-label" class="notif-label">Ponte al día</span>
 </div>
 </div>
+
+  <p id="u-plan" class="center muted" style="font-weight:800; margin:6px 0 0;"></p>
 
     <h2 id="u-nombre">Nombre</h2>
     <div class="narrow">
@@ -1625,15 +1647,24 @@ function stopLoading(){
 }
     
     function renderUserMenu(){
-      document.getElementById('u-nombre').textContent = currentUser?.nombre || '';
-      document.getElementById('u-doc').textContent = currentUser?.documento || '';
-      document.getElementById('u-cel').textContent = currentUser?.telefono || 'SIN REGISTRO';
-      document.getElementById('u-res').textContent = currentUser?.residencia || 'SIN REGISTRO';
-      document.getElementById('u-ref').textContent = currentUser?.referencia || 'N/A';
-      document.getElementById('u-mpio').textContent = currentUser?.municipio || 'SIN REGISTRO';
-      document.getElementById('u-puesto').textContent = currentUser?.puesto || 'SIN REGISTRO';
-      document.getElementById('u-mesa').textContent = currentUser?.mesa || 'SIN REGISTRO';
-    }
+  document.getElementById('u-nombre').textContent = currentUser?.nombre || '';
+  document.getElementById('u-doc').textContent = currentUser?.documento || '';
+  document.getElementById('u-cel').textContent = currentUser?.telefono || 'SIN REGISTRO';
+  document.getElementById('u-res').textContent = currentUser?.residencia || 'SIN REGISTRO';
+  document.getElementById('u-ref').textContent = currentUser?.referencia || 'N/A';
+  document.getElementById('u-mpio').textContent = currentUser?.municipio || 'SIN REGISTRO';
+  document.getElementById('u-puesto').textContent = currentUser?.puesto || 'SIN REGISTRO';
+  document.getElementById('u-mesa').textContent = currentUser?.mesa || 'SIN REGISTRO';
+
+  // Etiqueta "Usuario Premium/Estándar" debajo del icono (según municipio)
+  const mpio = (currentUser?.municipio || '').trim().toUpperCase();
+  const planEl = document.getElementById('u-plan');
+  if (planEl){
+    planEl.textContent = (mpio === 'FLANDES' || mpio === 'A LA ESPERA')
+      ? 'Usuario Premium'
+      : 'Usuario Estándar';
+  }
+}
     async function refreshUserFromServer(){
       try{
         const doc = currentUser?.documento;
@@ -2927,12 +2958,26 @@ function renderComercioList(items){
     desc.className = 'com-card-desc';
     desc.textContent = it.descripcion || '';
 
-    const hi = document.createElement('div');
-    hi.className = 'com-card-hi';
-    hi.textContent = it.premiumColor || '';
+    // Etiqueta y recuadro Premium
+const premiumLabel = document.createElement('div');
+premiumLabel.className = 'com-offer-label';
+premiumLabel.textContent = 'Oferta Usuarios Premium';
 
-    const actions = document.createElement('div');
-    actions.className = 'com-card-actions';
+const hi = document.createElement('div');
+hi.className = 'com-card-hi';
+hi.textContent = it.premiumColor || '';
+
+// Etiqueta y recuadro Estándar
+const stdLabel = document.createElement('div');
+stdLabel.className = 'com-offer-label';
+stdLabel.textContent = 'Oferta Usuarios Estándar';
+
+const std = document.createElement('div');
+std.className = 'com-card-std';
+std.textContent = it.estandarColor || '';
+
+const actions = document.createElement('div');
+actions.className = 'com-card-actions';
 
     function addIcon(href, icon){
       if(!href) return;
@@ -2953,11 +2998,20 @@ function renderComercioList(items){
 
     // Armar tarjeta
     card.appendChild(title);
-    if(sub.textContent) card.appendChild(sub);
-    if(img.src) card.appendChild(img);
-    if(desc.textContent) card.appendChild(desc);
-    if(hi.textContent) card.appendChild(hi);
-    card.appendChild(actions);
+if(sub.textContent) card.appendChild(sub);
+if(img.src) card.appendChild(img);
+if(desc.textContent) card.appendChild(desc);
+
+if(hi.textContent){
+  card.appendChild(premiumLabel);
+  card.appendChild(hi);
+}
+if(std.textContent){
+  card.appendChild(stdLabel);
+  card.appendChild(std);
+}
+
+card.appendChild(actions);
 
     wrap.appendChild(card);
   }

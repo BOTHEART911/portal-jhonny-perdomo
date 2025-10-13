@@ -2947,25 +2947,25 @@ function renderComercioList(items){
     desc.textContent = it.descripcion || '';
 
     // Etiqueta y recuadro Premium
-const premiumLabel = document.createElement('div');
-premiumLabel.className = 'com-offer-label';
-premiumLabel.textContent = 'Oferta Usuarios Premium';
+    const premiumLabel = document.createElement('div');
+    premiumLabel.className = 'com-offer-label';
+    premiumLabel.textContent = 'Oferta Usuarios Premium';
 
-const hi = document.createElement('div');
-hi.className = 'com-card-hi';
-hi.textContent = it.premiumColor || '';
+    const hi = document.createElement('div');
+    hi.className = 'com-card-hi';
+    hi.textContent = it.premiumColor || '';
 
-// Etiqueta y recuadro Estándar
-const stdLabel = document.createElement('div');
-stdLabel.className = 'com-offer-label';
-stdLabel.textContent = 'Oferta Usuarios Estándar';
+    // Etiqueta y recuadro Estándar
+    const stdLabel = document.createElement('div');
+    stdLabel.className = 'com-offer-label';
+    stdLabel.textContent = 'Oferta Usuarios Estándar';
 
-const std = document.createElement('div');
-std.className = 'com-card-std';
-std.textContent = it.estandarColor || '';
+    const std = document.createElement('div');
+    std.className = 'com-card-std';
+    std.textContent = it.estandarColor || '';
 
-const actions = document.createElement('div');
-actions.className = 'com-card-actions';
+    const actions = document.createElement('div');
+    actions.className = 'com-card-actions';
 
     function addIcon(href, icon){
       if(!href) return;
@@ -2986,44 +2986,41 @@ actions.className = 'com-card-actions';
 
     // Armar tarjeta
     card.appendChild(title);
-if(sub.textContent) card.appendChild(sub);
-if(img.src) card.appendChild(img);
-if(desc.textContent) card.appendChild(desc);
+    if(sub.textContent) card.appendChild(sub);
+    if(img.src) card.appendChild(img);
+    if(desc.textContent) card.appendChild(desc);
 
-if(hi.textContent){
-  card.appendChild(premiumLabel);
-  card.appendChild(hi);
-}
-if(std.textContent){
-  card.appendChild(stdLabel);
-  card.appendChild(std);
-}
+    if(hi.textContent){
+      card.appendChild(premiumLabel);
+      card.appendChild(hi);
+    }
+    if(std.textContent){
+      card.appendChild(stdLabel);
+      card.appendChild(std);
+    }
 
-card.appendChild(actions);
+    card.appendChild(actions);
 
     wrap.appendChild(card);
   }
+
+  // --- Botón "Regresar" duplicado al final de la lista ---
+  const btnRow = document.createElement('div');
+  btnRow.className = 'btn-row spaced';
+
+  const backBtn = document.createElement('button');
+  backBtn.id = 'com-volver-bottom';
+  backBtn.textContent = 'Regresar';
+
+  btnRow.appendChild(backBtn);
+  wrap.appendChild(btnRow);
+
+  // Listeners específicos para este botón (sonido + volver al menú)
+  backBtn.addEventListener('click', () => {
+    try { playSoundOnce(SOUNDS.back); } catch(_){}
+    showView('view-menu');
+  });
 }
-
-     // --- Botón "Regresar" al final ---
-const btnRow = document.createElement('div');
-btnRow.className = 'btn-row spaced';
-
-const backBtn = document.createElement('button');
-backBtn.id = 'com-volver-bottom';
-backBtn.textContent = 'Regresar';
-
-btnRow.appendChild(backBtn);
-wrap.appendChild(btnRow);
-
-// Listeners específicos para este botón (sonido + volver al menú)
-backBtn.addEventListener('click', () => {
-  try { playSoundOnce(SOUNDS.back); } catch(_){}
-  showView('view-menu');
-});
-
-// Botón regresar de la vista de comercios
-document.getElementById('com-volver')?.addEventListener('click', ()=> showView('view-menu'));
 
    
 

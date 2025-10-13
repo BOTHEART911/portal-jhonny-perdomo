@@ -546,6 +546,14 @@
   width:24px; height:24px; object-fit:contain; border-radius:6px; background:#fff;
 }
 
+  /* Etiqueta pequeña encima de cada cuadro de oferta */
+.com-offer-label{
+  font-size:.72rem;
+  color:#444;
+  margin:2px 0 6px;
+  text-align:center;
+}
+  
   /* Centrar únicamente el chip con la categoría seleccionada */
 .com-spec #com-cat-chip{
   display: table;           /* permite centrar con margin:auto aunque el contenedor esté justificado */
@@ -781,6 +789,7 @@
   <span id="notif-count" class="notif-count">0</span>
   <span id="notif-label" class="notif-label">Ponte al día</span>
 </div>
+    <div id="user-tier" class="center muted" style="font-weight:800; margin-top:6px;"></div>
 </div>
 
     <h2 id="u-nombre">Nombre</h2>
@@ -1654,6 +1663,14 @@ function stopLoading(){
         }
       }catch(e){ /* silencio */ }
     }
+
+    // Tipo de Usuario
+const tierEl = document.getElementById('user-tier');
+if (tierEl) {
+  const m = String(currentUser?.municipio || '').trim().toUpperCase();
+  const isPremium = (m === 'FLANDES' || m === 'A LA ESPERA');
+  tierEl.textContent = isPremium ? 'Usuario Premium' : 'Usuario Estándar';
+}
 
     // Ocultar botón si no es Lider
     function updateLeaderUI(isLeader){
@@ -2914,22 +2931,54 @@ function renderComercioList(items){
     title.textContent = it.titulo || '';
 
     const sub = document.createElement('div');
-    sub.className = 'com-card-sub';
-    sub.textContent = it.subtitulo || '';
+sub.className = 'com-card-sub';
+sub.textContent = it.subtitulo || ''; // I (nuevo)
 
-    const img = document.createElement('img');
-    img.className = 'com-card-img';
-    img.alt = '';
-    img.loading = 'lazy';
-    img.src = driveThumb(it.imagen || '');
+const img = document.createElement('img');
+img.className = 'com-card-img';
+img.alt = '';
+img.loading = 'lazy';
+img.src = driveThumb(it.imagen || ''); // sin cambios
+
+// Acciones: columnas corridas
+addIcon(it.ubicacion || '', ICON_UBIC);  // J
+addIcon(it.facebook  || '', ICON_FB);    // K
+addIcon(it.instagram || '', ICON_IG);    // L
+addIcon(it.tiktok    || '', ICON_TT);    // M
+addIcon(waDigits ? ('https://wa.me/' + waDigits) : '', ICON_WA); // N
+addIcon(telDigits ? ('tel:' + telDigits) : '', ICON_TEL); // O
 
     const desc = document.createElement('div');
     desc.className = 'com-card-desc';
     desc.textContent = it.descripcion || '';
 
-    const hi = document.createElement('div');
-    hi.className = 'com-card-hi';
-    hi.textContent = it.cuadro || '';
+    function mkOffer(labelText, colorValue){
+  if(!colorValue) return null;
+  const wrap = document.createElement('div');
+
+  const lab = document.createElement('div');
+  lab.className = 'com-offer-label';
+  lab.textContent = labelText;
+
+  const box = document.createElement('div');
+  box.className = 'com-card-hi';
+  // Mantiene el estilo existente y solo cambia color
+  box.style.background = colorValue;
+  box.style.borderColor = colorValue;
+
+  // No texto dentro del cuadro; se conserva el estilo original
+  box.textContent = '';
+
+  wrap.appendChild(lab);
+  wrap.appendChild(box);
+  return wrap;
+}
+
+const premiumOffer  = mkOffer('Oferta Usuarios Premium', it.premiumColor);
+const estandarOffer = mkOffer('Oferta Usuarios Estándar', it.estandarColor);
+
+if (premiumOffer)  card.appendChild(premiumOffer);
+if (estandarOffer) card.appendChild(estandarOffer);
 
     const actions = document.createElement('div');
     actions.className = 'com-card-actions';

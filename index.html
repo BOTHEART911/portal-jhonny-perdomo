@@ -3008,6 +3008,23 @@ card.appendChild(actions);
 // Botón regresar de la vista de comercios
 document.getElementById('com-volver')?.addEventListener('click', ()=> showView('view-menu'));
 
+    // --- Botón "Regresar" al final ---
+const btnRow = document.createElement('div');
+btnRow.className = 'btn-row spaced';
+
+const backBtn = document.createElement('button');
+backBtn.id = 'com-volver-bottom';
+backBtn.textContent = 'Regresar';
+
+btnRow.appendChild(backBtn);
+wrap.appendChild(btnRow);
+
+// Listeners específicos para este botón (sonido + volver al menú)
+backBtn.addEventListener('click', () => {
+  try { playSoundOnce(SOUNDS.back); } catch(_){}
+  showView('view-menu');
+});
+
 // Sonido de "Atrás" para esta vista
 (function(){
   const el = document.getElementById('com-volver');

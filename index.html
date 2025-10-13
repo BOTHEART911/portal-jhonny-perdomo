@@ -1737,15 +1737,11 @@ function stopLoading(){
   }
 
   try {
-    // 1) validarDocumento + validarestado EN PARALELO
-    const [res, est] = await Promise.all([
-      apiGet('validarDocumento', { documento }),
-      apiGet('validarestado', { documento })
-    ]);
+    // Una sola llamada rápida al backend
+    const res = await apiGet('loginfast', { documento });
 
     if (res && res.existe) {
-      // 2) Restringir si INACTIVO
-      const estado = String(est?.estado || '').toUpperCase();
+      const estado = String(res.estado || '').toUpperCase();
       if (estado === 'INACTIVO'){
         await Swal.fire({
           icon: 'info',
@@ -1757,39 +1753,31 @@ function stopLoading(){
         return;
       }
 
-      // 3) Crear sesión y mostrar menú de inmediato
+      // Crear sesión y mostrar menú de inmediato
       currentUser = {
-        documento: res.documento,
-        nombre: res.nombre,
-        telefono: res.telefono || '',
-        residencia: res.residencia || '',
-        referencia: res.referencia || '',
-        municipio: res.municipio || '',
-        puesto: res.puesto || '',
-        mesa: res.mesa || ''
+        documento: res.user.documento,
+        nombre: res.user.nombre,
+        telefono: res.user.telefono || '',
+        residencia: res.user.residencia || '',
+        referencia: res.user.referencia || '',
+        municipio: res.user.municipio || '',
+        puesto: res.user.puesto || '',
+        mesa: res.user.mesa || ''
       };
       renderUserMenu();
       playSoundOnce(SOUNDS.login);
       showView('view-menu');
 
-      // 4) En segundo plano: notificaciones + badge
+      // En segundo plano: feed + badge + mostrar botón de líder si aplica
       try{ sessionStorage.removeItem(FEED_SOUND_KEY); }catch(_){}
-      loadFeed()
-        .then(()=> refreshNotificationsBadge())
-        .catch(()=> { /* silencioso */ });
-
-      // 5) En segundo plano: validar líder y mostrar/ocultar botón
-      updateLeaderUI(false); // oculto por defecto, aparece si aplica
-      apiGet('validarLider', { documento })
-        .then(rL => updateLeaderUI(!!(rL && rL.codigo && rL.nombre)))
-        .catch(()=> updateLeaderUI(false));
+      loadFeed().then(()=> refreshNotificationsBadge()).catch(()=>{});
+      updateLeaderUI(!!res.isLeader);
 
     } else {
       regCard.style.display = '';
       Swal.fire({ icon:'info', title:'Nuevo usuario', text:'Completa tu registro para continuar.' });
     }
   } catch (e) {
-    // Si prefieres BLOQUEAR ante error de estado/doc, puedes personalizar aquí
     Swal.fire({ icon:'error', title:'Error', text:e.message });
   }
 });

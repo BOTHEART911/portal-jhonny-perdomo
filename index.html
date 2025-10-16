@@ -501,7 +501,6 @@
   display:grid; gap:12px;
   grid-template-columns: 1fr;
 }
-/* REEMPLAZO: grid de Comerciantes (solo escritorio) */
 @media (min-width: 1024px){
   /* Ensancha el ancho útil de la sección (sin afectar móviles) */
   #view-comerciantes .card.narrow{
@@ -3031,7 +3030,7 @@ function renderComercioList(items){
     wrap.appendChild(card);
   }
 
-  // --- Botón "Regresar" al final (fuera del grid) ---
+// --- Botón "Regresar" al final (fuera del grid) ---
 const oldBottom = document.getElementById('com-volver-bottom');
 if (oldBottom && oldBottom.parentElement) {
   oldBottom.parentElement.remove(); // evita duplicados
@@ -3056,7 +3055,6 @@ backBtn.addEventListener('click', () => {
   try { playSoundOnce(SOUNDS.back); } catch(_){}
   showView('view-menu');
 });
-
    
 
 // Sonido de "Atrás" para esta vista

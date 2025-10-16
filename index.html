@@ -501,8 +501,35 @@
   display:grid; gap:12px;
   grid-template-columns: 1fr;
 }
-@media (min-width: 860px){
-  .com-list{ grid-template-columns: 1fr 1fr; }
+/* REEMPLAZO: grid de Comerciantes (solo escritorio) */
+@media (min-width: 1024px){
+  /* Ensancha el ancho útil de la sección (sin afectar móviles) */
+  #view-comerciantes .card.narrow{
+    max-width: 1100px; /* ajusta si quieres más/menos ancho en PC */
+  }
+
+  /* Grid:
+     - 1 comercio: se centra
+     - 2+ comercios: 2 columnas
+     - Columnas un poco más anchas en PC
+  */
+  #view-comerciantes .com-list{
+    grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
+    justify-content: center; /* centra cuando solo hay 1 ítem */
+  }
+
+  /* Evita que una tarjeta crezca de lado a lado cuando es única */
+  #view-comerciantes .com-card{
+    max-width: 520px;
+    margin: 0 auto; /* centra cada tarjeta en su celda */
+  }
+}
+
+  /* NUEVO: contenedor del botón inferior de Comerciantes (fuera del grid) */
+#view-comerciantes .com-bottom-actions{
+  display:flex;
+  justify-content:center;
+  margin-top:12px;
 }
 
 .com-card{
@@ -3004,23 +3031,31 @@ function renderComercioList(items){
     wrap.appendChild(card);
   }
 
-  // --- Botón "Regresar" duplicado al final de la lista ---
-  const btnRow = document.createElement('div');
-  btnRow.className = 'btn-row spaced';
-
-  const backBtn = document.createElement('button');
-  backBtn.id = 'com-volver-bottom';
-  backBtn.textContent = 'Regresar';
-
-  btnRow.appendChild(backBtn);
-  wrap.appendChild(btnRow);
-
-  // Listeners específicos para este botón (sonido + volver al menú)
-  backBtn.addEventListener('click', () => {
-    try { playSoundOnce(SOUNDS.back); } catch(_){}
-    showView('view-menu');
-  });
+  // --- Botón "Regresar" al final (fuera del grid) ---
+const oldBottom = document.getElementById('com-volver-bottom');
+if (oldBottom && oldBottom.parentElement) {
+  oldBottom.parentElement.remove(); // evita duplicados
 }
+
+const bottom = document.createElement('div');
+bottom.className = 'com-bottom-actions spaced';
+
+const backBtn = document.createElement('button');
+backBtn.id = 'com-volver-bottom';
+backBtn.textContent = 'Regresar';
+backBtn.style.width = 'auto'; // que no se estire a 100%
+
+bottom.appendChild(backBtn);
+
+/* Inserta el contenedor inmediatamente DESPUÉS del grid,
+   de modo que no sea parte del layout de columnas */
+wrap.insertAdjacentElement('afterend', bottom);
+
+// Listeners: sonido + volver al menú
+backBtn.addEventListener('click', () => {
+  try { playSoundOnce(SOUNDS.back); } catch(_){}
+  showView('view-menu');
+});
 
    
 

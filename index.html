@@ -2941,6 +2941,21 @@ async function prepararComerciantes(){
   }
 }
 
+    // Helper: limpia resultados (lista y especificación), sin tocar la selección,
+// y oculta/elimina el segundo botón ("Ocultar") si existe.
+function clearComerciantesUI(){
+  const list = document.getElementById('com-list');
+  const spec = document.getElementById('com-spec');
+  if (list) list.innerHTML = '';
+  if (spec) spec.style.display = 'none';
+
+  // Oculta/elimina el botón inferior si está presente
+  const bottomBtn = document.getElementById('com-volver-bottom');
+  if (bottomBtn && bottomBtn.parentElement){
+    bottomBtn.parentElement.remove(); // remueve el contenedor del botón inferior
+  }
+}
+
 document.getElementById('com-cat')?.addEventListener('change', async (e)=>{
   const categoria = e.target.value;
   if(!categoria) return;
@@ -3061,10 +3076,11 @@ function renderComercioList(items){
     wrap.appendChild(card);
   }
 
-// --- Botón "Regresar" al final (fuera del grid) ---
+// --- Botón "Ocultar" al final (fuera del grid) ---
+// (Reemplaza el bloque que crea el botón "Regresar" inferior)
 const oldBottom = document.getElementById('com-volver-bottom');
 if (oldBottom && oldBottom.parentElement) {
-  oldBottom.parentElement.remove(); // evita duplicados
+  oldBottom.parentElement.remove(); // evita duplicados al re-renderizar
 }
 
 const bottom = document.createElement('div');
@@ -3072,8 +3088,7 @@ bottom.className = 'com-bottom-actions spaced';
 
 const backBtn = document.createElement('button');
 backBtn.id = 'com-volver-bottom';
-backBtn.textContent = 'Regresar';
-backBtn.style.width = 'auto'; // que no se estire a 100%
+backBtn.textContent = 'Ocultar';  // nombre actualizado
 
 bottom.appendChild(backBtn);
 
@@ -3081,10 +3096,15 @@ bottom.appendChild(backBtn);
    de modo que no sea parte del layout de columnas */
 wrap.insertAdjacentElement('afterend', bottom);
 
-// Listeners: sonido + volver al menú
+// Listener: solo limpia y se oculta (no navega)
 backBtn.addEventListener('click', () => {
   try { playSoundOnce(SOUNDS.back); } catch(_){}
-  showView('view-menu');
+  clearComerciantesUI();        // limpia lista + especificaciones y quita el botón
+  // Opcional: desplaza al inicio de la vista
+  try {
+    document.getElementById('view-comerciantes')
+      ?.scrollIntoView({ behavior:'smooth', block:'start' });
+  } catch(_){}
 });
 }
 

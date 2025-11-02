@@ -1314,6 +1314,7 @@
  /* PWA: instalar + detección de instalada (Android/PC prompt; iOS instrucciones).
    Botones soportados: #btn-instalar (menú) y #btn-instalar-standalone (vista instalar). */
 let deferredPrompt = null;
+  let installFollowupTimer = null;
 const installButtons = Array.from(document.querySelectorAll('#btn-instalar, #btn-instalar-standalone'));
 
 function isStandalone(){
@@ -1376,6 +1377,31 @@ window.addEventListener('beforeinstallprompt', (e)=>{
 window.addEventListener('appinstalled', ()=>{
   markInstalled();
   updateInstallButtonsVisibility();
+
+  // CANCELA el seguimiento si estaba programado
+  if (installFollowupTimer){
+    clearTimeout(installFollowupTimer);
+    installFollowupTimer = null;
+  }
+
+
+
+  // Si el usuario sigue en la vista "Instalar", muestra confirmación inmediata
+  const v = document.getElementById('view-instalar');
+  if (v && v.classList.contains('active')) {
+    Swal.fire({
+      icon: 'success',
+      title: 'App Instalada',
+      text: 'Refresca o busca en el escritorio de tu dispositivo el icono.'
+    });
+  }
+});
+
+    window.addEventListener('beforeunload', () => {
+  if (installFollowupTimer){
+    clearTimeout(installFollowupTimer);
+    installFollowupTimer = null;
+  }
 });
 
 installButtons.forEach(btn=>{
@@ -1393,9 +1419,29 @@ installButtons.forEach(btn=>{
     const choice = await deferredPrompt.userChoice;
     deferredPrompt = null;
     if (choice.outcome === 'accepted'){
-      markInstalled();
-      Swal.fire({ icon:'success', title:'¡App instalándose!', timer:2000, showConfirmButton:false });
-    }
+     markInstalled();
+
+// Nueva alerta con instrucciones de espera
+Swal.fire({
+  icon: 'success',
+  title: '¡App instalándose!',
+  html: 'Debes esperar 1 minuto.<br>Al terminar este tiempo, refresca la página o busca el icono de la aplicación en la pantalla de tu dispositivo.',
+  timer: 2000,
+  showConfirmButton: false
+});
+
+// Programa alerta de seguimiento a los 55s si el usuario sigue en la vista "Instalar"
+if (installFollowupTimer) clearTimeout(installFollowupTimer);
+installFollowupTimer = setTimeout(() => {
+  const v = document.getElementById('view-instalar');
+  if (v && v.classList.contains('active')) {
+    Swal.fire({
+      icon: 'success',
+      title: 'App Instalada',
+      text: 'Refresca o busca en el escritorio de tu dispositivo el icono.'
+    });
+  }
+}, 55000);
     updateInstallButtonsVisibility();
   });
 });
@@ -1665,6 +1711,11 @@ function stopLoading(){
   function showView(id){
   for(const el of document.querySelectorAll('.view')) el.classList.remove('active');
   document.getElementById(id).classList.add('active');
+    // Si salimos de la vista "Instalar", cancela el seguimiento
+if (id !== 'view-instalar' && typeof installFollowupTimer !== 'undefined' && installFollowupTimer){
+  clearTimeout(installFollowupTimer);
+  installFollowupTimer = null;
+}
   overlay.classList.remove('open');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 

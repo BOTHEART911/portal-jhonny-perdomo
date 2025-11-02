@@ -1314,7 +1314,6 @@
  /* PWA: instalar + detección de instalada (Android/PC prompt; iOS instrucciones).
    Botones soportados: #btn-instalar (menú) y #btn-instalar-standalone (vista instalar). */
 let deferredPrompt = null;
-  let installFollowupTimer = null;
 const installButtons = Array.from(document.querySelectorAll('#btn-instalar, #btn-instalar-standalone'));
 
 function isStandalone(){
@@ -1374,35 +1373,11 @@ window.addEventListener('beforeinstallprompt', (e)=>{
   updateInstallButtonsVisibility();
 });
 
-window.addEventListener('appinstalled', ()=>{
-  markInstalled();
-  updateInstallButtonsVisibility();
-
-  // CANCELA el seguimiento si estaba programado
-  if (installFollowupTimer){
-    clearTimeout(installFollowupTimer);
-    installFollowupTimer = null;
-  }
-
-
-
-  // Si el usuario sigue en la vista "Instalar", muestra confirmación inmediata
-  const v = document.getElementById('view-instalar');
-  if (v && v.classList.contains('active')) {
-    Swal.fire({
-      icon: 'success',
-      title: 'App Instalada',
-      text: 'Refresca o busca en el escritorio de tu dispositivo el icono.'
-    });
-  }
+window.addEventListener('appinstalled', ()=>{ 
+  markInstalled(); 
+  updateInstallButtonsVisibility(); 
 });
 
-    window.addEventListener('beforeunload', () => {
-  if (installFollowupTimer){
-    clearTimeout(installFollowupTimer);
-    installFollowupTimer = null;
-  }
-});
 
 installButtons.forEach(btn=>{
   if (!btn) return;
@@ -1711,11 +1686,6 @@ function stopLoading(){
   function showView(id){
   for(const el of document.querySelectorAll('.view')) el.classList.remove('active');
   document.getElementById(id).classList.add('active');
-    // Si salimos de la vista "Instalar", cancela el seguimiento
-if (id !== 'view-instalar' && typeof installFollowupTimer !== 'undefined' && installFollowupTimer){
-  clearTimeout(installFollowupTimer);
-  installFollowupTimer = null;
-}
   overlay.classList.remove('open');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 

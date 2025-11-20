@@ -3386,9 +3386,9 @@ function renderReferidos(list){
     const det = document.createElement('div');
     det.className = 'ref-details';
     const docSpan = document.createElement('span');
-    docSpan.textContent = '<b>CC:</b> ' + (it.documento || '');
+    docSpan.innerHTML = '<b>CC:</b> ' + (it.documento || '');
     const resSpan = document.createElement('span');
-    resSpan.textContent = '<b>RESIDENCIA:</b> ' + (it.residencia || '');
+    resSpan.innerHTML = '<b>RESIDENCIA:</b> ' + (it.residencia || '');
     det.appendChild(docSpan);
     det.appendChild(resSpan);
 

@@ -309,9 +309,12 @@
 .ref-vote.gray{ background:#e5e7eb; color:#374151; border:2px solid #9ca3af; }
 .ref-vote.orange{ background:#ffedd5; color:#9a3412; border:2px solid #f97316; }
 .ref-vote.red{ background:#fee2e2; color:#991b1b; border:2px solid #dc2626; }
+.ref-vote.blue{ background:#dbeafe; color:#1e40af; border:2px solid #3b82f6; }
 
 .ref-details{
-  display:flex; flex-wrap:wrap; gap:12px;
+  display:flex;
+  flex-direction:column;   /* <- apila cada línea */
+  gap:4px;
   font-size:.75rem; color:#333; font-weight:600;
 }
 
@@ -3341,6 +3344,7 @@ function updateReferidosSummary(list){
 function voteClass(v){
   const val = String(v||'').trim().toUpperCase();
   if(val === 'FLANDES') return 'green';
+  if(val === 'SIN CONSULTAR') return 'blue';
   if(val === 'A LA ESPERA') return 'gray';
   if(val === 'POR CONFIRMAR') return 'orange';
   return 'red';

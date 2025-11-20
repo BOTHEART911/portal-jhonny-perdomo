@@ -242,6 +242,100 @@
   .social-grid{ grid-template-columns: 1fr 1fr; }
 }
 
+  /* ==== REFERIDOS (vista líder) ==== */
+.ref-summary-wrap{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:8px; margin:8px 0 16px;
+}
+.ref-selected-group{
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+}
+.ref-selected-badge{
+  display:inline-block;
+  border-radius:999px; padding:8px 16px;
+  font-weight:900; text-align:center;
+  color:#0a0; background:#d7f8e3;
+  border:3px solid #7adf9b;
+  box-shadow:0 4px 10px rgba(0,0,0,.12);
+  min-width:120px;
+}
+.ref-summary-caption{
+  font-size:.85rem; color:#666; text-align:center;
+}
+.ref-filter-input{
+  appearance:none;
+  border-radius:999px;
+  background:#fff;
+  border:3px solid #111;
+  padding:10px 16px;
+  font-weight:700;
+  min-width:240px;
+  max-width:360px;
+  box-shadow:0 8px 18px rgba(0,0,0,.08);
+  outline:none;
+  font-size:.95rem;
+}
+.ref-filter-input::placeholder{ color:#999; font-weight:600; }
+
+.ref-list{
+  display:flex; flex-direction:column; gap:12px;
+}
+
+.ref-item{
+  background:rgba(255,255,255,.9);
+  border:2px solid #2f6bdb;
+  border-radius:16px;
+  padding:12px 12px 10px;
+  box-shadow:0 6px 14px rgba(0,0,0,.12);
+  display:flex; flex-direction:column; gap:6px;
+}
+
+.ref-row-top{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+}
+
+.ref-name{
+  font-weight:900; font-size:1.05rem; color:#1b2a6b;
+  text-transform:uppercase; margin:0;
+}
+
+.ref-vote{
+  font-weight:900; font-size:.8rem; margin:0;
+  padding:4px 10px; border-radius:999px;
+  background:#eee; color:#222;
+}
+
+.ref-vote.green{ background:#c6f6d5; color:#065f46; border:2px solid #16a34a; }
+.ref-vote.gray{ background:#e5e7eb; color:#374151; border:2px solid #9ca3af; }
+.ref-vote.orange{ background:#ffedd5; color:#9a3412; border:2px solid #f97316; }
+.ref-vote.red{ background:#fee2e2; color:#991b1b; border:2px solid #dc2626; }
+
+.ref-details{
+  display:flex; flex-wrap:wrap; gap:12px;
+  font-size:.75rem; color:#333; font-weight:600;
+}
+
+.ref-details span{ white-space:nowrap; }
+
+.ref-actions{
+  display:flex; gap:10px; align-items:center;
+  margin-top:4px;
+}
+
+.ref-wa{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:42px; height:42px; border-radius:10px;
+  border:2px solid var(--primary);
+  background:#fff; box-shadow:0 6px 12px rgba(0,0,0,.18);
+}
+.ref-wa img{ width:26px; height:26px; border-radius:6px; background:#fff; }
+
+@media (max-width:560px){
+  .ref-row-top{ flex-direction:column; align-items:flex-start; }
+  .ref-filter-input{ width:100%; max-width:100%; }
+}
+
+
     /* Vista Instalar centrada, sin card */
 #view-instalar{
   display:flex;
@@ -880,7 +974,8 @@
     <button class="menu-btn" id="go-asistencia">Registra Asistencia a Evento ✋🏾</button>
     <button class="menu-btn" id="go-actualizacion">Actualiza tus Datos Personales 🔁</button>
     <button class="menu-btn" id="go-consultar">Consulta tu Puesto de Votación 🗳</button>
-    <button class="menu-btn" id="go-lider">Si eres Líder, Refiere con un solo Clic 📤</button>
+    <button class="menu-btn" id="go-lider">Refiere tu código por Whatsapp 📤</button>
+    <button class="menu-btn" id="go-referidos">Mis Referidos 🔢</button>
     <button class="menu-btn" id="btn-instalar" style="display:none;">Instalar la App 📲</button>
     <div style="height:24px"></div>
     <img class="brand" alt="Brand" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png" />
@@ -1571,6 +1666,27 @@ updateInstallButtonsVisibility();
   </div>
 </section>
 
+     <!-- VISTA 14: MIS REFERIDOS -->
+    <section id="view-referidos" class="view">
+  <div class="card narrow" style="padding-top:12px;">
+    <h2 id="ref-title" style="color:var(--primary); text-shadow:0 2px 2px #031732; margin-bottom:10px;">REFERIDOS</h2>
+
+    <div class="ref-summary-wrap">
+      <div class="ref-selected-group">
+        <div id="ref-count" class="ref-selected-badge" style="display:none"></div>
+        <div id="ref-caption" class="ref-summary-caption" style="display:none">N° de Referidos</div>
+      </div>
+      <input id="ref-filter" class="ref-filter-input" type="text" placeholder="Escribe para filtrar" aria-label="Filtrar por nombre, documento, residencia o votación">
+    </div>
+
+    <div id="ref-list" class="ref-list"></div>
+
+    <div class="btn-row spaced">
+      <button id="ref-volver">Regresar</button>
+    </div>
+  </div>
+</section>
+
   <script>
     // URL de tu Apps Script desplegado
     const API_BASE = 'https://script.google.com/macros/s/AKfycbzYEzUpAoXZKgkCut4HI2CgcHiwkgldjx23RXucAGx-BlTKXreJO_ZQ2MCyr8aqnOl0/exec';
@@ -1724,10 +1840,12 @@ function stopLoading(){
     }
 
     // Ocultar botón si no es Lider
-    function updateLeaderUI(isLeader){
+   function updateLeaderUI(isLeader){
   try{
-    const btn = document.getElementById('go-lider');
-    if(btn){ btn.style.display = isLeader ? '' : 'none'; }
+    const btnLider = document.getElementById('go-lider');
+    const btnRef   = document.getElementById('go-referidos');
+    if(btnLider) btnLider.style.display = isLeader ? '' : 'none';
+    if(btnRef)   btnRef.style.display   = isLeader ? '' : 'none';
   }catch(_){}
 }
     
@@ -2038,6 +2156,12 @@ document.getElementById('go-redes').addEventListener('click', ()=>{
         Swal.fire({ icon:'error', title:'Error', text:e.message });
       }
     });
+
+    document.getElementById('go-referidos').addEventListener('click', async ()=>{
+  overlay.classList.remove('open');
+  await prepararReferidos();
+  showView('view-referidos');
+});
 
     document.getElementById('go-feed').addEventListener('click', ()=>{
   overlay.classList.remove('open');
@@ -2431,7 +2555,7 @@ document.addEventListener('visibilitychange', () => {
 });
 
 // Detener al navegar desde el menú a cualquier otra vista
-['go-asistencia','go-actualizacion','go-consultar','go-solicitud','go-ideas','go-sede','go-redes','btn-logout','go-feed','go-libretacontactos','go-comerciantes']
+['go-asistencia','go-actualizacion','go-consultar','go-solicitud','go-ideas','go-sede','go-redes','btn-logout','go-feed','go-libretacontactos','go-comerciantes','go-referidos']
   .forEach(id => {
     const el = document.getElementById(id);
     if (el) {
@@ -3132,13 +3256,13 @@ backBtn.addEventListener('click', () => {
 })();
 
     // Sonido para botones Atrás/Regresar
-    ['btn-ovl-back','a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver','btn-reg-atras','sede-volver','redes-volver','lc-volver','com-volver'].forEach(id=>{
+    ['btn-ovl-back','a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver','btn-reg-atras','sede-volver','redes-volver','lc-volver','com-volver','ref-volver'].forEach(id=>{
   const el = document.getElementById(id);
   if(el) el.addEventListener('click', ()=> playSoundOnce(SOUNDS.back));
 });
 
     // Volver genéricos
-    ['a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver','sede-volver','redes-volver','lc-volver','com-volver'].forEach(id=>{
+    ['a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver','sede-volver','redes-volver','lc-volver','com-volver','ref-volver'].forEach(id=>{
   const el = document.getElementById(id);
   if(el) el.addEventListener('click', ()=> showView('view-menu'));
 });
@@ -3170,6 +3294,154 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+    /* ==== REFERIDOS (vista líder) ==== */
+let REF_DATA = [];
+
+async function prepararReferidos(){
+  if(!currentUser) return;
+  // Solicita lista al backend
+  try{
+    const r = await apiGet('listReferidos', { documento: currentUser.documento });
+    const leaderName = r?.leaderName || '';
+    REF_DATA = Array.isArray(r?.items) ? r.items : [];
+
+    // Título
+    const tEl = document.getElementById('ref-title');
+    if(tEl){
+      tEl.textContent = 'REFERIDOS ' + (leaderName || '');
+    }
+
+    // Limpia filtro y pinta
+    const f = document.getElementById('ref-filter');
+    if(f) f.value = '';
+    renderReferidos(REF_DATA);
+    updateReferidosSummary(REF_DATA);
+  }catch(e){
+    REF_DATA = [];
+    renderReferidos(REF_DATA);
+    updateReferidosSummary(REF_DATA);
+    Swal.fire({ icon:'error', title:'Error', text:e.message });
+  }
+}
+
+function updateReferidosSummary(list){
+  const box = document.getElementById('ref-count');
+  const cap = document.getElementById('ref-caption');
+  if(!box || !cap) return;
+  if(!list.length){
+    box.style.display='none'; cap.style.display='none'; box.textContent='';
+    return;
+  }
+  box.textContent = String(list.length);
+  box.style.display='inline-block';
+  cap.style.display='block';
+}
+
+function voteClass(v){
+  const val = String(v||'').trim().toUpperCase();
+  if(val === 'FLANDES') return 'green';
+  if(val === 'A LA ESPERA') return 'gray';
+  if(val === 'POR CONFIRMAR') return 'orange';
+  return 'red';
+}
+
+function renderReferidos(list){
+  const wrap = document.getElementById('ref-list');
+  if(!wrap) return;
+  wrap.innerHTML = '';
+
+  if(!list.length){
+    const p = document.createElement('p');
+    p.className = 'muted center';
+    p.textContent = 'No hay referidos registrados.';
+    wrap.appendChild(p);
+    return;
+  }
+
+  for(const it of list){
+    const card = document.createElement('div');
+    card.className = 'ref-item';
+
+    // Top row: nombre + votación
+    const top = document.createElement('div');
+    top.className = 'ref-row-top';
+
+    const name = document.createElement('p');
+    name.className = 'ref-name';
+    name.textContent = it.nombre || '';
+
+    const vote = document.createElement('div');
+    vote.className = 'ref-vote ' + voteClass(it.votacion);
+    vote.textContent = 'VOTACIÓN: ' + (it.votacion || '—');
+
+    top.appendChild(name);
+    top.appendChild(vote);
+
+    // Details
+    const det = document.createElement('div');
+    det.className = 'ref-details';
+    const docSpan = document.createElement('span');
+    docSpan.textContent = 'CC: ' + (it.documento || '');
+    const resSpan = document.createElement('span');
+    resSpan.textContent = 'RESIDENCIA: ' + (it.residencia || '');
+    det.appendChild(docSpan);
+    det.appendChild(resSpan);
+
+    // Actions (solo WhatsApp)
+    const actions = document.createElement('div');
+    actions.className = 'ref-actions';
+
+    const telDigits = String(it.telefono||'').replace(/\D/g,'');
+    const waFull = telDigits ? (telDigits.startsWith('57') ? telDigits : ('57'+telDigits.slice(-10))) : '';
+    if(waFull){
+      const aWa = document.createElement('a');
+      aWa.className = 'ref-wa';
+      aWa.href = 'https://wa.me/' + waFull;
+      aWa.target = '_blank';
+      aWa.rel = 'noopener';
+      aWa.setAttribute('aria-label','Abrir chat de WhatsApp');
+      const imgWa = document.createElement('img');
+      imgWa.src = 'https://res.cloudinary.com/dqqeavica/image/upload/v1759166341/WhatsApp_mljaqm.webp';
+      imgWa.alt = '';
+      aWa.appendChild(imgWa);
+      actions.appendChild(aWa);
+    }
+
+    card.appendChild(top);
+    card.appendChild(det);
+    card.appendChild(actions);
+    wrap.appendChild(card);
+  }
+}
+
+// Filtro con debounce
+(function(){
+  const input = document.getElementById('ref-filter');
+  if(!input) return;
+  function normalize(s){ return String(s||'').toLowerCase(); }
+  function matches(it,q){
+    if(!q) return true;
+    const qq = q.toLowerCase();
+    return normalize(it.nombre).includes(qq) ||
+           normalize(it.documento).includes(qq) ||
+           normalize(it.residencia).includes(qq) ||
+           normalize(it.votacion).includes(qq);
+  }
+  let t;
+  input.addEventListener('input', ()=>{
+    clearTimeout(t);
+    t = setTimeout(()=>{
+      const q = input.value.trim();
+      const filtered = REF_DATA.filter(it=>matches(it,q));
+      renderReferidos(filtered);
+      updateReferidosSummary(filtered);
+    }, 160);
+  });
+})();
+
+// Botón Regresar (aplica estilos/sonido existentes)
+document.getElementById('ref-volver').addEventListener('click', ()=> showView('view-menu'));
 
   </script>
 </body>

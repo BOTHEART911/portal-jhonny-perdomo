@@ -53,6 +53,54 @@
       outline:none; transition: border-color .2s ease, transform .08s ease;
       font-size:16px;
     }
+    /* Toggle ver/ocultar documento en login (igual a indexref) */
+  .pwd-wrapper{
+    position:relative;
+    width:100%;
+  }
+  .pwd-wrapper input#doc-login{
+    display:block;
+    width:100%;
+    box-sizing:border-box;
+    padding-right:40px;
+  }
+  .toggle-cedula{
+    position:absolute;
+    top:50%;
+    right:10px;
+    transform:translateY(-50%);
+    background:transparent !important;
+    border:0 !important;
+    padding:0;
+    width:28px;
+    height:28px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    border-radius:6px;
+  }
+  .toggle-cedula:hover{
+    background:rgba(0,0,0,.06);
+  }
+  .toggle-cedula:active{
+    transform:translateY(-50%) scale(.92);
+  }
+  .toggle-cedula:focus-visible{
+    outline:none;
+    box-shadow:0 0 0 3px rgba(6,64,43,.35);
+  }
+  .toggle-cedula img{
+    width:22px;
+    height:22px;
+    display:block;
+    pointer-events:none;
+  }
+  @media (max-width:480px){
+    .pwd-wrapper input#doc-login{ padding-right:36px; }
+    .toggle-cedula{ right:8px; width:26px; height:26px; }
+    .toggle-cedula img{ width:20px; height:20px; }
+  }
     input:focus, select:focus, textarea:focus{ border-color:var(--primary); }
     button{
       cursor:pointer; border:2px solid var(--primary);
@@ -728,8 +776,26 @@
         <h1 style="color:var(--primary); text-shadow: 0 2px 2px #031732;">JHONNY PERDOMO</h1>
         <p class="helper"><b>Al usar esta aplicación, aceptas voluntariamente suministrar tus datos Personales.</b><br><i>Art. 5 Ley 1581 de 2012 y Decreto 1074 de 2015</i></p>
 
-        <label>Documento:</label>
-        <input id="doc-login" type="tel" inputmode="numeric" placeholder="Sin puntos ni espacios" />
+                <label>Documento:</label>
+        <div class="pwd-wrapper">
+          <input
+            id="doc-login"
+            type="password"
+            inputmode="numeric"
+            placeholder="Sin puntos ni espacios"
+          />
+          <button
+            type="button"
+            id="toggle-doc-login"
+            aria-label="Mostrar documento"
+            class="toggle-cedula"
+          >
+            <img
+              src="https://res.cloudinary.com/dqqeavica/image/upload/v1764084782/Mostrar_yymceh.png"
+              alt="Mostrar"
+            >
+          </button>
+        </div>
 
         <div class="btn-row spaced">
           <button class="btn-primary" id="btn-login">Iniciar Sesión</button>
@@ -1881,6 +1947,23 @@ function stopLoading(){
     const docLogin = document.getElementById('doc-login');
     const regCard = document.getElementById('registro-card');
     const btnGuardarRegistro = document.getElementById('btn-guardar-registro');
+
+        // Toggle ver/ocultar Documento en login (igual que indexref)
+    (function(){
+      const toggleBtn = document.getElementById('toggle-doc-login');
+      const input = document.getElementById('doc-login');
+      if(!toggleBtn || !input) return;
+      toggleBtn.addEventListener('click', ()=>{
+        const oculto = input.type === 'password';
+        input.type = oculto ? 'tel' : 'password';
+        const nuevoIcono = oculto
+          ? 'https://res.cloudinary.com/dqqeavica/image/upload/v1764084782/Ocultar_lgdxpd.png'
+          : 'https://res.cloudinary.com/dqqeavica/image/upload/v1764084782/Mostrar_yymceh.png';
+        const accion = oculto ? 'Ocultar' : 'Mostrar';
+        toggleBtn.setAttribute('aria-label', accion + ' documento');
+        toggleBtn.innerHTML = '<img src="'+nuevoIcono+'" alt="'+accion+'">';
+      });
+    })();
 
     btnLogin.addEventListener('click', async () => {
   const documento = (docLogin.value || '').trim();

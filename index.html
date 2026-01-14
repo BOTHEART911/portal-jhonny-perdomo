@@ -20,31 +20,27 @@
   --scrim:rgba(0,0,0,.35);
 }
 html,body{
-  margin:0;
-  padding:0;
-  width:100%;
+  margin:0; padding:0; height:100%; width:100%;
   overflow-x:hidden;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   color:#111;
   background: url('https://res.cloudinary.com/dqqeavica/image/upload/v1753538930/FONDO_JHONNY_sugwsj.png') center/cover fixed no-repeat;
 }
-
 .container{
   max-width: 1000px;
   margin: 0 auto;
-  padding: 0 16px;
-  padding-bottom: 0;
+  padding: 16px;
 }
 
-/* VISTAS con transición (sin espacios verticales sobrantes) */
+/* VISTAS con transición */
 .view{
   display:none;
   opacity:0;
   transform: translateY(8px);
   transition: opacity .25s ease, transform .25s ease;
-  min-height: 0;
+  min-height: 0;             /* sin altura forzada extra */
   box-sizing:border-box;
-  padding: 0 16px;
+  padding: 0 16px;           /* sin padding vertical, solo laterales */
 }
 .view.active{
   display:block;
@@ -59,17 +55,20 @@ html,body{
 /* Panel lateral (menú deslizable): sin espacio “muerto” abajo/arriba */
 .overlay .panel{
   padding-top: 16px;
-  padding-bottom: 0;
+  padding-bottom: 0; /* igual que indexref: sin espacio al final */
 }
 .overlay .panel > *:first-child{ margin-top: 0 !important; }
 .overlay .panel > *:last-child{ margin-bottom: 0 !important; }
-  
+
+/* Recorte global de bordes: sin espacio extra al final de la página */
+.container{ padding-bottom: 0; }
+
 /* Vista Instalar centrada, sin espacio sobrante */
 #view-instalar{
   display:flex;
   align-items:center;
   justify-content:center;
-  min-height: 0;
+  min-height: 0;              /* dejamos que la tarjeta mande */
   padding: 0 16px;
   text-align:center;
 }

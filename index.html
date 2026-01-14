@@ -395,13 +395,6 @@
   min-height: calc(100dvh - 32px);
   text-align:center;
 }
-#view-instalar .install-wrap{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:12px;
-  padding: 8px;
-}
 #view-instalar .brand{ width:220px; border-radius:8px; }
 #view-instalar .tagline{
   font-weight:800;
@@ -459,10 +452,6 @@
 }
 .overlay .panel > *:first-child{ margin-top: 0 !important; }
 .overlay .panel > *:last-child{ margin-bottom: 0 !important; }
-
-  /* 1) FIX crítico: la vista "Instalar" no debe ocupar espacio cuando no está activa */
-#view-instalar.view { display: none; }            /* Oculta siempre por defecto */
-#view-instalar.view.active { display: flex; }     /* Solo flex cuando la vista está activa */
 
 /* 2) Recorte global de bordes: sin espacio arriba/abajo si no hay más contenido */
 .container{ padding-bottom: 0; }                  /* Nada de espacio extra al final de la página */

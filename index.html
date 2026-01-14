@@ -19,73 +19,22 @@
   --error:#dc2626;
   --scrim:rgba(0,0,0,.35);
 }
-html,body{
-  margin:0; padding:0; height:100%; width:100%;
-  overflow-x:hidden;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  color:#111;
-  background: url('https://res.cloudinary.com/dqqeavica/image/upload/v1753538930/FONDO_JHONNY_sugwsj.png') center/cover fixed no-repeat;
-}
-.container{
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 16px;
-  padding-bottom: 0;
-}
+ html,body{
+      margin:0; padding:0; height:100%; width:100%;
+      overflow-x:hidden; /* SIN scroll lateral */
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:#111;
+      background: url('https://res.cloudinary.com/dqqeavica/image/upload/v1767566043/fondo_gustavo_qkqv6h.jpg') center/cover fixed no-repeat;
+    }
+    .container{ max-width: 1000px; margin: 0 auto; padding: 16px; }
 
-/* VISTAS con transición, sin aire vertical extra */
-.view{
-  display:none;
-  opacity:0;
-  transform: translateY(8px);
-  transition: opacity .25s ease, transform .25s ease;
-  min-height: 0;
-  box-sizing:border-box;
-  padding: 0 16px;           /* solo laterales, sin padding arriba/abajo */
-}
-.view.active{
-  display:block;
-  opacity:1;
-  transform: translateY(0);
-}
-
-/* Evitar márgenes colapsados del primer y último elemento dentro de cada vista */
-.view > *:first-child{ margin-top: 0 !important; }
-.view > *:last-child{ margin-bottom: 0 !important; }
-
-/* Panel lateral (menú deslizable): sin espacio “muerto” abajo/arriba */
-.overlay .panel{
-  padding-top: 16px;
-  padding-bottom: 0;
-}
-.overlay .panel > *:first-child{ margin-top: 0 !important; }
-.overlay .panel > *:last-child{ margin-bottom: 0 !important; }
-
-/* Vista Instalar centrada, sin espacio sobrante */
-#view-instalar{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  min-height: 0;
-  padding: 0 16px;
-  text-align:center;
-}
-#view-instalar .brand{
-  width:220px;
-  border-radius:8px;
-}
-#view-instalar .tagline{
-  font-weight:800;
-  color:#111;
-  margin:0 0 4px;
-}
-
-/* Botón instalar PWA */
-#btn-instalar{
-  border-radius:999px;
-  font-size:1rem;
-  padding:12px 18px;
-}
+    /* VISTAS con transición */
+    .view{ display:none; opacity:0; transform: translateY(8px);
+      transition: opacity .25s ease, transform .25s ease;
+      min-height: 0; /* <--- ELIMINADO min-height extra */
+      box-sizing:border-box; padding:16px;
+    }
+    .view.active{ display:block; opacity:1; transform: translateY(0); }
 
 /* Tarjetas y formularios */
 .card{
@@ -152,11 +101,17 @@ input, select, textarea, button{
   .toggle-cedula{ right:8px; width:26px; height:26px; }
   .toggle-cedula img{ width:20px; height:20px; }
 }
-input:focus, select:focus, textarea:focus{ border-color:var(--primary); }
-button{
-  cursor:pointer; border:2px solid var(--primary);
-  background:#fff; color:#000; font-weight:700;
-}
+   input, select, textarea, button{
+      width:100%; padding:12px; box-sizing:border-box;
+      border:1.5px solid #ccc; border-radius:8px; background:#fff;
+      outline:none; transition: border-color .2s ease, transform .08s ease;
+      font-size:16px;
+    }
+    input:focus, select:focus, textarea:focus{ border-color:var(--primary); }
+    button{
+      cursor:pointer; border:2px solid var(--primary);
+      background:#fff; color:#000; font-weight:700;
+    }
 button:hover{ background:var(--primary-2); color:#fff; border-color:var(--primary-2); }
 .btn-primary{ background:var(--primary); color:#fff; }
 .btn-row{ display:flex; gap:12px; }
@@ -171,33 +126,120 @@ button:hover{ background:var(--primary-2); color:#fff; border-color:var(--primar
 }
 .danger{ background:#e11; border-color:#e11; color:#fff; }
 
-/* Quitar márgenes extra en el copyright para evitar aire al final */
-p.center.muted{
-  margin-top:4px;
-  margin-bottom:0;
-}
-
 /* OVERLAY BANNER LATERAL */
-.overlay{ position: fixed; inset: 0; pointer-events:none; }
-.overlay .scrim{ position:absolute; inset:0; background:var(--scrim);
-  opacity:0; transition:opacity .25s ease;
+.overlay{
+  position: fixed;
+  inset: 0;
+  pointer-events:none;
+}
+.overlay .scrim{
+  position:absolute;
+  inset:0;
+  background:var(--scrim);
+  opacity:0;
+  transition:opacity .25s ease;
 }
 .overlay .panel{
-  position:absolute; top:0; left:0; width:min(360px, 90vw); height:100%;
-  background:#2f6bdb; color:#fff; padding:16px 16px 8px 16px; box-sizing:border-box;
-  transform: translateX(-100%); transition: transform .25s ease;
-  display:flex; flex-direction:column; gap:10px; overflow-y:auto;
+  position:absolute;
+  top:0;
+  left:0;
+  width:min(360px, 90vw);
+  height:100%;
+  background:#de2e03; /* color del overlay */
+  color:#fff;
+  padding:16px 16px 8px 16px;
+  box-sizing:border-box;
+  transform: translateX(-100%);
+  transition: transform .25s ease;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  overflow-y:auto;
   min-height: 0;
 }
+
+/* Botones del menú lateral en azul */
+.menu-btn{
+  background: var(--primary);
+  color:#fff;
+  border:0;
+  font-weight:800;
+  border-radius:999px;
+  padding:12px;
+  box-shadow: 0 6px 12px rgba(0,0,0,.18);
+}
+.menu-btn:hover{
+  background: var(--primary-2);
+}
+  
 .overlay.open{ pointer-events:auto; }
 .overlay.open .scrim{ opacity:1; }
 .overlay.open .panel{ transform: translateX(0); }
 .panel h3{ margin: 4px 0 8px; text-align:center; }
-.menu-btn{
-  background:#7de3ef; color:#000; border:0; font-weight:800;
-  border-radius:999px; padding:12px; box-shadow: 0 6px 12px rgba(0,0,0,.18);
+
+  /* Bloques de categorías en el menú lateral */
+.menu-section-block{
+  margin:6px 0;
 }
 
+/* Botón de categoría (cabecera) */
+.menu-cat-btn{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:10px;
+  width:100%;
+  border-radius:999px;
+  font-weight:800;
+  font-size:0.9rem;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* Texto dentro del botón de categoría */
+.menu-cat-btn span{
+  flex:1 1 auto;
+  text-align:left;
+}
+
+/* Contenedor de opciones de cada categoría */
+.menu-cat-options{
+  display:none;
+  flex-direction:column;
+  gap:8px;
+  margin:6px 0 10px;
+}
+
+/* Botones internos un poco más compactos dentro de las categorías */
+.menu-cat-options .menu-btn{
+  font-weight:600;
+  font-size:0.86rem;
+}
+
+/* Categoría activa (cabecera resaltada) */
+.menu-cat-btn.active{
+  background:#7de3ef;
+  color:#000;
+  border-color:#7de3ef;
+}
+
+/* Animación de aparición de las opciones */
+.menu-cat-options.showing{
+  animation: menuDropIn 0.22s ease-out;
+}
+
+@keyframes menuDropIn{
+  from{
+    opacity:0;
+    transform:translateY(-6px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+  
 /* VIDEO */
 .video-card{
   position:relative; width: min(560px, 90vw); aspect-ratio: 16 / 9;
@@ -440,6 +482,17 @@ p.center.muted{
   .ref-filter-input{ width:100%; max-width:100%; }
 }
 
+   /* Botón instalar PWA */
+  #btn-instalar{
+    border-radius:999px;
+    font-size:1rem;
+    padding:12px 18px;
+  }
+
+  @media (max-width:700px){
+    .btn-row{ flex-direction:column; }
+  }
+
 /* Botón con icono */
 .btn-with-icon{
   display:flex;
@@ -453,6 +506,34 @@ p.center.muted{
   border-radius:4px;
   background:#fff;
 }
+
+   /* Quitar espacio extra arriba/abajo en todas las vistas (menu, sede, redes, etc.) */
+.view{
+  padding: 0 16px; /* sin padding vertical; se conserva solo el lateral */
+}
+
+  /* Evitar márgenes colapsados del primer y último elemento dentro de cada vista */
+.view > *:first-child{ margin-top: 0 !important; }
+.view > *:last-child{ margin-bottom: 0 !important; }
+
+  /* Panel lateral (menú deslizable): sin espacio “muerto” abajo/arriba */
+.overlay .panel{
+  padding-top: 16px;
+  padding-bottom: 0; /* quita espacio al final */
+}
+.overlay .panel > *:first-child{ margin-top: 0 !important; }
+.overlay .panel > *:last-child{ margin-bottom: 0 !important; }
+
+/* 2) Recorte global de bordes: sin espacio arriba/abajo si no hay más contenido */
+.container{ padding-bottom: 0; }                  /* Nada de espacio extra al final de la página */
+.view{ padding-top: 0; padding-bottom: 0; }       /* Sin padding vertical en cada vista */
+.view > *:first-child{ margin-top: 0 !important; }/* Primer bloque sin margen superior */
+.view > *:last-child{ margin-bottom: 0 !important; }/* Último bloque sin margen inferior */
+
+/* Opcional: si quieres que Sede y Redes no tengan ni 1px de “aire” arriba */
+#view-sede > *:first-child,
+#view-redes > *:first-child{ margin-top: 0 !important; }
+
 
 /* FEED NOTIFICACIONES */
 .feed-list{
@@ -539,6 +620,27 @@ p.center.muted{
   100%{ transform: scale(1); }
 }
 
+    .image-center{ display:flex; justify-content:center; align-items:center; }
+
+    /* Evitar desbordes en detalle (URLs y palabras largas) */
+.feed-detail-desc{
+  overflow-wrap:anywhere;   /* fuerza corte de palabras muy largas/URLs */
+  word-break:break-word;    /* respaldo */
+  max-width:100%;
+}
+
+  /* Badge del botón "Ponte al día" en el menú lateral */
+.menu-btn{ position:relative; }
+.btn-badge{
+  position:absolute; right:-6px; top:-6px;
+  background:#e11; color:#fff; border-radius:999px;
+  min-width:18px; height:18px; line-height:18px; text-align:center;
+  padding:0 4px; font-size:12px; font-weight:800; display:none;
+  box-shadow: 0 0 0 2px #fff;
+}
+.btn-badge.active{ display:inline-block; }
+
+  /* Etiqueta "Ponte al día" junto a la campana, con el mismo latido */
 .notif-label{
   position:absolute; left:calc(100% + 6px); top:-6px;
   height:28px; line-height:28px; padding:0 10px;
@@ -547,6 +649,9 @@ p.center.muted{
   animation:heartbeat 1.2s infinite;
   cursor: pointer;
 }
+  .notif-label.active{ display:inline-block; }
+
+  .notif-label{ cursor: pointer; }
 
 /* Badge del botón "Ponte al día" en el menú lateral */
 .menu-btn{ position:relative; }
@@ -593,6 +698,8 @@ p.center.muted{
 .contact-actions img{
   width:26px; height:26px; object-fit:contain; border-radius:6px; background:#fff;
 }
+
+  /* Texto guía bajo el título */
 .contact-hint{
   text-align:center; color:#333; margin-top:0; margin-bottom:12px;
 }
@@ -714,7 +821,14 @@ p.center.muted{
   text-align: justify;
 }
 
-/* Sonido botón menú se mantiene */
+  /* Asegurar que la descripción dentro de cada tarjeta esté justificada */
+.com-card-desc{
+  color:#666;
+  font-size:.8rem;          /* mismo tamaño que el subtítulo */
+  margin:0 0 10px;
+  text-align: justify;
+}
+
 </style>
   
 </head>
@@ -939,7 +1053,7 @@ p.center.muted{
 
     <!-- VISTA 2: MENÚ -->
 <section id="view-menu" class="view">
-  <div class="btn-row" style="margin-bottom:4px;">
+  <div class="btn-row" style="margin-bottom:12px;">
     <button class="chip" id="btn-open-menu">MENÚ</button>
     <button class="chip danger" id="btn-logout">Cerrar Sesión</button>
   </div>
@@ -988,22 +1102,69 @@ p.center.muted{
     <div class="image-center">
       <img alt="banner" src="https://res.cloudinary.com/dqqeavica/image/upload/v1759696513/Jhonny_y1tslf.gif" style="max-width:180px;border-radius:10px;" />
     </div>
-    <h3>Selecciona una de las opciones</h3>
-    <button class="menu-btn" id="go-feed">
-      Ponte al día 📅
-      <span id="go-feed-badge" class="btn-badge">0</span>
-    </button>
-    <button class="menu-btn" id="go-solicitud">Realiza tu Solicitud 📬</button>
-    <button class="menu-btn" id="go-ideas">Suma tus Ideas 💡</button>
-    <button class="menu-btn" id="go-libretacontactos">Libreta de Contactos 📒</button>
-    <button class="menu-btn" id="go-comerciantes">Comerciantes Amigos 🛍️</button>
-    <button class="menu-btn" id="go-sede">Visita Nuestra Casa Social 📍</button>
-    <button class="menu-btn" id="go-redes">Conoce Nuestras Redes Sociales 🌐</button>
-    <button class="menu-btn" id="go-asistencia">Registra Asistencia a Evento ✋🏾</button>
-    <button class="menu-btn" id="go-actualizacion">Actualiza tus Datos Personales 🔁</button>
-    <button class="menu-btn" id="go-consultar">Consulta tu Puesto de Votación 🗳</button>
-    <button class="menu-btn" id="go-lider">Refiere tu código por Whatsapp 📤</button>
-    <button class="menu-btn" id="go-referidos">Mis Referidos 🔢</button>
+    <h3>Selecciona una categoría</h3>
+
+    <!-- REGISTRO DE DATOS -->
+    <div class="menu-section-block">
+      <button class="menu-btn menu-cat-btn" data-cat="cat-registro">
+        <span>REGISTRO DE DATOS</span>
+      </button>
+      <div id="cat-registro" class="menu-cat-options">
+        <button class="menu-btn" id="go-actualizacion">Actualiza tus Datos Personales 🔁</button>
+        <button class="menu-btn" id="go-asistencia">Registra Asistencia a Evento ✋🏾</button>
+        <button class="menu-btn" id="go-consultar">Consulta tu Puesto de Votación 🗳</button>
+      </div>
+    </div>
+
+    <!-- APORTES Y SOLICITUDES -->
+    <div class="menu-section-block">
+      <button class="menu-btn menu-cat-btn" data-cat="cat-aportes">
+        <span>APORTES Y SOLICITUDES</span>
+      </button>
+      <div id="cat-aportes" class="menu-cat-options">
+        <button class="menu-btn" id="go-solicitud">Realiza tu Solicitud 📬</button>
+        <button class="menu-btn" id="go-ideas">Suma tus Ideas 💡</button>
+      </div>
+    </div>
+
+    <!-- NUESTRO EQUIPO, TU EQUIPO -->
+    <div class="menu-section-block">
+      <button class="menu-btn menu-cat-btn" data-cat="cat-equipo">
+        <span>NUESTRO EQUIPO, TU EQUIPO</span>
+      </button>
+      <div id="cat-equipo" class="menu-cat-options">
+        <button class="menu-btn" id="go-feed">
+          Ponte al día 📅
+          <span id="go-feed-badge" class="btn-badge">0</span>
+        </button>
+        <!-- <button class="menu-btn" id="go-calendario">Nuestro Calendario 📆</button> -->
+        <button class="menu-btn" id="go-sede">Visita Nuestra Casa Social 📍</button>
+        <button class="menu-btn" id="go-redes">Conoce Nuestras Redes Sociales 🌐</button>
+      </div>
+    </div>
+
+    <!-- GESTIÓN E INFORMACIÓN -->
+    <div class="menu-section-block">
+      <button class="menu-btn menu-cat-btn" data-cat="cat-gestion">
+        <span>GESTIÓN E INFORMACIÓN</span>
+      </button>
+      <div id="cat-gestion" class="menu-cat-options">
+        <button class="menu-btn" id="go-libretacontactos">Libreta de Contactos 📒</button>
+        <button class="menu-btn" id="go-comerciantes">Comerciantes Amigos 🛍️</button>
+      </div>
+    </div>
+
+    <!-- LÍDERES (se controla visibilidad desde JS) -->
+    <div class="menu-section-block" id="cat-lideres-block">
+      <button class="menu-btn menu-cat-btn" data-cat="cat-lideres">
+        <span>LÍDERES</span>
+      </button>
+      <div id="cat-lideres" class="menu-cat-options">
+        <button class="menu-btn" id="go-lider">Refiere por Whatsapp 📤</button>
+        <button class="menu-btn" id="go-referidos">Mis Referidos 🔢</button>
+      </div>
+    </div>
+    
     <div style="height:24px"></div>
     <img class="brand" alt="Brand" src="https://res.cloudinary.com/dqqeavica/image/upload/v1753538919/BANNER_JHONNY_e0yw7m.png" />
     <p class="center muted">Copyright © <a href="#" target="https://wa.me/573103230712"><b>Oscar Polanía</b></a></p>
@@ -2128,6 +2289,98 @@ if (formData.referencia && !referenciaRegex.test(formData.referencia)) {
     document.getElementById('btn-ovl-back').addEventListener('click', ()=> overlay.classList.remove('open'));
     document.getElementById('ovlClose').addEventListener('click', ()=> overlay.classList.remove('open'));
 
+      // Sonido login para todos los botones del menú lateral
+    (function(){
+      const idsMenu = [
+        'go-feed',
+        'go-solicitud',
+        'go-ideas',
+        'go-libretacontactos',
+        'go-comerciantes',
+        'go-sede',
+        'go-redes',
+        'go-asistencia',
+        'go-actualizacion',
+        'go-consultar',
+        'go-lider',
+        'go-referidos'
+      ];
+      idsMenu.forEach(function(id){
+        const el = document.getElementById(id);
+        if(el){
+          el.addEventListener('click', function(){
+            playSoundOnce(SOUNDS.login);
+          }, { capture:true });
+        }
+      });
+    })();
+
+
+        // Menú por categorías: abrir/cerrar secciones con sonido back
+    (function initOverlayCategories(){
+      const catButtons    = Array.from(document.querySelectorAll('.menu-cat-btn'));
+      const catContainers = Array.from(document.querySelectorAll('.menu-cat-options'));
+
+      function hideAllCategories(){
+        catContainers.forEach(c =>{
+          c.style.display = 'none';
+          c.classList.remove('showing');
+        });
+        catButtons.forEach(b => b.classList.remove('active'));
+      }
+
+      function showCategory(catId){
+        hideAllCategories();
+
+        const cont = document.getElementById(catId);
+        const btn  = catButtons.find(b => b.dataset.cat === catId);
+
+        if(cont){
+          cont.style.display = 'flex';
+          // fuerza reflujo para poder aplicar animación
+          cont.offsetHeight;
+          cont.classList.add('showing');
+        }
+        if(btn){
+          btn.classList.add('active');
+        }
+      }
+
+      // Click en la cabecera de cada categoría: toggle con sonido BACK
+      catButtons.forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const id = btn.dataset.cat;
+          if(!id) return;
+
+          try{
+            if(typeof playSoundOnce === 'function' && SOUNDS && SOUNDS.back){
+              playSoundOnce(SOUNDS.back);
+            }
+          }catch(_){}
+
+          const cont = document.getElementById(id);
+          const isOpen = cont && cont.style.display === 'flex';
+
+          if(isOpen){
+            hideAllCategories();
+          }else{
+            showCategory(id);
+          }
+        });
+      });
+
+      // Al cargar: todas cerradas
+      hideAllCategories();
+
+      // Al abrir el overlay con el botón MENÚ, se cierran todas las categorías
+      const openBtn = document.getElementById('btn-open-menu');
+      if(openBtn){
+        openBtn.addEventListener('click', ()=>{
+          hideAllCategories();
+        });
+      }
+    })();
+    
     document.getElementById('btn-logout').addEventListener('click', ()=>{
   playSoundOnce(SOUNDS.logout);
   try{ sessionStorage.removeItem(FEED_SOUND_KEY); }catch(_){}

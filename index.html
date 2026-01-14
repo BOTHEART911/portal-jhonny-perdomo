@@ -13,28 +13,77 @@
 
 <style>
 :root{
-      --primary:#007BFF;
-      --primary-2:#0056b3;
-      --ok:#16a34a;
-      --error:#dc2626;
-      --scrim:rgba(0,0,0,.35);
-    }
-    html,body{
-      margin:0; padding:0; height:100%; width:100%;
-      overflow-x:hidden; /* SIN scroll lateral */
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color:#111;
-      background: url('https://res.cloudinary.com/dqqeavica/image/upload/v1753538930/FONDO_JHONNY_sugwsj.png') center/cover fixed no-repeat;
-    }
-    .container{ max-width: 1000px; margin: 0 auto; padding: 16px; }
+  --primary:#007BFF;
+  --primary-2:#0056b3;
+  --ok:#16a34a;
+  --error:#dc2626;
+  --scrim:rgba(0,0,0,.35);
+}
+html,body{
+  margin:0; padding:0; height:100%; width:100%;
+  overflow-x:hidden;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color:#111;
+  background: url('https://res.cloudinary.com/dqqeavica/image/upload/v1753538930/FONDO_JHONNY_sugwsj.png') center/cover fixed no-repeat;
+}
+.container{ max-width: 1000px; margin: 0 auto; padding: 16px; }
 
-    /* VISTAS con transición */
-    .view{ display:none; opacity:0; transform: translateY(8px);
-      transition: opacity .25s ease, transform .25s ease;
-      min-height: 0; /* <--- ELIMINADO min-height extra */
-      box-sizing:border-box; padding:16px;
-    }
-    .view.active{ display:block; opacity:1; transform: translateY(0); }
+   /* VISTAS con transición (VERSIÓN ÚNICA, COMO EN indexref.md) */
+.view{
+  display:none;
+  opacity:0;
+  transform: translateY(8px);
+  transition: opacity .25s ease, transform .25s ease;
+  min-height: 0;              /* no forzamos altura extra */
+  box-sizing:border-box;
+  padding: 0 16px;            /* sin padding vertical, solo laterales */
+}
+.view.active{
+  display:block;
+  opacity:1;
+  transform: translateY(0);
+}
+
+/* Evitar márgenes colapsados del primer y último elemento dentro de cada vista */
+.view > *:first-child{ margin-top: 0 !important; }
+.view > *:last-child{ margin-bottom: 0 !important; }
+
+/* Panel lateral (menú deslizable): sin espacio “muerto” abajo/arriba */
+.overlay .panel{
+  padding-top: 16px;
+  padding-bottom: 0;
+}
+.overlay .panel > *:first-child{ margin-top: 0 !important; }
+.overlay .panel > *:last-child{ margin-bottom: 0 !important; }
+
+/* Recorte global de bordes: sin espacio extra al final de la página */
+.container{ padding-bottom: 0; }
+
+/* Vista Instalar centrada, sin espacio sobrante */
+#view-instalar{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height: 0;              /* dejamos que la tarjeta mande */
+  padding: 0 16px;
+  text-align:center;
+}
+#view-instalar .brand{
+  width:220px;
+  border-radius:8px;
+}
+#view-instalar .tagline{
+  font-weight:800;
+  color:#111;
+  margin:0 0 4px;
+}
+
+/* Botón instalar PWA */
+#btn-instalar{
+  border-radius:999px;
+  font-size:1rem;
+  padding:12px 18px;
+}
 
     /* Tarjetas y formularios */
     .card{
@@ -387,35 +436,6 @@
 }
 
 
-     /* Vista Instalar centrada, sin card */
-#view-instalar{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  min-height: calc(100dvh - 32px);
-  text-align:center;
-}
-#view-instalar .brand{
-  width:220px;
-  border-radius:8px;
-}
-#view-instalar .tagline{
-  font-weight:800;
-  color:#111;
-  margin:0 0 4px;
-}
-
-/* Botón instalar PWA */
-#btn-instalar{
-  border-radius:999px;
-  font-size:1rem;
-  padding:12px 18px;
-}
-
-  @media (max-width:700px){
-    .btn-row{ flex-direction:column; }
-  }
-
     /* Botón con icono */
 .btn-with-icon{
   display:flex;               /* mantiene el ancho 100% del botón y centra contenido */
@@ -430,37 +450,7 @@
   background:#fff;            /* se ve bien sobre fondos oscuros */
 }
 
-    /* VISTAS con transición */
-    .view{
-      display:none;
-      opacity:0;
-      transform: translateY(8px);
-      transition: opacity .25s ease, transform .25s ease;
-      min-height: 0;
-      box-sizing:border-box;
-      padding: 0 16px;  /* sin padding vertical; solo laterales */
-    }
-    .view.active{
-      display:block;
-      opacity:1;
-      transform: translateY(0);
-    }
-
-/* Evitar márgenes colapsados del primer y último elemento dentro de cada vista */
-.view > *:first-child{ margin-top: 0 !important; }
-.view > *:last-child{ margin-bottom: 0 !important; }
-
-/* Panel lateral (menú deslizable): sin espacio “muerto” abajo/arriba */
-.overlay .panel{
-  padding-top: 16px;
-  padding-bottom: 0;
-}
-.overlay .panel > *:first-child{ margin-top: 0 !important; }
-.overlay .panel > *:last-child{ margin-bottom: 0 !important; }
-
-/* Recorte global de bordes: sin espacio extra al final de la página */
-.container{ padding-bottom: 0; }
-
+  
   /* ==== FEED NOTIFICACIONES (lista y detalle) ==== */
 .feed-list{
   display:flex; flex-direction:column; gap:12px;

@@ -453,16 +453,6 @@
 .overlay .panel > *:first-child{ margin-top: 0 !important; }
 .overlay .panel > *:last-child{ margin-bottom: 0 !important; }
 
-/* 2) Recorte global de bordes: sin espacio arriba/abajo si no hay más contenido */
-.container{ padding-bottom: 0; }                  /* Nada de espacio extra al final de la página */
-.view{ padding-top: 0; padding-bottom: 0; }       /* Sin padding vertical en cada vista */
-.view > *:first-child{ margin-top: 0 !important; }/* Primer bloque sin margen superior */
-.view > *:last-child{ margin-bottom: 0 !important; }/* Último bloque sin margen inferior */
-
-/* Opcional: si quieres que Sede y Redes no tengan ni 1px de “aire” arriba */
-#view-sede > *:first-child,
-#view-redes > *:first-child{ margin-top: 0 !important; }
-
   /* ==== FEED NOTIFICACIONES (lista y detalle) ==== */
 .feed-list{
   display:flex; flex-direction:column; gap:12px;

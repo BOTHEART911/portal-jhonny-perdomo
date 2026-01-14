@@ -409,6 +409,17 @@
   margin: 0 0 4px;
 }
 
+   /* Botón instalar PWA */
+  #btn-instalar{
+    border-radius:999px;
+    font-size:1rem;
+    padding:12px 18px;
+  }
+
+  @media (max-width:700px){
+    .btn-row{ flex-direction:column; }
+  }
+
     /* Botón con icono */
 .btn-with-icon{
   display:flex;               /* mantiene el ancho 100% del botón y centra contenido */
@@ -1479,60 +1490,55 @@
   </script>
     </section>
 <script>
- /* PWA: instalar + detección de instalada (Android/PC prompt; iOS instrucciones).
-   Botones soportados: #btn-instalar (menú) y #btn-instalar-standalone (vista instalar). */
+ /* ================== PWA AVANZADO ================== */
 let deferredPrompt = null;
-const installButtons = Array.from(document.querySelectorAll('#btn-instalar, #btn-instalar-standalone'));
+let __installStartShown = false;    // bandera: ya mostramos "App instalándose"
+let __installSuccessShown = false;  // bandera: ya mostramos "Instalación exitosa"
 
 function isStandalone(){
   const dmStandalone = window.matchMedia('(display-mode: standalone)').matches;
+  const dmInstalled  = window.matchMedia('(display-mode: installed)').matches;
   const iosStandalone = (window.navigator.standalone === true);
-  const dmInstalled = window.matchMedia('(display-mode: installed)').matches;
-  return dmStandalone || iosStandalone || dmInstalled;
+  return dmStandalone || dmInstalled || iosStandalone;
 }
 function isIOS(){
   return /(iphone|ipad|ipod)/i.test(navigator.userAgent || '');
 }
 function isMarkedInstalled(){
-  try{ return localStorage.getItem('appInstalled') === '1'; }catch(_){ return false; }
+  try{ return localStorage.getItem('pwaInstalledFlag') === '1'; }catch(_){ return false; }
 }
 function markInstalled(){
-  try{ localStorage.setItem('appInstalled', '1'); }catch(_){}
+  try{ localStorage.setItem('pwaInstalledFlag', '1'); }catch(_){}
 }
 function clearInstalledMark(){
-  try{ localStorage.removeItem('appInstalled'); }catch(_){}
+  try{ localStorage.removeItem('pwaInstalledFlag'); }catch(_){}
 }
-
-// Detección robusta con prioridad a getInstalledRelatedApps.
-// Si detecta que YA NO está instalada, limpia el flag local.
 async function detectInstalled(){
   if (isStandalone()) return true;
-
   if (typeof navigator.getInstalledRelatedApps === 'function'){
     try{
       const apps = await navigator.getInstalledRelatedApps();
       const found = apps.some(a =>
         a.platform === 'webapp' &&
         typeof a.url === 'string' &&
-        /portal-jhonny-perdomo\/manifest\.webmanifest$/.test(a.url)
+        /manifest\.webmanifest$/.test(a.url)
       );
       if (found){
         markInstalled();
         return true;
       } else {
-        clearInstalledMark(); // importante para el caso de desinstalar
+        clearInstalledMark();
       }
     }catch(_){}
   }
-
-  // Fallback: si el navegador no soporta la API, usa el flag local
   return isMarkedInstalled();
 }
-
 function updateInstallButtonsVisibility(){
-  const installedFlag = isMarkedInstalled();
-  const shouldShow = !isStandalone() && !installedFlag && (isIOS() || !!deferredPrompt);
-  installButtons.forEach(btn => { if (btn) btn.style.display = shouldShow ? '' : 'none'; });
+  const btn1 = document.getElementById('btn-instalar');
+  const canPrompt = !!deferredPrompt;
+  const installed = isMarkedInstalled() || isStandalone();
+  const shouldShow = !installed && (canPrompt || isIOS());
+  if(btn1) btn1.style.display = shouldShow ? '' : 'none';
 }
 
 window.addEventListener('beforeinstallprompt', (e)=>{
@@ -1543,77 +1549,87 @@ window.addEventListener('beforeinstallprompt', (e)=>{
 
 window.addEventListener('appinstalled', ()=>{
   markInstalled();
+  deferredPrompt = null;
   updateInstallButtonsVisibility();
 });
 
-installButtons.forEach(btn=>{
-  if (!btn) return;
-  btn.addEventListener('click', async ()=>{
-    if (isIOS()){
-      return Swal.fire({
-        icon:'info',
-        title:'Instalar en iPhone/iPad',
-        html:'1) Toca Compartir (cuadro con flecha).<br>2) Elige "Agregar a pantalla de inicio".<br>3) Confirma "Agregar".'
-      });
-    }
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const choice = await deferredPrompt.userChoice;
-    deferredPrompt = null;
-    if (choice.outcome === 'accepted'){
-      markInstalled();
-      Swal.fire({
+document.getElementById('btn-instalar').addEventListener('click', async ()=>{
+  // Flujo iOS: se respeta exactamente tu alerta e instrucciones
+  if(isIOS()){
+    Swal.fire({
+      icon:'info',
+      title: '¡Para Instalar en tu Iphone!',
+  html: `
+    <div style="text-align:center; margin-top:8px;">
+      <img
+        src="https://res.cloudinary.com/dqqeavica/image/upload/v1765745210/instalacion_ios_ysbhnd.gif"
+        alt="Instalación de IOS"
+        style="width:180px; max-width:70vw; height:auto; display:block; margin:0 auto 12px;"
+      >
+      <div style="margin-top:10px;">
+        <b>1.</b> Toca Compartir.<br><b>2.</b> Elige "Agregar a pantalla de inicio".<br><b>3.</b> Confirma "Agregar".
+      </div>
+    </div>
+  `,
+    });
+    return;
+  }
+  // Android: requiere beforeinstallprompt (deferredPrompt)
+  if(!deferredPrompt){
+    Swal.fire({icon:'info',title:'Instalación no disponible todavía'});
+    return;
+  }
+
+  const dp = deferredPrompt;
+  dp.prompt();                           // muestra diálogo nativo de instalación
+  const choice = await dp.userChoice;    // espera la elección del usuario
+  deferredPrompt = null;                 // limpia el prompt (solo se usa una vez)
+
+  if (choice.outcome === 'accepted'){
+    // Primera alerta (Android): confirma inicio de instalación por 6 segundos
+    markInstalled();
+    __installStartShown = true;
+    Swal.fire({
   icon: 'success',
   title: '¡App instalándose!',
-  html: 'Debes esperar 1 minuto.<br><br>Al terminar este tiempo, refresca la página o busca el icono de la aplicación en la pantalla de tu dispositivo.',
-  timer: 8000,
+  html: `
+    <div style="text-align:center; margin-top:8px;">
+      <img
+        src="https://res.cloudinary.com/dqqeavica/image/upload/v1765740540/instalacion_lydtcl.gif"
+        alt="Instalando app"
+        style="width:180px; max-width:70vw; height:auto; display:block; margin:0 auto 12px;"
+      >
+      <div>Debes esperar unos segundos mientras el sistema instala la App.</div>
+      <div style="margin-top:10px;">
+        <b>Al desaparecer este aviso, puedes salir de esta vista. La App aparecerá en la pantalla principal de este dispositivo.</b>
+      </div>
+    </div>
+  `,
+  timer: 12000,
   showConfirmButton: false
 });
-    }
-    updateInstallButtonsVisibility();
-  });
+  } else {
+    Swal.fire({icon:'info',title:'Instalación cancelada'});
+  }
+
+  updateInstallButtonsVisibility();
 });
 
+async function initPWAVista(){
+  const installed = await detectInstalled();
+  if (installed){
+    showView('view-login');
+  } else {
+    showView('view-instalar');
+    updateInstallButtonsVisibility();
+  }
+}
 if ('serviceWorker' in navigator){
   window.addEventListener('load', ()=>{
     navigator.serviceWorker.register('./sw.js').catch(()=>{});
   });
 }
-
-updateInstallButtonsVisibility();
-
-/* #instalar: lógica
-   - Mostrar SIEMPRE la vista "Instalar App" primero
-   - Si está instalada, tras ~2s ir a login
-   - Si no, permanecer en la vista e iluminar botón si aplica */
-(function(){
-  let installRedirectTimer = null;
-
-  async function openOrInstall(){
-    if (location.hash !== '#instalar') return;
-
-    try{ overlay.classList.remove('open'); }catch(_){}
-    showView('view-instalar');
-
-    const installed = await detectInstalled();
-
-    if (installRedirectTimer){
-      clearTimeout(installRedirectTimer);
-      installRedirectTimer = null;
-    }
-
-    if (installed){
-      installRedirectTimer = setTimeout(()=>{
-        showView('view-login');
-      }, 2000);
-    } else {
-      updateInstallButtonsVisibility();
-    }
-  }
-
-  window.addEventListener('load', openOrInstall);
-  window.addEventListener('hashchange', openOrInstall);
-})();
+window.addEventListener('load', initPWAVista);
     
   </script>
 

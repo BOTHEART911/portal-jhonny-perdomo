@@ -20,15 +20,23 @@
   --scrim:rgba(0,0,0,.35);
 }
 html,body{
-  margin:0; padding:0; height:100%; width:100%;
+  margin:0;
+  padding:0;
+  width:100%;
   overflow-x:hidden;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   color:#111;
   background: url('https://res.cloudinary.com/dqqeavica/image/upload/v1753538930/FONDO_JHONNY_sugwsj.png') center/cover fixed no-repeat;
 }
-.container{ max-width: 1000px; margin: 0 auto; padding: 16px; }
 
-/* VISTAS con transición (VERSIÓN ÚNICA, COMO EN indexref.md) */
+.container{
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 16px;
+  padding-bottom: 0;
+}
+
+/* VISTAS con transición (sin espacios verticales sobrantes) */
 .view{
   display:none;
   opacity:0;
@@ -55,9 +63,6 @@ html,body{
 }
 .overlay .panel > *:first-child{ margin-top: 0 !important; }
 .overlay .panel > *:last-child{ margin-bottom: 0 !important; }
-
-/* Recorte global de bordes: sin espacio extra al final de la página */
-.container{ padding-bottom: 0; }
   
 /* Vista Instalar centrada, sin espacio sobrante */
 #view-instalar{

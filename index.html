@@ -387,7 +387,7 @@
 }
 
 
-    /* Vista Instalar centrada, sin card */
+     /* Vista Instalar centrada, sin card */
 #view-instalar{
   display:flex;
   align-items:center;
@@ -395,19 +395,22 @@
   min-height: calc(100dvh - 32px);
   text-align:center;
 }
-#view-instalar .brand{ width:220px; border-radius:8px; }
+#view-instalar .brand{
+  width:220px;
+  border-radius:8px;
+}
 #view-instalar .tagline{
   font-weight:800;
   color:#111;
-  margin: 0 0 4px;
+  margin:0 0 4px;
 }
 
-   /* Botón instalar PWA */
-  #btn-instalar{
-    border-radius:999px;
-    font-size:1rem;
-    padding:12px 18px;
-  }
+/* Botón instalar PWA */
+#btn-instalar{
+  border-radius:999px;
+  font-size:1rem;
+  padding:12px 18px;
+}
 
   @media (max-width:700px){
     .btn-row{ flex-direction:column; }
@@ -427,31 +430,36 @@
   background:#fff;            /* se ve bien sobre fondos oscuros */
 }
 
-   /* Quitar espacio extra arriba/abajo en todas las vistas (menu, sede, redes, etc.) */
-.view{
-  padding: 0 16px; /* sin padding vertical; se conserva solo el lateral */
-}
+    /* VISTAS con transición */
+    .view{
+      display:none;
+      opacity:0;
+      transform: translateY(8px);
+      transition: opacity .25s ease, transform .25s ease;
+      min-height: 0;
+      box-sizing:border-box;
+      padding: 0 16px;  /* sin padding vertical; solo laterales */
+    }
+    .view.active{
+      display:block;
+      opacity:1;
+      transform: translateY(0);
+    }
 
 /* Evitar márgenes colapsados del primer y último elemento dentro de cada vista */
 .view > *:first-child{ margin-top: 0 !important; }
 .view > *:last-child{ margin-bottom: 0 !important; }
 
-/* Opcional: si quieres limitarlo sólo a las vistas mencionadas
-#view-menu > *:first-child,
-#view-sede > *:first-child,
-#view-redes > *:first-child{ margin-top: 0 !important; }
-#view-menu > *:last-child,
-#view-sede > *:last-child,
-#view-redes > *:last-child{ margin-bottom: 0 !important; }
-*/
-
 /* Panel lateral (menú deslizable): sin espacio “muerto” abajo/arriba */
 .overlay .panel{
   padding-top: 16px;
-  padding-bottom: 0; /* quita espacio al final */
+  padding-bottom: 0;
 }
 .overlay .panel > *:first-child{ margin-top: 0 !important; }
 .overlay .panel > *:last-child{ margin-bottom: 0 !important; }
+
+/* Recorte global de bordes: sin espacio extra al final de la página */
+.container{ padding-bottom: 0; }
 
   /* ==== FEED NOTIFICACIONES (lista y detalle) ==== */
 .feed-list{

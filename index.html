@@ -30,9 +30,10 @@ html,body{
   max-width: 1000px;
   margin: 0 auto;
   padding: 16px;
+  padding-bottom: 0;
 }
 
-/* VISTAS con transición */
+/* VISTAS con transición, sin aire vertical extra */
 .view{
   display:none;
   opacity:0;
@@ -40,7 +41,7 @@ html,body{
   transition: opacity .25s ease, transform .25s ease;
   min-height: 0;
   box-sizing:border-box;
-  padding: 0 16px;  /* solo laterales, sin espacio arriba/abajo */
+  padding: 0 16px;           /* solo laterales, sin padding arriba/abajo */
 }
 .view.active{
   display:block;
@@ -52,26 +53,20 @@ html,body{
 .view > *:first-child{ margin-top: 0 !important; }
 .view > *:last-child{ margin-bottom: 0 !important; }
 
-/* Recorte global del contenedor para no dejar aire al final de la página */
-.container{ padding-bottom: 0; }
-
 /* Panel lateral (menú deslizable): sin espacio “muerto” abajo/arriba */
 .overlay .panel{
   padding-top: 16px;
-  padding-bottom: 0; /* igual que indexref: sin espacio al final */
+  padding-bottom: 0;
 }
 .overlay .panel > *:first-child{ margin-top: 0 !important; }
 .overlay .panel > *:last-child{ margin-bottom: 0 !important; }
-
-/* Recorte global de bordes: sin espacio extra al final de la página */
-.container{ padding-bottom: 0; }
 
 /* Vista Instalar centrada, sin espacio sobrante */
 #view-instalar{
   display:flex;
   align-items:center;
   justify-content:center;
-  min-height: 0;              /* dejamos que la tarjeta mande */
+  min-height: 0;
   padding: 0 16px;
   text-align:center;
 }
@@ -92,129 +87,135 @@ html,body{
   padding:12px 18px;
 }
 
-    /* Tarjetas y formularios */
+/* Tarjetas y formularios */
 .card{
   background: rgba(255,255,255,.06);
   backdrop-filter: blur(3px);
   border: 2px solid #ddd; border-radius: 10px;
   box-shadow: 0 8px 18px rgba(0,0,0,.15);
-  max-width: 420px; margin: 16px auto; padding: 16px 16px 6px 16px;
+  max-width: 420px; margin: 16px auto; padding: 16px 16px 10px 16px;
 }
-    h1,h2{ margin: 8px 0 12px; text-align:center; }
-    p.helper{ color:#666; font-size:.95rem; text-align:center; margin:8px 0 16px; }
-    label{ display:block; font-weight:700; margin: 10px 0 6px; color:#007BFF; }
-    input, select, textarea, button{
-      width:100%; padding:12px; box-sizing:border-box;
-      border:1.5px solid #ccc; border-radius:8px; background:#fff;
-      outline:none; transition: border-color .2s ease, transform .08s ease;
-      font-size:16px;
-    }
-    /* Toggle ver/ocultar documento en login (igual a indexref) */
-  .pwd-wrapper{
-    position:relative;
-    width:100%;
-  }
-  .pwd-wrapper input#doc-login{
-    display:block;
-    width:100%;
-    box-sizing:border-box;
-    padding-right:40px;
-  }
-  .toggle-cedula{
-    position:absolute;
-    top:50%;
-    right:10px;
-    transform:translateY(-50%);
-    background:transparent !important;
-    border:0 !important;
-    padding:0;
-    width:28px;
-    height:28px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    cursor:pointer;
-    border-radius:6px;
-  }
-  .toggle-cedula:hover{
-    background:rgba(0,0,0,.06);
-  }
-  .toggle-cedula:active{
-    transform:translateY(-50%) scale(.92);
-  }
-  .toggle-cedula:focus-visible{
-    outline:none;
-    box-shadow:0 0 0 3px rgba(6,64,43,.35);
-  }
-  .toggle-cedula img{
-    width:22px;
-    height:22px;
-    display:block;
-    pointer-events:none;
-  }
-  @media (max-width:480px){
-    .pwd-wrapper input#doc-login{ padding-right:36px; }
-    .toggle-cedula{ right:8px; width:26px; height:26px; }
-    .toggle-cedula img{ width:20px; height:20px; }
-  }
-    input:focus, select:focus, textarea:focus{ border-color:var(--primary); }
-    button{
-      cursor:pointer; border:2px solid var(--primary);
-      background:#fff; color:#000; font-weight:700;
-    }
-    button:hover{ background:var(--primary-2); color:#fff; border-color:var(--primary-2); }
-    .btn-primary{ background:var(--primary); color:#fff; }
-    .btn-row{ display:flex; gap:12px; }
-    .btn-row > *{ flex:1; }
-    .muted{ color:#666; font-size:.9rem; }
-    .center{ text-align:center; }
-    .image-center{ display:flex; justify-content:center; }
-    .brand{ width:210px; border-radius:8px; display:block; margin:12px auto 4px; }
-    .chip{
-      padding:8px 12px; border-radius:999px; border:2px solid var(--primary);
-      background:#fff; font-weight:700; color:#000;
-    }
-    .danger{ background:#e11; border-color:#e11; color:#fff; }
+h1,h2{ margin: 8px 0 12px; text-align:center; }
+p.helper{ color:#666; font-size:.95rem; text-align:center; margin:8px 0 16px; }
+label{ display:block; font-weight:700; margin: 10px 0 6px; color:#007BFF; }
+input, select, textarea, button{
+  width:100%; padding:12px; box-sizing:border-box;
+  border:1.5px solid #ccc; border-radius:8px; background:#fff;
+  outline:none; transition: border-color .2s ease, transform .08s ease;
+  font-size:16px;
+}
+/* Toggle ver/ocultar documento en login (igual a indexref) */
+.pwd-wrapper{
+  position:relative;
+  width:100%;
+}
+.pwd-wrapper input#doc-login{
+  display:block;
+  width:100%;
+  box-sizing:border-box;
+  padding-right:40px;
+}
+.toggle-cedula{
+  position:absolute;
+  top:50%;
+  right:10px;
+  transform:translateY(-50%);
+  background:transparent !important;
+  border:0 !important;
+  padding:0;
+  width:28px;
+  height:28px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  border-radius:6px;
+}
+.toggle-cedula:hover{
+  background:rgba(0,0,0,.06);
+}
+.toggle-cedula:active{
+  transform:translateY(-50%) scale(.92);
+}
+.toggle-cedula:focus-visible{
+  outline:none;
+  box-shadow:0 0 0 3px rgba(6,64,43,.35);
+}
+.toggle-cedula img{
+  width:22px;
+  height:22px;
+  display:block;
+  pointer-events:none;
+}
+@media (max-width:480px){
+  .pwd-wrapper input#doc-login{ padding-right:36px; }
+  .toggle-cedula{ right:8px; width:26px; height:26px; }
+  .toggle-cedula img{ width:20px; height:20px; }
+}
+input:focus, select:focus, textarea:focus{ border-color:var(--primary); }
+button{
+  cursor:pointer; border:2px solid var(--primary);
+  background:#fff; color:#000; font-weight:700;
+}
+button:hover{ background:var(--primary-2); color:#fff; border-color:var(--primary-2); }
+.btn-primary{ background:var(--primary); color:#fff; }
+.btn-row{ display:flex; gap:12px; }
+.btn-row > *{ flex:1; }
+.muted{ color:#666; font-size:.9rem; }
+.center{ text-align:center; }
+.image-center{ display:flex; justify-content:center; align-items:center; }
+.brand{ width:210px; border-radius:8px; display:block; margin:12px auto 4px; }
+.chip{
+  padding:8px 12px; border-radius:999px; border:2px solid var(--primary);
+  background:#fff; font-weight:700; color:#000;
+}
+.danger{ background:#e11; border-color:#e11; color:#fff; }
 
-    /* OVERLAY BANNER LATERAL */
-    .overlay{ position: fixed; inset: 0; pointer-events:none; }
-    .overlay .scrim{ position:absolute; inset:0; background:var(--scrim);
-      opacity:0; transition:opacity .25s ease;
-    }
-    .overlay .panel{
-      position:absolute; top:0; left:0; width:min(360px, 90vw); height:100%;
-      background:#2f6bdb; color:#fff; padding:16px 16px 8px 16px; box-sizing:border-box;
-      transform: translateX(-100%); transition: transform .25s ease;
-      display:flex; flex-direction:column; gap:10px; overflow-y:auto;
-      min-height: 0;
-    }
-    .overlay.open{ pointer-events:auto; }
-    .overlay.open .scrim{ opacity:1; }
-    .overlay.open .panel{ transform: translateX(0); }
-    .panel h3{ margin: 4px 0 8px; text-align:center; }
-    .menu-btn{
-      background:#7de3ef; color:#000; border:0; font-weight:800;
-      border-radius:999px; padding:12px; box-shadow: 0 6px 12px rgba(0,0,0,.18);
-    }
-   
-    /* VIDEO */
-    .video-card{
-      position:relative; width: min(560px, 90vw); aspect-ratio: 16 / 9;
-      margin: 12px auto; background:#000; border-radius: 14px; overflow:hidden;
-      border:2px solid #ddd; box-shadow: 0 10px 24px rgba(0,0,0,.25);
-    }
-    .video-card .video-thumb{
-      position:absolute; inset:0; width:100%; height:100%;
-      object-fit:cover; display:block;
-    }
-    .video-card .play-layer{
-      position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-      background: radial-gradient(circle at center, rgba(255,255,255,.18), rgba(0,0,0,.55));
-      color:#fff; font-size: 64px; cursor:pointer; transition: opacity .2s ease;
-    }
-    .video-card.playing .play-layer{ opacity:0; pointer-events:none; }
-    .video-card.playing .video-thumb{ display:none; }
-    .video-card iframe{ width:100%; height:100%; display:block; }
+/* Quitar márgenes extra en el copyright para evitar aire al final */
+p.center.muted{
+  margin-top:4px;
+  margin-bottom:0;
+}
+
+/* OVERLAY BANNER LATERAL */
+.overlay{ position: fixed; inset: 0; pointer-events:none; }
+.overlay .scrim{ position:absolute; inset:0; background:var(--scrim);
+  opacity:0; transition:opacity .25s ease;
+}
+.overlay .panel{
+  position:absolute; top:0; left:0; width:min(360px, 90vw); height:100%;
+  background:#2f6bdb; color:#fff; padding:16px 16px 8px 16px; box-sizing:border-box;
+  transform: translateX(-100%); transition: transform .25s ease;
+  display:flex; flex-direction:column; gap:10px; overflow-y:auto;
+  min-height: 0;
+}
+.overlay.open{ pointer-events:auto; }
+.overlay.open .scrim{ opacity:1; }
+.overlay.open .panel{ transform: translateX(0); }
+.panel h3{ margin: 4px 0 8px; text-align:center; }
+.menu-btn{
+  background:#7de3ef; color:#000; border:0; font-weight:800;
+  border-radius:999px; padding:12px; box-shadow: 0 6px 12px rgba(0,0,0,.18);
+}
+
+/* VIDEO */
+.video-card{
+  position:relative; width: min(560px, 90vw); aspect-ratio: 16 / 9;
+  margin: 12px auto; background:#000; border-radius: 14px; overflow:hidden;
+  border:2px solid #ddd; box-shadow: 0 10px 24px rgba(0,0,0,.25);
+}
+.video-card .video-thumb{
+  position:absolute; inset:0; width:100%; height:100%;
+  object-fit:cover; display:block;
+}
+.video-card .play-layer{
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  background: radial-gradient(circle at center, rgba(255,255,255,.18), rgba(0,0,0,.55));
+  color:#fff; font-size: 64px; cursor:pointer; transition: opacity .2s ease;
+}
+.video-card.playing .play-layer{ opacity:0; pointer-events:none; }
+.video-card.playing .video-thumb{ display:none; }
+.video-card iframe{ width:100%; height:100%; display:block; }
 
 /* Loader centrado (overlay) */
 .loader{
@@ -222,12 +223,12 @@ html,body{
   display:flex; align-items:center; justify-content:center;
   background:rgba(0,0,0,.35);
   z-index:9999; backdrop-filter: blur(2px);
-  opacity:1; transition: opacity .12s ease; /* antes .2s */
+  opacity:1; transition: opacity .12s ease;
   will-change: opacity;
 }
 /* Para que el loader haga fade-out pero NO afecte otros .hidden */
 .loader.hidden{
-  display:flex !important; /* sobreescribe .hidden genérico solo para el loader */
+  display:flex !important;
   opacity:0; pointer-events:none;
 }
 
@@ -241,7 +242,6 @@ html,body{
   background:#fff; border-radius:3px;
   opacity:.2;
   animation:iosFade 1.2s linear infinite;
-  /* Cada barra se ubica por rotación y se aleja hacia arriba */
   transform-origin: center center;
 }
 
@@ -251,7 +251,7 @@ html,body{
   40% { opacity:1; }
 }
 
-/* 12 barras, separadas 30° y con retraso escalonado */
+/* 12 barras */
 .spinner-ios i:nth-child(1)  { transform: rotate(  0deg) translateY(-24px); animation-delay:-1.1s; }
 .spinner-ios i:nth-child(2)  { transform: rotate( 30deg) translateY(-24px); animation-delay:-1.0s; }
 .spinner-ios i:nth-child(3)  { transform: rotate( 60deg) translateY(-24px); animation-delay:-0.9s; }
@@ -270,12 +270,12 @@ html,body{
 .narrow{ max-width: 520px; margin: 0 auto; }
 .spaced{ margin-top:12px; }
 
-/* INSERT: tarjeta de mapa estático (similar a video-card) */
+/* Tarjeta de mapa estático */
 .map-card{
-  width: 100%;              /* que se ajuste al ancho del card */
+  width: 100%;
   max-width: 100%;
-  aspect-ratio: 16 / 9;     /* mantiene proporción 16:9 */
-  margin: 12px 0;           /* mismo espaciado que otros medios dentro del card */
+  aspect-ratio: 16 / 9;
+  margin: 12px 0;
   border-radius: 14px;
   overflow: hidden;
   border: 2px solid #ddd;
@@ -291,36 +291,35 @@ html,body{
   border: 0;
 }
 
-/* FIX mapa responsivo dentro del card (no se sale en móvil) */
+/* Mapa responsivo dentro del card */
 #view-sede .map-embed{
   position: relative;
-  width: 100%;              /* ocupa el ancho del card */
-  aspect-ratio: 16 / 9;     /* mantiene proporción 16:9 */
+  width: 100%;
+  aspect-ratio: 16 / 9;
   border-radius: 14px;
   overflow: hidden;
   border: 2px solid #ddd;
   box-shadow: 0 10px 24px rgba(0,0,0,.25);
   background:#000;
-  margin: 12px 0;           /* igual que otras tarjetas de media */
+  margin: 12px 0;
 }
 #view-sede .map-embed iframe{
   position:absolute; inset:0;
   width:100%; height:100%; border:0; display:block;
 }
 
-/* Si accidentalmente vuelves a usar .video-card para el mapa en esta vista,
-   garantizamos que no use 90vw y no se salga del card */
+/* Si se usa .video-card para el mapa en esta vista */
 #view-sede .video-card{
   width:100% !important;
   max-width:100%;
   margin:12px 0;
-  border-radius:14px; 
+  border-radius:14px;
   overflow:hidden;
 }
 
 @media (max-width: 700px){ .btn-row{ flex-direction:column; } }
 
-    /* Redes sociales: botones con icono, responsivos */
+/* Redes sociales: botones con icono */
 .social-grid{
   display:grid;
   grid-template-columns: 1fr;
@@ -341,12 +340,11 @@ html,body{
   width:26px; height:26px; object-fit:contain; margin-left:10px;
   border-radius:4px; background:#fff;
 }
-/* En pantallas anchas se pueden ver en 2 columnas */
 @media (min-width: 560px){
   .social-grid{ grid-template-columns: 1fr 1fr; }
 }
 
-  /* ==== REFERIDOS (vista líder) ==== */
+/* REFERIDOS (vista líder) */
 .ref-summary-wrap{
   display:flex; flex-direction:column; align-items:center; justify-content:center;
   gap:8px; margin:8px 0 16px;
@@ -417,7 +415,7 @@ html,body{
 
 .ref-details{
   display:flex;
-  flex-direction:column;   /* <- apila cada línea */
+  flex-direction:column;
   gap:4px;
   font-size:.75rem; color:#333; font-weight:600;
 }
@@ -442,23 +440,21 @@ html,body{
   .ref-filter-input{ width:100%; max-width:100%; }
 }
 
-
-    /* Botón con icono */
+/* Botón con icono */
 .btn-with-icon{
-  display:flex;               /* mantiene el ancho 100% del botón y centra contenido */
+  display:flex;
   align-items:center;
   justify-content:center;
-  gap:10px;                   /* espacio entre icono y texto */
+  gap:10px;
 }
 .btn-with-icon img{
   width:22px; height:22px;
   object-fit:contain;
   border-radius:4px;
-  background:#fff;            /* se ve bien sobre fondos oscuros */
+  background:#fff;
 }
 
-  
-  /* ==== FEED NOTIFICACIONES (lista y detalle) ==== */
+/* FEED NOTIFICACIONES */
 .feed-list{
   display:flex; flex-direction:column; gap:12px;
 }
@@ -484,7 +480,7 @@ html,body{
   display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; text-overflow:ellipsis;
 }
 
-/* Punto rojo (no leído) en ítem de lista */
+/* Punto rojo (no leído) */
 .feed-dot{
   width:12px; height:12px; background:#e11; border-radius:999px; flex-shrink:0; margin-left:6px; margin-top:4px;
   box-shadow: 0 0 0 2px #fff;
@@ -508,10 +504,6 @@ html,body{
 .feed-detail-desc{
   text-align:justify; color:#222; white-space:pre-line;
 }
-.feed-actions{ display:flex; gap:12px; margin-top:12px; }
-.feed-actions > *{ flex:1; }
-
-  /* Feed detail: acciones en columna */
 .feed-actions{
   display:flex;
   flex-direction:column;
@@ -547,16 +539,16 @@ html,body{
   100%{ transform: scale(1); }
 }
 
-  .image-center{ display:flex; justify-content:center; align-items:center; }
-
-  /* Evitar desbordes en detalle (URLs y palabras largas) */
-.feed-detail-desc{
-  overflow-wrap:anywhere;   /* fuerza corte de palabras muy largas/URLs */
-  word-break:break-word;    /* respaldo */
-  max-width:100%;
+.notif-label{
+  position:absolute; left:calc(100% + 6px); top:-6px;
+  height:28px; line-height:28px; padding:0 10px;
+  background:#7de3ef; color:#000; border-radius:999px;
+  font-weight:800; font-size:14px; white-space:nowrap; display:none;
+  animation:heartbeat 1.2s infinite;
+  cursor: pointer;
 }
 
-  /* Badge del botón "Ponte al día" en el menú lateral */
+/* Badge del botón "Ponte al día" en el menú lateral */
 .menu-btn{ position:relative; }
 .btn-badge{
   position:absolute; right:-6px; top:-6px;
@@ -566,20 +558,16 @@ html,body{
   box-shadow: 0 0 0 2px #fff;
 }
 .btn-badge.active{ display:inline-block; }
-
-/* Etiqueta "Ponte al día" junto a la campana, con el mismo latido */
-.notif-label{
-  position:absolute; left:calc(100% + 6px); top:-6px;
-  height:28px; line-height:28px; padding:0 10px;
-  background:#7de3ef; color:#000; border-radius:999px;
-  font-weight:800; font-size:14px; white-space:nowrap; display:none;
-  animation:heartbeat 1.2s infinite; /* mismo efecto que la campana */
-}
 .notif-label.active{ display:inline-block; }
 
-  .notif-label{ cursor: pointer; }
+/* Evitar desbordes en detalle (URLs y palabras largas) */
+.feed-detail-desc{
+  overflow-wrap:anywhere;
+  word-break:break-word;
+  max-width:100%;
+}
 
-  /* ==== LIBRETA DE CONTACTOS ==== */
+/* LIBRETA DE CONTACTOS */
 .contact-list{
   display:flex; flex-direction:column; gap:12px;
 }
@@ -590,8 +578,8 @@ html,body{
   box-shadow: 0 6px 14px rgba(0,0,0,.12);
 }
 .contact-name{
-  font-weight:900; color:#1b2a6b; /* afín al estilo del portal */
-  flex:1; min-width:0;            /* permite crecer si el nombre es largo */
+  font-weight:900; color:#1b2a6b;
+  flex:1; min-width:0;
   text-transform:uppercase;
 }
 .contact-actions{
@@ -605,14 +593,12 @@ html,body{
 .contact-actions img{
   width:26px; height:26px; object-fit:contain; border-radius:6px; background:#fff;
 }
-
-/* Texto guía bajo el título */
 .contact-hint{
   text-align:center; color:#333; margin-top:0; margin-bottom:12px;
 }
 .contact-hint img{ width:20px; height:20px; vertical-align:middle; border-radius:4px; background:#fff; }
 
-  /* ==== Comerciantes Amigos ==== */
+/* Comerciantes Amigos */
 .com-top{
   text-align:center;
   margin: 0 auto 10px;
@@ -642,29 +628,20 @@ html,body{
   grid-template-columns: 1fr;
 }
 @media (min-width: 1024px){
-  /* Ensancha el ancho útil de la sección (sin afectar móviles) */
   #view-comerciantes .card.narrow{
-    max-width: 1100px; /* ajusta si quieres más/menos ancho en PC */
+    max-width: 1100px;
   }
-
-  /* Grid:
-     - 1 comercio: se centra
-     - 2+ comercios: 2 columnas
-     - Columnas un poco más anchas en PC
-  */
   #view-comerciantes .com-list{
     grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
-    justify-content: center; /* centra cuando solo hay 1 ítem */
+    justify-content: center;
   }
-
-  /* Evita que una tarjeta crezca de lado a lado cuando es única */
   #view-comerciantes .com-card{
     max-width: 520px;
-    margin: 0 auto; /* centra cada tarjeta en su celda */
+    margin: 0 auto;
   }
 }
 
-  /* NUEVO: contenedor del botón inferior de Comerciantes (fuera del grid) */
+/* contenedor botón inferior Comerciantes */
 #view-comerciantes .com-bottom-actions{
   display:flex;
   justify-content:center;
@@ -692,23 +669,20 @@ html,body{
   display:block; margin: 6px 0 10px;
 }
 .com-card-desc{
-  color:#666; font-size:.8rem; margin:0 0 10px; text-align:justify; /* mismo tamaño y color que subtítulo */
+  color:#666; font-size:.8rem; margin:0 0 10px; text-align:justify;
 }
 .com-card-hi{
   background:#c6f6d5; color:#000; border:2px solid #16a34a;
   border-radius:12px; padding:10px; font-weight:800;
   text-align:center; margin: 0 0 10px;
 }
-/* Etiqueta pequeña centrada encima de cada oferta */
 .com-offer-label{
   font-size:.75rem;
   text-align:center;
   font-weight:700;
-  color:#000; /* negro */
+  color:#000;
   margin: 4px 0 6px;
 }
-
-/* Recuadro Estándar (verde más traslúcido) */
 .com-card-std{
   background: rgba(22,163,74,.08);
   color:#000;
@@ -731,26 +705,16 @@ html,body{
 .com-card-actions img{
   width:24px; height:24px; object-fit:contain; border-radius:6px; background:#fff;
 }
-
-  /* Centrar únicamente el chip con la categoría seleccionada */
 .com-spec #com-cat-chip{
-  display: table;           /* permite centrar con margin:auto aunque el contenedor esté justificado */
-  margin: 0 auto 8px;       /* centrado horizontal + separación inferior */
-  text-align: center;       /* por si el texto se parte en 2 líneas */
+  display: table;
+  margin: 0 auto 8px;
+  text-align: center;
 }
-
-/* Asegurar justificación del bloque de especificación (texto largo) */
 .com-spec{
   text-align: justify;
 }
 
-/* Asegurar que la descripción dentro de cada tarjeta esté justificada */
-.com-card-desc{
-  color:#666;
-  font-size:.8rem;          /* mismo tamaño que el subtítulo */
-  margin:0 0 10px;
-  text-align: justify;
-}
+/* Sonido botón menú se mantiene */
 </style>
   
 </head>
@@ -975,7 +939,7 @@ html,body{
 
     <!-- VISTA 2: MENÚ -->
 <section id="view-menu" class="view">
-  <div class="btn-row" style="margin-bottom:12px;">
+  <div class="btn-row" style="margin-bottom:4px;">
     <button class="chip" id="btn-open-menu">MENÚ</button>
     <button class="chip danger" id="btn-logout">Cerrar Sesión</button>
   </div>
@@ -1860,13 +1824,18 @@ function stopLoading(){
     let currentUser = null;
 
     // Helpers de vistas
-  function showView(id){
+ function showView(id){
   for(const el of document.querySelectorAll('.view')) el.classList.remove('active');
   document.getElementById(id).classList.add('active');
   overlay.classList.remove('open');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  // Al entrar al Menú, refresca el badge (y sonido una sola vez)
+  const target = document.getElementById(id);
+  if (target && typeof target.scrollIntoView === 'function'){
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } else {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   if(id === 'view-menu'){ refreshNotificationsBadge(); }
 }
     

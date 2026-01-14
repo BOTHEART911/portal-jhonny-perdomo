@@ -28,15 +28,15 @@ html,body{
 }
 .container{ max-width: 1000px; margin: 0 auto; padding: 16px; }
 
-   /* VISTAS con transición (VERSIÓN ÚNICA, COMO EN indexref.md) */
+/* VISTAS con transición (VERSIÓN ÚNICA, COMO EN indexref.md) */
 .view{
   display:none;
   opacity:0;
   transform: translateY(8px);
   transition: opacity .25s ease, transform .25s ease;
-  min-height: 0;              /* no forzamos altura extra */
+  min-height: 0;
   box-sizing:border-box;
-  padding: 0 16px;            /* sin padding vertical, solo laterales */
+  padding: 0 16px;
 }
 .view.active{
   display:block;
@@ -64,7 +64,7 @@ html,body{
   display:flex;
   align-items:center;
   justify-content:center;
-  min-height: 0;              /* dejamos que la tarjeta mande */
+  min-height: 0;
   padding: 0 16px;
   text-align:center;
 }

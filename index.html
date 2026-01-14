@@ -38,9 +38,9 @@ html,body{
   opacity:0;
   transform: translateY(8px);
   transition: opacity .25s ease, transform .25s ease;
-  min-height: 0;             /* sin altura forzada extra */
+  min-height: 0;
   box-sizing:border-box;
-  padding: 0 16px;           /* sin padding vertical, solo laterales */
+  padding: 0 16px;  /* solo laterales, sin espacio arriba/abajo */
 }
 .view.active{
   display:block;
@@ -51,6 +51,9 @@ html,body{
 /* Evitar márgenes colapsados del primer y último elemento dentro de cada vista */
 .view > *:first-child{ margin-top: 0 !important; }
 .view > *:last-child{ margin-bottom: 0 !important; }
+
+/* Recorte global del contenedor para no dejar aire al final de la página */
+.container{ padding-bottom: 0; }
 
 /* Panel lateral (menú deslizable): sin espacio “muerto” abajo/arriba */
 .overlay .panel{
@@ -90,13 +93,13 @@ html,body{
 }
 
     /* Tarjetas y formularios */
-    .card{
-      background: rgba(255,255,255,.06);
-      backdrop-filter: blur(3px);
-      border: 2px solid #ddd; border-radius: 10px;
-      box-shadow: 0 8px 18px rgba(0,0,0,.15);
-      max-width: 420px; margin: 16px auto; padding: 16px 16px 10px 16px; /* menos padding abajo */
-    }
+.card{
+  background: rgba(255,255,255,.06);
+  backdrop-filter: blur(3px);
+  border: 2px solid #ddd; border-radius: 10px;
+  box-shadow: 0 8px 18px rgba(0,0,0,.15);
+  max-width: 420px; margin: 16px auto; padding: 16px 16px 6px 16px;
+}
     h1,h2{ margin: 8px 0 12px; text-align:center; }
     p.helper{ color:#666; font-size:.95rem; text-align:center; margin:8px 0 16px; }
     label{ display:block; font-weight:700; margin: 10px 0 6px; color:#007BFF; }

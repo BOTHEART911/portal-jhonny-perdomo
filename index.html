@@ -3727,27 +3727,29 @@ function renderReferidos(list){
 
     const rawPhone = it.telefono == null ? '' : String(it.telefono);
     const telDigits = rawPhone.replace(/\D/g,'');
-    const waFull = telDigits
-      ? (telDigits.startsWith('57') ? telDigits : ('57' + telDigits.slice(-10)))
+
+    // Para WhatsApp y llamada usamos el mismo número base.
+    // Si no trae 57 y parece celular colombiano, se lo agregamos.
+    const basePhone = telDigits
+      ? (telDigits.startsWith('57') ? telDigits : '57' + telDigits.slice(-10))
       : '';
 
     // Botón WhatsApp: abre modal con mensaje opcional
-    if(waFull){
+    if(basePhone){
       const btnWa = document.createElement('button');
       btnWa.type = 'button';
       btnWa.className = 'ref-wa';
-      btnWa.setAttribute('data-wa', waFull);
+      btnWa.setAttribute('data-wa', basePhone);
       btnWa.setAttribute('aria-label','Enviar WhatsApp');
       const imgWa = document.createElement('img');
       imgWa.src = 'https://res.cloudinary.com/dqqeavica/image/upload/v1759166341/WhatsApp_mljaqm.webp';
       imgWa.alt = '';
       btnWa.appendChild(imgWa);
 
-      // IMPORTANTE: este listener evita que el click
-      // se “suba” a la tarjeta y solo abra el modal.
+      // Evita que el clic se “suba” a la tarjeta y no abra el modal
       btnWa.addEventListener('click', (ev)=>{
         ev.stopPropagation();
-        abrirModalWhatsappRef(waFull);
+        abrirModalWhatsappRef(basePhone);
       });
 
       actions.appendChild(btnWa);
@@ -3758,13 +3760,8 @@ function renderReferidos(list){
       const aTel = document.createElement('a');
       aTel.className = 'ref-wa';
 
-      // Aquí se antepone el signo correspondiente y el indicativo,
-      // usando 57 si el número no lo trae.
-      const fullTel = telDigits.startsWith('57')
-        ? telDigits
-        : '57' + telDigits.slice(-10);
-
-      aTel.href = 'tel:' + fullTel;
+      // Se usa el mismo número normalizado con indicativo.
+      aTel.href = 'tel:' + basePhone;
       aTel.setAttribute('aria-label','Llamar al contacto');
       const imgTel = document.createElement('img');
       imgTel.src = 'https://res.cloudinary.com/dqqeavica/image/upload/v1759952569/Llamada_hra2ch.webp';

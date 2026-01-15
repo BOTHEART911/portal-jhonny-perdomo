@@ -3742,7 +3742,12 @@ function renderReferidos(list){
       imgWa.src = 'https://res.cloudinary.com/dqqeavica/image/upload/v1759166341/WhatsApp_mljaqm.webp';
       imgWa.alt = '';
       btnWa.appendChild(imgWa);
-      btnWa.addEventListener('click', ()=> abrirModalWhatsappRef(waFull));
+
+      btnWa.addEventListener('click', (ev)=> {
+        ev.stopPropagation();
+        abrirModalWhatsappRef(waFull);
+      });
+
       actions.appendChild(btnWa);
     }
 
@@ -3750,7 +3755,7 @@ function renderReferidos(list){
     if(telDigits){
       const aTel = document.createElement('a');
       aTel.className = 'ref-wa';
-      aTel.href = 'tel:' + telDigits;
+      aTel.href = 'tel:' + (telDigits.startsWith('57') ? telDigits : ('57' + telDigits.slice(-10)));
       aTel.setAttribute('aria-label','Llamar al contacto');
       const imgTel = document.createElement('img');
       imgTel.src = 'https://res.cloudinary.com/dqqeavica/image/upload/v1759952569/Llamada_hra2ch.webp';
@@ -3762,7 +3767,6 @@ function renderReferidos(list){
     card.appendChild(top);
     card.appendChild(det);
     card.appendChild(actions);
-    wrap.appendChild(card);
   }
 }
 

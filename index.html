@@ -3755,13 +3755,13 @@ function renderReferidos(list){
       actions.appendChild(btnWa);
     }
 
-    // Botón de llamada telefónica
-    if(telDigits){
+       // Botón de llamada telefónica
+    if (telDigits){
       const aTel = document.createElement('a');
       aTel.className = 'ref-wa';
 
-      // Se usa el mismo número normalizado con indicativo.
-      aTel.href = 'tel:' + basePhone;
+      // Se usa el mismo número normalizado con indicativo y un prefijo más
+      aTel.href = 'tel:' + '+' + basePhone;
       aTel.setAttribute('aria-label','Llamar al contacto');
       const imgTel = document.createElement('img');
       imgTel.src = 'https://res.cloudinary.com/dqqeavica/image/upload/v1759952569/Llamada_hra2ch.webp';
@@ -3799,6 +3799,18 @@ function ocultarModalWhatsappRef(){
 function abrirModalWhatsappRef(phone){
   MW_CURRENT_PHONE = phone;
   mostrarModalWhatsappRef();
+
+  // Ajuste visual para que el modal no quede “tapado”
+  const modal = document.getElementById('modal-wa-ref');
+  if (modal){
+    modal.style.position = 'fixed';
+    modal.style.left = '0';
+    modal.style.top = '0';
+    modal.style.right = '0';
+    modal.style.bottom = '0';
+    modal.style.zIndex = '99999';
+    modal.style.display = 'flex';
+  }
 }
 
 (function initModalWhatsappRef(){

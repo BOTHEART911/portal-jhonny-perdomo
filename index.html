@@ -1512,8 +1512,6 @@ button:hover{ background:var(--primary-2); color:#fff; border-color:var(--primar
     </div>
   </section> 
 
-    
-
     <!-- VISTA 9: CASA SOCIAL -->
 <section id="view-sede" class="view">
   <div class="card narrow">
@@ -1557,31 +1555,9 @@ button:hover{ background:var(--primary-2); color:#fff; border-color:var(--primar
       </p>
     </div>
   </div>
+
   
   <!-- Forzar abrir Google Maps app con fallback a web -->
-
-   <!-- Modal WhatsApp para Mis Referidos -->
-<div class="modal fade" id="modalWhatsappReferido" tabindex="-1" aria-labelledby="modalWhatsappReferidoLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <form id="formWhatsappReferido">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="modalWhatsappReferidoLabel">Enviar WhatsApp</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-        <div class="modal-body">
-          <label for="mensajeWhatsappReferido">Mensaje:</label>
-          <textarea class="form-control" id="mensajeWhatsappReferido" rows="4" placeholder="Escribe tu mensaje aquí"></textarea>
-        </div>
-        <div class="modal-footer">
-          <button id="btnEnviarWhatsappReferido" type="submit" class="boton-efecto" style="background: #25D366;">Enviar</button>
-        </div>
-      </div>
-    </form>
-  </div>
-</div>
-
-  
   <script>
     (function(){
       const btn = document.getElementById('btn-como-llegar');
@@ -1859,6 +1835,7 @@ window.addEventListener('load', initPWAVista);
   </div>
 </section>
 
+
   <!-- VISTA 11: PONTE AL DÍA (lista) -->
 <section id="view-feed" class="view">
   <div class="card narrow" style="padding-top:12px;">
@@ -1906,6 +1883,27 @@ window.addEventListener('load', initPWAVista);
     </div>
   </div>
 </section>
+
+    <!-- Modal WhatsApp para Mis Referidos -->
+<div class="modal fade" id="modalWhatsappReferido" tabindex="-1" aria-labelledby="modalWhatsappReferidoLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form id="formWhatsappReferido">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalWhatsappReferidoLabel">Enviar WhatsApp</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <label for="mensajeWhatsappReferido">Mensaje:</label>
+          <textarea class="form-control" id="mensajeWhatsappReferido" rows="4" placeholder="Escribe tu mensaje aquí"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button id="btnEnviarWhatsappReferido" type="submit" class="boton-efecto" style="background: #25D366;">Enviar</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
 
   <script>
     // URL de tu Apps Script desplegado
@@ -2065,7 +2063,7 @@ function stopLoading(){
     }
 
     // Ocultar botón si no es Lider
-      function updateLeaderUI(isLeader){
+     function updateLeaderUI(isLeader){
   try{
     const btnLider = document.getElementById('go-lider');
     const btnRef   = document.getElementById('go-referidos');
@@ -3805,11 +3803,7 @@ function renderReferidos(list){
   });
 })();
 
-
-// Botón Regresar (aplica estilos/sonido existentes)
-document.getElementById('ref-volver').addEventListener('click', ()=> showView('view-menu'));
-
-     // Modal WhatsApp para Mis Referidos
+    // Modal WhatsApp para Mis Referidos
 let telefonoReferidoActual = '';
 
 function abrirModalWhatsappReferido(numeroWhatsApp){
@@ -3853,6 +3847,9 @@ document.getElementById('formWhatsappReferido').addEventListener('submit', funct
     if(instance) instance.hide();
   }
 });
+
+// Botón Regresar (aplica estilos/sonido existentes)
+document.getElementById('ref-volver').addEventListener('click', ()=> showView('view-menu'));
 
   </script>
 </body>

@@ -3721,12 +3721,15 @@ function renderReferidos(list){
     det.appendChild(docSpan);
     det.appendChild(resSpan);
 
-    // Actions (solo WhatsApp)
-        const actions = document.createElement('div');
+    // Acciones: WhatsApp + Teléfono
+    const actions = document.createElement('div');
     actions.className = 'ref-actions';
 
-    const telDigits = String(it.telefono||'').replace(/\D/g,'');
-    const waFull = telDigits ? (telDigits.startsWith('57') ? telDigits : ('57'+telDigits.slice(-10))) : '';
+    const rawPhone = it.telefono == null ? '' : String(it.telefono);
+    const telDigits = rawPhone.replace(/\D/g,'');
+    const waFull = telDigits
+      ? (telDigits.startsWith('57') ? telDigits : ('57' + telDigits.slice(-10)))
+      : '';
 
     // Botón WhatsApp: abre modal con mensaje opcional
     if(waFull){
@@ -3743,7 +3746,7 @@ function renderReferidos(list){
       actions.appendChild(btnWa);
     }
 
-    // Nuevo: botón de llamada telefónica (igual estilo que Libreta de contactos)
+    // Botón de llamada telefónica
     if(telDigits){
       const aTel = document.createElement('a');
       aTel.className = 'ref-wa';
@@ -3759,6 +3762,7 @@ function renderReferidos(list){
     card.appendChild(top);
     card.appendChild(det);
     card.appendChild(actions);
+    wrap.appendChild(card);
   }
 }
 

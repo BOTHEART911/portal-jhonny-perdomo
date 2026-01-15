@@ -829,6 +829,26 @@ button:hover{ background:var(--primary-2); color:#fff; border-color:var(--primar
   text-align: justify;
 }
 
+  /* MODAL WHATSAPP REFERIDOS - estilos */
+#modal-wa-ref{
+  position:fixed;
+  inset:0;
+  z-index:10000;
+  background:rgba(0,0,0,.45);
+  display:none;
+}
+
+#modal-wa-ref.show{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+#modal-wa-ref .swal2-popup{
+  width:90%;
+  max-width:420px;
+}
+
 </style>
   
 </head>
@@ -3781,112 +3801,89 @@ function renderReferidos(list){
 }
 
 
-    // Lógica modal WhatsApp para Mis Referidos
-let MW_CURRENT_PHONE = null;
+   /* ===== MODAL WHATSAPP REFERIDOS ===== */
+const modalWaRef  = document.getElementById('modal-wa-ref');
+const mwMensaje   = document.getElementById('mw-mensaje');
+const mwEnviar    = document.getElementById('mw-enviar');
+const mwCancelar  = document.getElementById('mw-cancelar');
+const mwClose     = document.getElementById('mw-close');
 
-function mostrarModalWhatsappRef(){
-  const modal = document.getElementById('modal-wa-ref');
-  if(!modal) return;
+let telActualWa = '';
 
-  // Asegurar que el contenedor cubra toda la pantalla y quede encima
-  modal.style.display = 'flex';
-  modal.style.position = 'fixed';
-  modal.style.left = '0';
-  modal.style.top = '0';
-  modal.style.right = '0';
-  modal.style.bottom = '0';
-  modal.style.zIndex = '10000';
-
-  // Forzar que tenga las clases correctas de SweetAlert
-  modal.classList.add('swal2-container', 'swal2-center', 'swal2-backdrop-show');
+function abrirModalWa(tel){
+  telActualWa = (tel || '').toString().trim();
+  if(!telActualWa){
+    Swal.fire({icon:'info',title:'Sin número registrado'});
+    return;
+  }
+  if(mwMensaje){ mwMensaje.value = ''; }
+  if(modalWaRef){
+    modalWaRef.style.display = 'flex';
+  }
 }
 
-function ocultarModalWhatsappRef(){
-  const modal = document.getElementById('modal-wa-ref');
-  if(!modal) return;
-
-  modal.style.display = 'none';
-
-  // Limpiar mensaje
-  const txt = document.getElementById('mw-mensaje');
-  if(txt) txt.value = '';
-
-  // Opcional: quitar clases para dejarlo “limpio”
-  modal.classList.remove('swal2-backdrop-show');
+function cerrarModalWa(){
+  if(modalWaRef){
+    modalWaRef.style.display = 'none';
+  }
+  telActualWa = '';
 }
 
-function abrirModalWhatsappRef(phone){
-  const modal = document.getElementById('modal-wa-ref');
-  const ta    = document.getElementById('mw-mensaje');
-  const btnClose   = document.getElementById('mw-close');
-  const btnCancel  = document.getElementById('mw-cancelar');
-  const btnSend    = document.getElementById('mw-enviar');
+// cerrar modal por botones
+if(mwCancelar){ mwCancelar.onclick = cerrarModalWa; }
+if(mwClose){ mwClose.onclick = cerrarModalWa; }
 
-  if (!modal || !ta || !btnClose || !btnCancel || !btnSend) return;
+// enviar whatsapp
+if(mwEnviar){
+  mwEnviar.onclick = function(){
+    if(!telActualWa){
+      Swal.fire({icon:'info',title:'Sin número'});
+      return;
+    }
+    const msg = (mwMensaje && mwMensaje.value) ? mwMensaje.value : '';
+    const telLimpio = telActualWa.replace(/\D/g,'');
+    const urlBase = /android|iphone|ipad|mobile/i.test(navigator.userAgent)
+      ? 'whatsapp://send?phone='
+      : 'https://api.whatsapp.com/send?phone=';
 
-  ta.value = '';
-
-  const closeModal = () => {
-    modal.style.display = 'none';
+    const url = urlBase + telLimpio + (msg ? '&text=' + encodeURIComponent(msg) : '');
+    cerrarModalWa();
+    window.open(url,'_blank');
   };
-
-  btnClose.onclick  = closeModal;
-  btnCancel.onclick = closeModal;
-
-  btnSend.onclick = () => {
-    const text = ta.value || '';
-    const encoded = encodeURIComponent(text);
-    const esMovil = /android|iphone|ipad|mobile/i.test(navigator.userAgent);
-
-    const urlBase = esMovil ? 'whatsapp://send?' : 'https://api.whatsapp.com/send?';
-    const url = urlBase + 'phone=' + encodeURIComponent(phone) +
-                (text ? '&text=' + encoded : '');
-
-    window.open(url, '_blank');
-    closeModal();
-  };
-
-  modal.style.display = 'flex';
 }
 
-(function initModalWhatsappRef(){
-  const m = document.getElementById('modal-wa-ref');
-  if(!m) return;
+/* CLICK DE BOTONES EN LA VISTA REFERIDOS */
+document.addEventListener('click', function(ev){
+  const t = ev.target;
 
-  const btnCerrar = document.getElementById('mw-close');
-  const btnCancelar = document.getElementById('mw-cancelar');
-  const btnEnviar = document.getElementById('mw-enviar');
+  // si pulsa la imagen, subir al botón
+  const btn = t.closest && t.closest('.ref-wa');
+  if(!btn) return;
 
-  if(btnCerrar) btnCerrar.addEventListener('click', ocultarModalWhatsappRef);
-  if(btnCancelar) btnCancelar.addEventListener('click', ocultarModalWhatsappRef);
+  const tipo = btn.getAttribute('data-tipo');
+  const tel  = (btn.getAttribute('data-tel') || '').toString().trim();
 
-  if(btnEnviar){
-    btnEnviar.addEventListener('click', ()=>{
-      if(!MW_CURRENT_PHONE) return;
-      const txt = document.getElementById('mw-mensaje');
-      const mensaje = txt ? (txt.value || '').trim() : '';
-      if(navigator.clipboard && mensaje){
-        navigator.clipboard.writeText(mensaje).catch(()=>{});
-      }
-      const isMobile = /android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent);
-      const baseUrl = isMobile ? 'whatsapp://send?' : 'https://api.whatsapp.com/send?';
-      const params = new URLSearchParams();
-      params.set('phone', MW_CURRENT_PHONE);
-      if(mensaje){
-        params.set('text', mensaje);
-      }
-      window.open(baseUrl + params.toString(), '_blank');
-      ocultarModalWhatsappRef();
-    });
+  if(!tel){
+    Swal.fire({icon:'info',title:'Sin número registrado'});
+    return;
   }
 
-  // Cerrar al hacer clic fuera del cuadro
-  m.addEventListener('click', (ev)=>{
-    if(ev.target === m){
-      ocultarModalWhatsappRef();
+  if(tipo === 'wa'){
+    // abrir modal whatsapp
+    abrirModalWa(tel);
+    return;
+  }
+
+  if(tipo === 'llamada'){
+    // asegurar prefijo nacional con signo correspondiente
+    let limpio = tel.replace(/\D/g,'');
+    if(/^57/.test(limpio) === false){
+      limpio = '57' + limpio;
     }
-  });
-})();
+    const urlTel = 'tel:' + (limpio.startsWith('57') ? limpio.replace(/^57/, '57') : limpio);
+    window.location.href = urlTel;
+  }
+});
 
 // Filtro con debounce
 (function(){

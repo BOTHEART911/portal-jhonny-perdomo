@@ -1512,6 +1512,8 @@ button:hover{ background:var(--primary-2); color:#fff; border-color:var(--primar
     </div>
   </section> 
 
+    
+
     <!-- VISTA 9: CASA SOCIAL -->
 <section id="view-sede" class="view">
   <div class="card narrow">
@@ -1555,9 +1557,10 @@ button:hover{ background:var(--primary-2); color:#fff; border-color:var(--primar
       </p>
     </div>
   </div>
-
   
   <!-- Forzar abrir Google Maps app con fallback a web -->
+
+  
   <script>
     (function(){
       const btn = document.getElementById('btn-como-llegar');
@@ -1883,6 +1886,27 @@ window.addEventListener('load', initPWAVista);
   </div>
 </section>
 
+    <!-- Modal WhatsApp para Mis Referidos -->
+<div class="modal fade" id="modalWhatsappReferido" tabindex="-1" aria-labelledby="modalWhatsappReferidoLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form id="formWhatsappReferido">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalWhatsappReferidoLabel">Enviar WhatsApp</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <label for="mensajeWhatsappReferido">Mensaje:</label>
+          <textarea class="form-control" id="mensajeWhatsappReferido" rows="4" placeholder="Escribe tu mensaje aquí"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button id="btnEnviarWhatsappReferido" type="submit" class="boton-efecto" style="background: #25D366;">Enviar</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
   <script>
     // URL de tu Apps Script desplegado
     const API_BASE = 'https://script.google.com/macros/s/AKfycbzYEzUpAoXZKgkCut4HI2CgcHiwkgldjx23RXucAGx-BlTKXreJO_ZQ2MCyr8aqnOl0/exec';
@@ -2041,12 +2065,17 @@ function stopLoading(){
     }
 
     // Ocultar botón si no es Lider
-   function updateLeaderUI(isLeader){
+      function updateLeaderUI(isLeader){
   try{
     const btnLider = document.getElementById('go-lider');
     const btnRef   = document.getElementById('go-referidos');
+    const catBlock = document.getElementById('cat-lideres-block');
+
     if(btnLider) btnLider.style.display = isLeader ? '' : 'none';
     if(btnRef)   btnRef.style.display   = isLeader ? '' : 'none';
+
+    // Ocultar o mostrar todo el bloque de categoría LÍDERES
+    if(catBlock) catBlock.style.display = isLeader ? '' : 'none';
   }catch(_){}
 }
     
@@ -2286,8 +2315,14 @@ if (formData.referencia && !referenciaRegex.test(formData.referencia)) {
     const overlay = document.getElementById('overlay');
     document.getElementById('btn-open-menu').addEventListener('click', ()=> { playSoundOnce(SOUNDS.menu); });
     document.getElementById('btn-open-menu').addEventListener('click', ()=> overlay.classList.add('open'));
-    document.getElementById('btn-ovl-back').addEventListener('click', ()=> overlay.classList.remove('open'));
-    document.getElementById('ovlClose').addEventListener('click', ()=> overlay.classList.remove('open'));
+        document.getElementById('btn-ovl-back').addEventListener('click', ()=>{
+      playSoundOnce(SOUNDS.back);
+      overlay.classList.remove('open');
+    });
+    document.getElementById('ovlClose').addEventListener('click', ()=>{
+      playSoundOnce(SOUNDS.back);
+      overlay.classList.remove('open');
+    });
 
       // Sonido login para todos los botones del menú lateral
     (function(){
@@ -3700,29 +3735,48 @@ function renderReferidos(list){
     det.appendChild(resSpan);
 
     // Actions (solo WhatsApp)
-    const actions = document.createElement('div');
+        const actions = document.createElement('div');
     actions.className = 'ref-actions';
 
     const telDigits = String(it.telefono||'').replace(/\D/g,'');
     const waFull = telDigits ? (telDigits.startsWith('57') ? telDigits : ('57'+telDigits.slice(-10))) : '';
+
+    // Botón WhatsApp: ahora abre el modal, no el chat directo
     if(waFull){
-      const aWa = document.createElement('a');
-      aWa.className = 'ref-wa';
-      aWa.href = 'https://wa.me/' + waFull;
-      aWa.target = '_blank';
-      aWa.rel = 'noopener';
-      aWa.setAttribute('aria-label','Abrir chat de WhatsApp');
+      const waBtn = document.createElement('button');
+      waBtn.type = 'button';
+      waBtn.className = 'ref-wa';
+      waBtn.setAttribute('data-wa', waFull);
+      waBtn.setAttribute('aria-label','Abrir modal de WhatsApp');
+
       const imgWa = document.createElement('img');
       imgWa.src = 'https://res.cloudinary.com/dqqeavica/image/upload/v1759166341/WhatsApp_mljaqm.webp';
       imgWa.alt = '';
-      aWa.appendChild(imgWa);
-      actions.appendChild(aWa);
+      waBtn.appendChild(imgWa);
+
+      waBtn.addEventListener('click', ()=>{
+        abrirModalWhatsappReferido(waFull);
+      });
+
+      actions.appendChild(waBtn);
+
+      // Botón Teléfono, con el mismo número (llamada)
+      const callBtn = document.createElement('a');
+      callBtn.href = 'tel:' + telDigits;
+      callBtn.className = 'ref-wa';
+      callBtn.setAttribute('aria-label','Llamar al referido');
+
+      const imgTel = document.createElement('img');
+      imgTel.src = 'https://res.cloudinary.com/dqqeavica/image/upload/v1759952569/Llamada_hra2ch.webp';
+      imgTel.alt = '';
+      callBtn.appendChild(imgTel);
+
+      actions.appendChild(callBtn);
     }
 
     card.appendChild(top);
     card.appendChild(det);
     card.appendChild(actions);
-    wrap.appendChild(card);
   }
 }
 
@@ -3750,6 +3804,51 @@ function renderReferidos(list){
     }, 160);
   });
 })();
+
+    // Modal WhatsApp para Mis Referidos
+let telefonoReferidoActual = '';
+
+function abrirModalWhatsappReferido(numeroWhatsApp){
+  telefonoReferidoActual = numeroWhatsApp || '';
+  const textarea = document.getElementById('mensajeWhatsappReferido');
+  if(textarea){
+    textarea.value = '';
+  }
+  const modalEl = document.getElementById('modalWhatsappReferido');
+  if(modalEl && window.bootstrap && bootstrap.Modal){
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+  }
+}
+
+document.getElementById('formWhatsappReferido').addEventListener('submit', function(e){
+  e.preventDefault();
+
+  const mensaje = (document.getElementById('mensajeWhatsappReferido').value || '').trim();
+  const numero = telefonoReferidoActual || '';
+
+  if(!numero){
+    Swal.fire({ icon:'error', title:'Sin número', text:'No se encontró número de WhatsApp para este referido.' });
+    return;
+  }
+
+  // Copiar mensaje al portapapeles (opcional)
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(mensaje || '').catch(()=>{});
+  }
+
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  const base = isMobile ? 'whatsapp://send' : 'https://api.whatsapp.com/send';
+  const url = base + '?phone=' + encodeURIComponent(numero) + '&text=' + encodeURIComponent(mensaje || '');
+
+  window.open(url, '_blank');
+
+  const modalEl = document.getElementById('modalWhatsappReferido');
+  if(modalEl && window.bootstrap && bootstrap.Modal.getInstance){
+    const instance = bootstrap.Modal.getInstance(modalEl);
+    if(instance) instance.hide();
+  }
+});
 
 // Botón Regresar (aplica estilos/sonido existentes)
 document.getElementById('ref-volver').addEventListener('click', ()=> showView('view-menu'));

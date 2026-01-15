@@ -3805,7 +3805,11 @@ function renderReferidos(list){
   });
 })();
 
-    // Modal WhatsApp para Mis Referidos
+
+// Botón Regresar (aplica estilos/sonido existentes)
+document.getElementById('ref-volver').addEventListener('click', ()=> showView('view-menu'));
+
+     // Modal WhatsApp para Mis Referidos
 let telefonoReferidoActual = '';
 
 function abrirModalWhatsappReferido(numeroWhatsApp){
@@ -3849,9 +3853,6 @@ document.getElementById('formWhatsappReferido').addEventListener('submit', funct
     if(instance) instance.hide();
   }
 });
-
-// Botón Regresar (aplica estilos/sonido existentes)
-document.getElementById('ref-volver').addEventListener('click', ()=> showView('view-menu'));
 
   </script>
 </body>

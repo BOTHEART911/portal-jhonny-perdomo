@@ -3696,7 +3696,7 @@ function renderReferidos(list){
     const card = document.createElement('div');
     card.className = 'ref-item';
 
-    // Top row: nombre + votación
+    // Fila superior: nombre y estado de votación
     const top = document.createElement('div');
     top.className = 'ref-row-top';
 
@@ -3711,7 +3711,7 @@ function renderReferidos(list){
     top.appendChild(name);
     top.appendChild(vote);
 
-    // Details
+    // Detalles de documento y residencia
     const det = document.createElement('div');
     det.className = 'ref-details';
     const docSpan = document.createElement('span');
@@ -3721,61 +3721,57 @@ function renderReferidos(list){
     det.appendChild(docSpan);
     det.appendChild(resSpan);
 
-    // Acciones: WhatsApp + Teléfono
+    // Acciones: botón WhatsApp (abre modal) y botón Llamar
     const actions = document.createElement('div');
     actions.className = 'ref-actions';
 
     const rawPhone = it.telefono == null ? '' : String(it.telefono);
     const telDigits = rawPhone.replace(/\D/g,'');
 
-    // Para WhatsApp y llamada usamos el mismo número base.
-    // Si no trae 57 y parece celular colombiano, se lo agregamos.
-    const basePhone = telDigits
-      ? (telDigits.startsWith('57') ? telDigits : '57' + telDigits.slice(-10))
+    // Número internacional normalizado para WhatsApp (ejemplo Colombia)
+    const waFull = telDigits
+      ? (telDigits.startsWith('57') ? telDigits : ('57' + telDigits.slice(-10)))
       : '';
 
-    // Botón WhatsApp: abre modal con mensaje opcional
-    if(basePhone){
+    // Botón WhatsApp que abre el modal personalizado
+    if(waFull){
       const btnWa = document.createElement('button');
       btnWa.type = 'button';
       btnWa.className = 'ref-wa';
-      btnWa.setAttribute('data-wa', basePhone);
+      btnWa.setAttribute('data-wa', waFull);
       btnWa.setAttribute('aria-label','Enviar WhatsApp');
+
       const imgWa = document.createElement('img');
       imgWa.src = 'https://res.cloudinary.com/dqqeavica/image/upload/v1759166341/WhatsApp_mljaqm.webp';
       imgWa.alt = '';
       btnWa.appendChild(imgWa);
 
-      // Evita que el clic se “suba” a la tarjeta y no abra el modal
-      btnWa.addEventListener('click', (ev)=>{
-        ev.stopPropagation();
-        abrirModalWhatsappRef(basePhone);
-      });
+      btnWa.addEventListener('click', () => openWaRefModal(waFull, it.nombre || ''));
 
       actions.appendChild(btnWa);
     }
 
-    // Botón de llamada telefónica
+    // Botón Llamar. Aquí se antepone el signo internacional al número.
     if(telDigits){
       const aTel = document.createElement('a');
-      aTel.className = 'ref-wa';
+      aTel.href = 'tel:' + '+' + telDigits;
+      aTel.setAttribute('aria-label','Llamar al referido');
 
-      // Se usa el mismo número normalizado con indicativo.
-      aTel.href = 'tel:' + basePhone;
-      aTel.setAttribute('aria-label','Llamar al contacto');
       const imgTel = document.createElement('img');
       imgTel.src = 'https://res.cloudinary.com/dqqeavica/image/upload/v1759952569/Llamada_hra2ch.webp';
       imgTel.alt = '';
       aTel.appendChild(imgTel);
+
       actions.appendChild(aTel);
     }
 
     card.appendChild(top);
     card.appendChild(det);
     card.appendChild(actions);
+
+    wrap.appendChild(card);
   }
 }
-
     // Lógica modal WhatsApp para Mis Referidos
 let MW_CURRENT_PHONE = null;
 

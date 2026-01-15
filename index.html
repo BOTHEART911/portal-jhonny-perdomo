@@ -829,26 +829,6 @@ button:hover{ background:var(--primary-2); color:#fff; border-color:var(--primar
   text-align: justify;
 }
 
-  /* MODAL WHATSAPP REFERIDOS - estilos */
-#modal-wa-ref{
-  position:fixed;
-  inset:0;
-  z-index:10000;
-  background:rgba(0,0,0,.45);
-  display:none;
-}
-
-#modal-wa-ref.show{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-#modal-wa-ref .swal2-popup{
-  width:90%;
-  max-width:420px;
-}
-
 </style>
   
 </head>
@@ -3731,45 +3711,43 @@ function renderReferidos(list){
     top.appendChild(name);
     top.appendChild(vote);
 
-    // Detalles
+    // Details
     const det = document.createElement('div');
     det.className = 'ref-details';
-
     const docSpan = document.createElement('span');
     docSpan.innerHTML = '<b>CC:</b> ' + (it.documento || '');
-
     const resSpan = document.createElement('span');
     resSpan.innerHTML = '<b>RESIDENCIA:</b> ' + (it.residencia || '');
-
     det.appendChild(docSpan);
     det.appendChild(resSpan);
 
-    // Acciones: WhatsApp y Teléfono
+    // Acciones: WhatsApp + Teléfono
     const actions = document.createElement('div');
     actions.className = 'ref-actions';
 
     const rawPhone = it.telefono == null ? '' : String(it.telefono);
     const telDigits = rawPhone.replace(/\D/g,'');
 
+    // Para WhatsApp y llamada usamos el mismo número base.
+    // Si no trae 57 y parece celular colombiano, se lo agregamos.
     const basePhone = telDigits
       ? (telDigits.startsWith('57') ? telDigits : '57' + telDigits.slice(-10))
       : '';
 
-    // Botón WhatsApp (abre modal, no navega)
-    if (basePhone){
+    // Botón WhatsApp: abre modal con mensaje opcional
+    if(basePhone){
       const btnWa = document.createElement('button');
       btnWa.type = 'button';
       btnWa.className = 'ref-wa';
       btnWa.setAttribute('data-wa', basePhone);
       btnWa.setAttribute('aria-label','Enviar WhatsApp');
-
       const imgWa = document.createElement('img');
       imgWa.src = 'https://res.cloudinary.com/dqqeavica/image/upload/v1759166341/WhatsApp_mljaqm.webp';
       imgWa.alt = '';
       btnWa.appendChild(imgWa);
 
-      btnWa.addEventListener('click', function(ev){
-        ev.preventDefault();
+      // Evita que el clic se “suba” a la tarjeta y no abra el modal
+      btnWa.addEventListener('click', (ev)=>{
         ev.stopPropagation();
         abrirModalWhatsappRef(basePhone);
       });
@@ -3777,18 +3755,18 @@ function renderReferidos(list){
       actions.appendChild(btnWa);
     }
 
-    // Botón llamada: usa tel: con prefijo internacional
+       // Botón de llamada telefónica
     if (telDigits){
       const aTel = document.createElement('a');
       aTel.className = 'ref-wa';
-      aTel.href = 'tel:' + basePhone;
-      aTel.setAttribute('aria-label','Llamar al contacto');
 
+      // Se usa el mismo número normalizado con indicativo y un prefijo más
+      aTel.href = 'tel:' + '+' + basePhone;
+      aTel.setAttribute('aria-label','Llamar al contacto');
       const imgTel = document.createElement('img');
       imgTel.src = 'https://res.cloudinary.com/dqqeavica/image/upload/v1759952569/Llamada_hra2ch.webp';
       imgTel.alt = '';
       aTel.appendChild(imgTel);
-
       actions.appendChild(aTel);
     }
 
@@ -3796,94 +3774,83 @@ function renderReferidos(list){
     card.appendChild(det);
     card.appendChild(actions);
 
-    wrap.appendChild(card);
+        wrap.appendChild(card);
   }
 }
 
 
-   /* ===== MODAL WHATSAPP REFERIDOS ===== */
-const modalWaRef  = document.getElementById('modal-wa-ref');
-const mwMensaje   = document.getElementById('mw-mensaje');
-const mwEnviar    = document.getElementById('mw-enviar');
-const mwCancelar  = document.getElementById('mw-cancelar');
-const mwClose     = document.getElementById('mw-close');
+    // Lógica modal WhatsApp para Mis Referidos
+let MW_CURRENT_PHONE = null;
 
-let telActualWa = '';
+function mostrarModalWhatsappRef(){
+  const modal = document.getElementById('modal-wa-ref');
+  if(!modal) return;
+  modal.style.display = 'flex';
+}
 
-function abrirModalWa(tel){
-  telActualWa = (tel || '').toString().trim();
-  if(!telActualWa){
-    Swal.fire({icon:'info',title:'Sin número registrado'});
-    return;
-  }
-  if(mwMensaje){ mwMensaje.value = ''; }
-  if(modalWaRef){
-    modalWaRef.style.display = 'flex';
+function ocultarModalWhatsappRef(){
+  const modal = document.getElementById('modal-wa-ref');
+  if(!modal) return;
+  modal.style.display = 'none';
+  const txt = document.getElementById('mw-mensaje');
+  if(txt) txt.value = '';
+}
+
+function abrirModalWhatsappRef(phone){
+  MW_CURRENT_PHONE = phone;
+  mostrarModalWhatsappRef();
+
+  // Ajuste visual para que el modal no quede “tapado”
+  const modal = document.getElementById('modal-wa-ref');
+  if (modal){
+    modal.style.position = 'fixed';
+    modal.style.left = '0';
+    modal.style.top = '0';
+    modal.style.right = '0';
+    modal.style.bottom = '0';
+    modal.style.zIndex = '99999';
+    modal.style.display = 'flex';
   }
 }
 
-function cerrarModalWa(){
-  if(modalWaRef){
-    modalWaRef.style.display = 'none';
+(function initModalWhatsappRef(){
+  const m = document.getElementById('modal-wa-ref');
+  if(!m) return;
+
+  const btnCerrar = document.getElementById('mw-close');
+  const btnCancelar = document.getElementById('mw-cancelar');
+  const btnEnviar = document.getElementById('mw-enviar');
+
+  if(btnCerrar) btnCerrar.addEventListener('click', ocultarModalWhatsappRef);
+  if(btnCancelar) btnCancelar.addEventListener('click', ocultarModalWhatsappRef);
+
+  if(btnEnviar){
+    btnEnviar.addEventListener('click', ()=>{
+      if(!MW_CURRENT_PHONE) return;
+      const txt = document.getElementById('mw-mensaje');
+      const mensaje = txt ? (txt.value || '').trim() : '';
+      if(navigator.clipboard && mensaje){
+        navigator.clipboard.writeText(mensaje).catch(()=>{});
+      }
+      const isMobile = /android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent);
+      const baseUrl = isMobile ? 'whatsapp://send?' : 'https://api.whatsapp.com/send?';
+      const params = new URLSearchParams();
+      params.set('phone', MW_CURRENT_PHONE);
+      if(mensaje){
+        params.set('text', mensaje);
+      }
+      window.open(baseUrl + params.toString(), '_blank');
+      ocultarModalWhatsappRef();
+    });
   }
-  telActualWa = '';
-}
 
-// cerrar modal por botones
-if(mwCancelar){ mwCancelar.onclick = cerrarModalWa; }
-if(mwClose){ mwClose.onclick = cerrarModalWa; }
-
-// enviar whatsapp
-if(mwEnviar){
-  mwEnviar.onclick = function(){
-    if(!telActualWa){
-      Swal.fire({icon:'info',title:'Sin número'});
-      return;
+  // Cerrar al hacer clic fuera del cuadro
+  m.addEventListener('click', (ev)=>{
+    if(ev.target === m){
+      ocultarModalWhatsappRef();
     }
-    const msg = (mwMensaje && mwMensaje.value) ? mwMensaje.value : '';
-    const telLimpio = telActualWa.replace(/\D/g,'');
-    const urlBase = /android|iphone|ipad|mobile/i.test(navigator.userAgent)
-      ? 'whatsapp://send?phone='
-      : 'https://api.whatsapp.com/send?phone=';
-
-    const url = urlBase + telLimpio + (msg ? '&text=' + encodeURIComponent(msg) : '');
-    cerrarModalWa();
-    window.open(url,'_blank');
-  };
-}
-
-/* CLICK DE BOTONES EN LA VISTA REFERIDOS */
-document.addEventListener('click', function(ev){
-  const t = ev.target;
-
-  // si pulsa la imagen, subir al botón
-  const btn = t.closest && t.closest('.ref-wa');
-  if(!btn) return;
-
-  const tipo = btn.getAttribute('data-tipo');
-  const tel  = (btn.getAttribute('data-tel') || '').toString().trim();
-
-  if(!tel){
-    Swal.fire({icon:'info',title:'Sin número registrado'});
-    return;
-  }
-
-  if(tipo === 'wa'){
-    // abrir modal whatsapp
-    abrirModalWa(tel);
-    return;
-  }
-
-  if(tipo === 'llamada'){
-    // asegurar prefijo nacional con signo correspondiente
-    let limpio = tel.replace(/\D/g,'');
-    if(/^57/.test(limpio) === false){
-      limpio = '57' + limpio;
-    }
-    const urlTel = 'tel:' + (limpio.startsWith('57') ? limpio.replace(/^57/, '57') : limpio);
-    window.location.href = urlTel;
-  }
-});
+  });
+})();
 
 // Filtro con debounce
 (function(){

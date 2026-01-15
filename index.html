@@ -1741,6 +1741,7 @@ if ('serviceWorker' in navigator){
   });
 }
 window.addEventListener('load', initPWAVista);
+  updateLeaderUI(false);
     
   </script>
 
@@ -1883,7 +1884,24 @@ window.addEventListener('load', initPWAVista);
   </div>
 </section>
 
+      <!-- MODAL WHATSAPP REFERIDOS -->
+  <div id="modal-wa-ref" class="swal2-container swal2-center swal2-backdrop-show" style="display:none;">
+    <div class="swal2-popup swal2-modal swal2-show" style="padding:1.25rem; border-radius:10px; max-width:420px;">
+      <button type="button" id="mw-close" class="swal2-close" aria-label="Cerrar" style="position:absolute; right:8px; top:4px;">×</button>
+      <h2 class="swal2-title" style="font-size:1.15rem; margin-bottom:8px;">Enviar WhatsApp</h2>
+      <div class="swal2-content" style="text-align:left; font-size:.95rem; margin-bottom:10px;">
+        <label for="mw-mensaje" style="display:block; margin-bottom:4px;">Mensaje:</label>
+        <textarea id="mw-mensaje" rows="4" style="width:100%; box-sizing:border-box; border-radius:6px; border:1px solid #ccc; padding:8px; font-size:.95rem;" placeholder="Escribe tu mensaje aquí (opcional)"></textarea>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:4px;">
+        <button type="button" id="mw-cancelar" style="padding:8px 14px; border-radius:6px; border:1px solid #ccc; background:#f3f4f6; cursor:pointer;">Cancelar</button>
+        <button type="button" id="mw-enviar" style="padding:8px 14px; border-radius:6px; border:0; background:#25D366; color:#fff; font-weight:700; cursor:pointer;">Enviar</button>
+      </div>
+    </div>
+  </div>
+
   <script>
+  
     // URL de tu Apps Script desplegado
     const API_BASE = 'https://script.google.com/macros/s/AKfycbzYEzUpAoXZKgkCut4HI2CgcHiwkgldjx23RXucAGx-BlTKXreJO_ZQ2MCyr8aqnOl0/exec';
 
@@ -2287,7 +2305,10 @@ if (formData.referencia && !referenciaRegex.test(formData.referencia)) {
     document.getElementById('btn-open-menu').addEventListener('click', ()=> { playSoundOnce(SOUNDS.menu); });
     document.getElementById('btn-open-menu').addEventListener('click', ()=> overlay.classList.add('open'));
     document.getElementById('btn-ovl-back').addEventListener('click', ()=> overlay.classList.remove('open'));
-    document.getElementById('ovlClose').addEventListener('click', ()=> overlay.classList.remove('open'));
+        document.getElementById('ovlClose').addEventListener('click', ()=>{
+      playSoundOnce(SOUNDS.back);
+      overlay.classList.remove('open');
+    });
 
       // Sonido login para todos los botones del menú lateral
     (function(){
@@ -3700,31 +3721,106 @@ function renderReferidos(list){
     det.appendChild(resSpan);
 
     // Actions (solo WhatsApp)
-    const actions = document.createElement('div');
+        const actions = document.createElement('div');
     actions.className = 'ref-actions';
 
     const telDigits = String(it.telefono||'').replace(/\D/g,'');
     const waFull = telDigits ? (telDigits.startsWith('57') ? telDigits : ('57'+telDigits.slice(-10))) : '';
+
+    // Botón WhatsApp: abre modal con mensaje opcional
     if(waFull){
-      const aWa = document.createElement('a');
-      aWa.className = 'ref-wa';
-      aWa.href = 'https://wa.me/' + waFull;
-      aWa.target = '_blank';
-      aWa.rel = 'noopener';
-      aWa.setAttribute('aria-label','Abrir chat de WhatsApp');
+      const btnWa = document.createElement('button');
+      btnWa.type = 'button';
+      btnWa.className = 'ref-wa';
+      btnWa.setAttribute('data-wa', waFull);
+      btnWa.setAttribute('aria-label','Enviar WhatsApp');
       const imgWa = document.createElement('img');
       imgWa.src = 'https://res.cloudinary.com/dqqeavica/image/upload/v1759166341/WhatsApp_mljaqm.webp';
       imgWa.alt = '';
-      aWa.appendChild(imgWa);
-      actions.appendChild(aWa);
+      btnWa.appendChild(imgWa);
+      btnWa.addEventListener('click', ()=> abrirModalWhatsappRef(waFull));
+      actions.appendChild(btnWa);
+    }
+
+    // Nuevo: botón de llamada telefónica (igual estilo que Libreta de contactos)
+    if(telDigits){
+      const aTel = document.createElement('a');
+      aTel.className = 'ref-wa';
+      aTel.href = 'tel:' + telDigits;
+      aTel.setAttribute('aria-label','Llamar al contacto');
+      const imgTel = document.createElement('img');
+      imgTel.src = 'https://res.cloudinary.com/dqqeavica/image/upload/v1759952569/Llamada_hra2ch.webp';
+      imgTel.alt = '';
+      aTel.appendChild(imgTel);
+      actions.appendChild(aTel);
     }
 
     card.appendChild(top);
     card.appendChild(det);
     card.appendChild(actions);
-    wrap.appendChild(card);
   }
 }
+
+    // Lógica modal WhatsApp para Mis Referidos
+let MW_CURRENT_PHONE = null;
+
+function mostrarModalWhatsappRef(){
+  const modal = document.getElementById('modal-wa-ref');
+  if(!modal) return;
+  modal.style.display = 'flex';
+}
+
+function ocultarModalWhatsappRef(){
+  const modal = document.getElementById('modal-wa-ref');
+  if(!modal) return;
+  modal.style.display = 'none';
+  const txt = document.getElementById('mw-mensaje');
+  if(txt) txt.value = '';
+}
+
+function abrirModalWhatsappRef(phone){
+  MW_CURRENT_PHONE = phone;
+  mostrarModalWhatsappRef();
+}
+
+(function initModalWhatsappRef(){
+  const m = document.getElementById('modal-wa-ref');
+  if(!m) return;
+
+  const btnCerrar = document.getElementById('mw-close');
+  const btnCancelar = document.getElementById('mw-cancelar');
+  const btnEnviar = document.getElementById('mw-enviar');
+
+  if(btnCerrar) btnCerrar.addEventListener('click', ocultarModalWhatsappRef);
+  if(btnCancelar) btnCancelar.addEventListener('click', ocultarModalWhatsappRef);
+
+  if(btnEnviar){
+    btnEnviar.addEventListener('click', ()=>{
+      if(!MW_CURRENT_PHONE) return;
+      const txt = document.getElementById('mw-mensaje');
+      const mensaje = txt ? (txt.value || '').trim() : '';
+      if(navigator.clipboard && mensaje){
+        navigator.clipboard.writeText(mensaje).catch(()=>{});
+      }
+      const isMobile = /android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent);
+      const baseUrl = isMobile ? 'whatsapp://send?' : 'https://api.whatsapp.com/send?';
+      const params = new URLSearchParams();
+      params.set('phone', MW_CURRENT_PHONE);
+      if(mensaje){
+        params.set('text', mensaje);
+      }
+      window.open(baseUrl + params.toString(), '_blank');
+      ocultarModalWhatsappRef();
+    });
+  }
+
+  // Cerrar al hacer clic fuera del cuadro
+  m.addEventListener('click', (ev)=>{
+    if(ev.target === m){
+      ocultarModalWhatsappRef();
+    }
+  });
+})();
 
 // Filtro con debounce
 (function(){

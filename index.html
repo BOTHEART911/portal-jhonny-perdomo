@@ -1560,6 +1560,27 @@ button:hover{ background:var(--primary-2); color:#fff; border-color:var(--primar
   
   <!-- Forzar abrir Google Maps app con fallback a web -->
 
+   <!-- Modal WhatsApp para Mis Referidos -->
+<div class="modal fade" id="modalWhatsappReferido" tabindex="-1" aria-labelledby="modalWhatsappReferidoLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form id="formWhatsappReferido">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalWhatsappReferidoLabel">Enviar WhatsApp</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <label for="mensajeWhatsappReferido">Mensaje:</label>
+          <textarea class="form-control" id="mensajeWhatsappReferido" rows="4" placeholder="Escribe tu mensaje aquí"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button id="btnEnviarWhatsappReferido" type="submit" class="boton-efecto" style="background: #25D366;">Enviar</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
   
   <script>
     (function(){
@@ -1885,27 +1906,6 @@ window.addEventListener('load', initPWAVista);
     </div>
   </div>
 </section>
-
-    <!-- Modal WhatsApp para Mis Referidos -->
-<div class="modal fade" id="modalWhatsappReferido" tabindex="-1" aria-labelledby="modalWhatsappReferidoLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <form id="formWhatsappReferido">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="modalWhatsappReferidoLabel">Enviar WhatsApp</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-        <div class="modal-body">
-          <label for="mensajeWhatsappReferido">Mensaje:</label>
-          <textarea class="form-control" id="mensajeWhatsappReferido" rows="4" placeholder="Escribe tu mensaje aquí"></textarea>
-        </div>
-        <div class="modal-footer">
-          <button id="btnEnviarWhatsappReferido" type="submit" class="boton-efecto" style="background: #25D366;">Enviar</button>
-        </div>
-      </div>
-    </form>
-  </div>
-</div>
 
   <script>
     // URL de tu Apps Script desplegado

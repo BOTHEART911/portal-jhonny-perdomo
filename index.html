@@ -1741,7 +1741,6 @@ if ('serviceWorker' in navigator){
   });
 }
 window.addEventListener('load', initPWAVista);
-  updateLeaderUI(false);
     
   </script>
 
@@ -2059,6 +2058,7 @@ function stopLoading(){
     }
 
     // Ocultar botón si no es Lider
+      // Ocultar botón si no es Lider
    function updateLeaderUI(isLeader){
   try{
     const btnLider = document.getElementById('go-lider');
@@ -2067,6 +2067,7 @@ function stopLoading(){
     if(btnRef)   btnRef.style.display   = isLeader ? '' : 'none';
   }catch(_){}
 }
+updateLeaderUI(false);
     
     // Choices (select con filtro)
     let choicesReg = null, choicesUpd = null, choicesCom = null;

@@ -3743,7 +3743,9 @@ function renderReferidos(list){
       imgWa.alt = '';
       btnWa.appendChild(imgWa);
 
-      btnWa.addEventListener('click', (ev)=> {
+      // IMPORTANTE: este listener evita que el click
+      // se “suba” a la tarjeta y solo abra el modal.
+      btnWa.addEventListener('click', (ev)=>{
         ev.stopPropagation();
         abrirModalWhatsappRef(waFull);
       });
@@ -3755,7 +3757,14 @@ function renderReferidos(list){
     if(telDigits){
       const aTel = document.createElement('a');
       aTel.className = 'ref-wa';
-      aTel.href = 'tel:' + (telDigits.startsWith('57') ? telDigits : ('57' + telDigits.slice(-10)));
+
+      // Aquí se antepone el signo correspondiente y el indicativo,
+      // usando 57 si el número no lo trae.
+      const fullTel = telDigits.startsWith('57')
+        ? telDigits
+        : '57' + telDigits.slice(-10);
+
+      aTel.href = 'tel:' + fullTel;
       aTel.setAttribute('aria-label','Llamar al contacto');
       const imgTel = document.createElement('img');
       imgTel.src = 'https://res.cloudinary.com/dqqeavica/image/upload/v1759952569/Llamada_hra2ch.webp';

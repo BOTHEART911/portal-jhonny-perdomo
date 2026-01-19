@@ -2041,17 +2041,21 @@ function stopLoading(){
       }catch(e){ /* silencio */ }
     }
 
-    // Ocultar botón si no es Lider
-      // Ocultar botón si no es Lider
-   function updateLeaderUI(isLeader){
-  try{
-    const btnLider = document.getElementById('go-lider');
-    const btnRef   = document.getElementById('go-referidos');
-    if(btnLider) btnLider.style.display = isLeader ? '' : 'none';
-    if(btnRef)   btnRef.style.display   = isLeader ? '' : 'none';
-  }catch(_){}
-}
-updateLeaderUI(false);
+         // Ocultar completamente la categoría LÍDERES si no es líder
+    function updateLeaderUI(isLeader){
+      try{
+        const catLideresBlock = document.getElementById('cat-lideres-block');
+        const btnLider        = document.getElementById('go-lider');
+        const btnReferidos    = document.getElementById('go-referidos');
+
+        const show = !!isLeader;
+
+        if (catLideresBlock) catLideresBlock.style.display = show ? '' : 'none';
+        if (btnLider)        btnLider.style.display        = show ? '' : 'none';
+        if (btnReferidos)    btnReferidos.style.display    = show ? '' : 'none';
+      }catch(_){}
+    }
+    updateLeaderUI(false);
     
     // Choices (select con filtro)
     let choicesReg = null, choicesUpd = null, choicesCom = null;

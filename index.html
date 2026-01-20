@@ -1162,6 +1162,7 @@ button:hover{ background:var(--primary-2); color:#fff; border-color:var(--primar
       <div id="cat-lideres" class="menu-cat-options">
         <button class="menu-btn" id="go-lider">Refiere por Whatsapp 📤</button>
         <button class="menu-btn" id="go-referidos">Mis Referidos 🔢</button>
+        <button class="menu-btn" id="go-agenda">Nuestra Agenda 📆</button>
       </div>
     </div>
     
@@ -1883,6 +1884,125 @@ window.addEventListener('load', initPWAVista);
   </div>
 </section>
 
+     <!-- VISTA 15: NUESTRA AGENDA -->
+
+    <section id="view-agenda" class="view">
+  <div class="card">
+    <div class="cal-wrapper">
+      <h2 style="color:var(--primary)">NUESTRA AGENDA</h2>
+
+      <div class="cal-header">
+        <div>
+          <div class="cal-title" id="agenda-title-text">Mes actual</div>
+          <p class="muted" style="margin:2px 0 0;">
+            Vista interactiva de tus eventos programados como líder
+          </p>
+        </div>
+        <div class="cal-nav-group">
+          <button id="agenda-btn-today" class="cal-pill-btn">Hoy</button>
+          <button id="agenda-prev" class="cal-pill-btn" aria-label="Anterior">‹</button>
+          <button id="agenda-next" class="cal-pill-btn" aria-label="Siguiente">›</button>
+        </div>
+        <div class="cal-filter-wrap">
+          <button id="agenda-filter-toggle" class="cal-pill-btn">Filtrar</button>
+          <input id="agenda-filter-input" class="cal-filter-input" type="text" placeholder="Filtrar por líder, lugar o nombre de evento" style="display:none;">
+        </div>
+        <div class="cal-nav-group">
+          <button id="agenda-view-day" class="cal-pill-btn">Día</button>
+          <button id="agenda-view-week" class="cal-pill-btn">Semana</button>
+          <button id="agenda-view-month" class="cal-pill-btn active">Mes</button>
+          <button id="agenda-view-year" class="cal-pill-btn">Año</button>
+        </div>
+      </div>
+
+      <div id="agenda-container" class="cal-grid">
+        <div style="padding:14px; text-align:center; font-size:.9rem;" class="muted">
+          Cargando agenda…
+        </div>
+      </div>
+
+      <div class="cal-footer-actions">
+        <button id="agenda-btn-new" class="btn-primary">Ingresar Evento</button>
+        <button id="agenda-btn-back" class="danger">Regresar</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+    <!-- VISTA 16: REGISTRAR / EDITAR AGENDA -->
+
+    <section id="view-agenda-evento" class="view">
+  <div class="card narrow">
+    <h2 id="agenda-evento-title" style="color:var(--primary)">REGISTRAR EVENTO</h2>
+    <div class="cal-form-grid">
+
+      <label for="agenda-nombreEvento">Nombre del Evento</label>
+      <textarea id="agenda-nombreEvento" rows="2" placeholder="Título descriptivo del evento"></textarea>
+
+      <label>Fecha del Evento</label>
+      <input
+        id="agenda-fechaEvento"
+        type="text"
+        placeholder="dd/mm/aaaa"
+        readonly
+      />
+
+      <label for="agenda-horaInicio">Hora de Inicio</label>
+      <input id="agenda-horaInicio" type="time">
+
+      <label for="agenda-horaTerminacion">Hora de Terminación</label>
+      <input id="agenda-horaTerminacion" type="time">
+
+      <label for="agenda-lugar">Lugar del Evento</label>
+      <select id="agenda-lugar">
+        <option value="" disabled selected>Selecciona el Lugar</option>
+        <!-- mismas opciones de residencia que ya usas en REGISTRO -->
+        <!-- (copia y pega el listado de <option> que tienes en reg-residencia) -->
+        <!-- te las puse completas en la respuesta anterior; reutiliza exactamente esas -->
+        <!-- ... -->
+      </select>
+
+      <label for="agenda-lider">Líder</label>
+      <input id="agenda-lider" type="text" readonly>
+
+      <label for="agenda-contacto">Contacto</label>
+      <input id="agenda-contacto" type="text" readonly>
+
+      <input id="agenda-evento-codigo" type="hidden">
+    </div>
+
+    <div class="btn-row spaced" style="margin-top:14px;">
+      <button id="agenda-evento-guardar" class="btn-primary">Guardar Evento</button>
+      <button id="agenda-evento-volver" class="danger">Regresar</button>
+    </div>
+  </div>
+
+  <!-- Modal Fecha Evento -->
+  <div id="agendaFechaModal" class="picker-modal-cal" aria-hidden="true">
+    <div class="picker-box-cal">
+      <h3 style="margin:0 0 8px 0;">Selecciona la Fecha del Evento</h3>
+      <div class="picker-grid-cal">
+        <div>
+          <small>Día</small>
+          <select id="agendaEvtDia" size="10"></select>
+        </div>
+        <div>
+          <small>Mes</small>
+          <select id="agendaEvtMes" size="12"></select>
+        </div>
+        <div>
+          <small>Año</small>
+          <select id="agendaEvtAnio" size="10"></select>
+        </div>
+      </div>
+      <div style="display:flex; gap:8px; justify-content:flex-end;">
+        <button type="button" class="btn" id="agendaEvtFechaCancelar">Cancelar</button>
+        <button type="button" class="btn-primary" id="agendaEvtFechaOk">Ok</button>
+      </div>
+    </div>
+  </div>
+</section>
+
   <script>
   
     // URL de tu Apps Script desplegado
@@ -1916,6 +2036,18 @@ function stopLoading(){
     // Oculta de inmediato (fade corto definido en CSS)
     loader.classList.add('hidden');
   }
+}
+
+    // Lista fija de documentos de líderes con acceso a NUESTRA AGENDA
+const AGENDA_LIDER_DOCS = [
+  '1108456583','1003523357','1070621556','93435295','1108454481',
+  '1108453352','65820648','1108454823','38210170','39584197',
+  '65820550','65820373','1108454657','88199574'
+];
+
+// Reutiliza normalizeDoc_ del backend en versión front (solo dígitos)
+function normalizeDocFront(s){
+  return String(s||'').replace(/\D/g,'').replace(/^0+/, '');
 }
 
     // Sonidos
@@ -2152,6 +2284,15 @@ function stopLoading(){
       try{ sessionStorage.removeItem(FEED_SOUND_KEY); }catch(_){}
       loadFeed().then(()=> refreshNotificationsBadge()).catch(()=>{});
       updateLeaderUI(!!res.isLeader);
+            // Mostrar botón NUESTRA AGENDA solo si es líder y su documento está en la lista
+      try{
+        const docNorm = normalizeDocFront(res.user.documento);
+        const allowed = !!res.isLeader && AGENDA_LIDER_DOCS.indexOf(docNorm) !== -1;
+        const agendaBtn = document.getElementById('go-agenda');
+        if(agendaBtn){
+          agendaBtn.style.display = allowed ? '' : 'none';
+        }
+      }catch(_){}
 
     } else {
       regCard.style.display = '';
@@ -3614,6 +3755,443 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+    // ================== AGENDA LÍDERES ==================
+const AGENDA_API_LIST = 'listEventosAgenda';
+const AGENDA_API_GET  = 'getEventoAgenda';
+const AGENDA_API_SAVE = 'guardarEventoAgenda';
+
+let AGENDA_EVENTS = [];
+let AGENDA_CURRENT_VIEW = 'month';
+let AGENDA_CURRENT_DATE = new Date();
+let AGENDA_SELECTED_EVENT = null;
+
+// Reutiliza helpers del calendario de index2 adaptados a prefijo agenda
+function agendaPad2(n){
+  return String(n).padStart(2,'0');
+}
+function agendaFormatDMY(d){
+  if(!d) return '';
+  const dd = agendaPad2(d.getDate());
+  const mm = agendaPad2(d.getMonth()+1);
+  const yy = d.getFullYear();
+  return dd + '/' + mm + '/' + yy;
+}
+function agendaParseDMY(str){
+  if(!str) return null;
+  const p = String(str).split('/');
+  if(p.length !== 3) return null;
+  const d = parseInt(p[0],10);
+  const m = parseInt(p[1],10);
+  const y = parseInt(p[2],10);
+  if(!d || !m || !y) return null;
+  const dt = new Date(y,m-1,d);
+  if(isNaN(dt.getTime())) return null;
+  return dt;
+}
+function agendaMinutesFromTimeStr(str){
+  if(!str) return 0;
+  const parts = String(str).split(':');
+  const h = parseInt(parts[0]||'0',10);
+  const m = parseInt(parts[1]||'0',10);
+  if(isNaN(h) || isNaN(m)) return 0;
+  return h*60 + m;
+}
+const AGENDA_MONTHS_SHORT = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+const AGENDA_WEEKDAYS_SHORT = ['DOM','LUN','MAR','MIÉ','JUE','VIE','SÁB'];
+
+    // Llama al backend (gs1) y llena AGENDA_EVENTS con los datos de la hoja EVENTOS
+async function agendaLoadEvents(){
+  try{
+    const list = await apiGet(AGENDA_API_LIST, {});
+    // El backend ya devuelve: codigo, nombreEvento, fechaEvento (dd/mm/aaaa),
+    // lugar, lider, contacto, estado, horaInicio, horaTermino, horaInicioAMPM, horaTerminoAMPM, etc.
+    AGENDA_EVENTS = Array.isArray(list) ? list : [];
+  }catch(e){
+    AGENDA_EVENTS = [];
+    Swal.fire({icon:'error',title:'Error cargando agenda',text:String(e.message||e)});
+  }
+}
+
+    // Inicio y fin de semana (domingo-sábado), igual que en index2 pero con prefijo agenda
+function agendaStartOfWeek(d){
+  const dt = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const day = dt.getDay();                // 0=Dom
+  const diff = (day + 7 - 0) % 7;
+  dt.setDate(dt.getDate() - diff);
+  return dt;
+}
+function agendaEndOfWeek(d){
+  const start = agendaStartOfWeek(d);
+  return new Date(start.getFullYear(), start.getMonth(), start.getDate() + 6);
+}
+
+// Actualiza el título superior ("Mes actual", "Semana del ...", etc.)
+function agendaUpdateTitle(){
+  const el = document.getElementById('agenda-title-text');
+  if(!el) return;
+
+  if(AGENDA_CURRENT_VIEW === 'year'){
+    el.textContent = AGENDA_CURRENT_DATE.getFullYear();
+    return;
+  }
+  if(AGENDA_CURRENT_VIEW === 'week'){
+    const s = agendaStartOfWeek(AGENDA_CURRENT_DATE);
+    const e = agendaEndOfWeek(AGENDA_CURRENT_DATE);
+    const label = AGENDA_MONTHS_SHORT[s.getMonth()] + ' ' + s.getDate() +
+      ' – ' + AGENDA_MONTHS_SHORT[e.getMonth()] + ' ' + e.getDate() +
+      ' ' + e.getFullYear();
+    el.textContent = label;
+    return;
+  }
+  if(AGENDA_CURRENT_VIEW === 'day'){
+    const d = AGENDA_CURRENT_DATE;
+    const label = d.getDate() + ' ' + AGENDA_MONTHS_SHORT[d.getMonth()] + ' ' + d.getFullYear();
+    el.textContent = label;
+    return;
+  }
+
+  const d = AGENDA_CURRENT_DATE;
+  el.textContent = d.toLocaleDateString('es-CO', { month:'long', year:'numeric' }).toUpperCase();
+}
+
+// Filtro de búsqueda: por líder, lugar o nombre de evento
+function agendaEventMatchesFilter(ev, query){
+  if(!query) return true;
+  const q = query.toLowerCase();
+  return [
+    ev.lider,
+    ev.lugar,
+    ev.nombreEvento
+  ].some(v => String(v||'').toLowerCase().includes(q));
+}
+
+// Todos los eventos para una fecha "dd/mm/aaaa"
+function agendaEventsOnDay(dmy){
+  return AGENDA_EVENTS.filter(ev => ev.fechaEvento === dmy);
+}
+
+    function agendaRender(){
+  const cont = document.getElementById('agenda-container');
+  if(!cont) return;
+
+  const filterVal = document.getElementById('agenda-filter-input')?.value.trim().toLowerCase() || '';
+  cont.innerHTML = '';
+
+  agendaUpdateTitle();
+
+  if(AGENDA_CURRENT_VIEW === 'month'){
+    agendaRenderMonth(cont, filterVal);
+  }else if(AGENDA_CURRENT_VIEW === 'week'){
+    agendaRenderWeek(cont, filterVal);
+  }else if(AGENDA_CURRENT_VIEW === 'day'){
+    agendaRenderDay(cont, filterVal);
+  }else if(AGENDA_CURRENT_VIEW === 'year'){
+    agendaRenderYear(cont, filterVal);
+  }
+}
+
+    function agendaRenderMonth(cont, filterVal){
+  // Encabezados de días de la semana
+  const header = document.createElement('div');
+  header.className = 'cal-weekdays';
+  AGENDA_WEEKDAYS_SHORT.forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'cal-weekday';
+    el.textContent = d;
+    header.appendChild(el);
+  });
+  cont.appendChild(header);
+
+  const grid = document.createElement('div');
+  grid.className = 'cal-month-grid';
+
+  const year = AGENDA_CURRENT_DATE.getFullYear();
+  const month = AGENDA_CURRENT_DATE.getMonth();
+  const firstDay = new Date(year,month,1);
+  const startWeekDay = firstDay.getDay();
+  const daysInMonth = new Date(year,month+1,0).getDate();
+
+  const prevMonthDays = (startWeekDay + 7 - 0) % 7;
+  const totalCells = prevMonthDays + daysInMonth;
+  const cells = totalCells <= 35 ? 35 : 42;
+
+  const todayDMY = agendaFormatDMY(new Date());
+
+  for(let i=0; i<cells; i++){
+    const cell = document.createElement('div');
+    cell.className = 'cal-day-cell';
+
+    const dayOffset = i - prevMonthDays + 1;
+    let cellDate;
+    let inThisMonth = true;
+
+    if(dayOffset < 1){
+      cellDate = new Date(year, month, dayOffset);
+      inThisMonth = false;
+    }else if(dayOffset > daysInMonth){
+      cellDate = new Date(year, month, dayOffset);
+      inThisMonth = false;
+    }else{
+      cellDate = new Date(year, month, dayOffset);
+    }
+
+    const iso = agendaFormatDMY(cellDate);
+    if(!inThisMonth) cell.classList.add('other-month');
+
+    const headerNum = document.createElement('div');
+    headerNum.className = 'cal-day-number';
+
+    if(iso === todayDMY){
+      headerNum.classList.add('today');
+      headerNum.textContent = cellDate.getDate();
+    }else{
+      headerNum.textContent = cellDate.getDate();
+    }
+
+    cell.appendChild(headerNum);
+
+    // Eventos de este día
+    const events = agendaEventsOnDay(iso).filter(ev => agendaEventMatchesFilter(ev, filterVal));
+    events.sort((a,b)=>{
+      const ma = agendaMinutesFromTimeStr(a.horaInicio || '');
+      const mb = agendaMinutesFromTimeStr(b.horaInicio || '');
+      return ma - mb;
+    });
+
+    events.forEach(ev => {
+      const chip = document.createElement('div');
+      // Usamos una sola clase "default filled" (no hay secretarías aquí)
+      chip.className = 'cal-event-chip sec-default-filled';
+
+      const title = document.createElement('span');
+      title.className = 'cal-evt-title';
+      // Texto: LÍDER + rango horario
+      title.textContent = 'Líder ' + (ev.lider || '');
+
+      const time = document.createElement('span');
+      time.className = 'cal-evt-time';
+      time.textContent = (ev.horaInicioAMPM || '') + ' - ' + (ev.horaTerminoAMPM || '');
+
+      chip.appendChild(title);
+      chip.appendChild(time);
+
+      // Click: abrir edición
+      chip.addEventListener('click', ()=> agendaOpenEventForEdit(ev));
+
+      cell.appendChild(chip);
+    });
+
+    grid.appendChild(cell);
+  }
+  cont.appendChild(grid);
+}
+
+    function agendaRenderDay(cont, filterVal){
+  const header = document.createElement('div');
+  header.className = 'cal-day-header-row';
+  const d = AGENDA_CURRENT_DATE;
+  header.textContent = d.toLocaleDateString('es-CO',{ weekday:'long', day:'numeric', month:'long', year:'numeric' }).toUpperCase();
+  cont.appendChild(header);
+
+  const body = document.createElement('div');
+  body.className = 'cal-day-body';
+
+  const iso = agendaFormatDMY(d);
+  const events = agendaEventsOnDay(iso).filter(ev => agendaEventMatchesFilter(ev, filterVal));
+  events.sort((a,b)=>{
+    const ma = agendaMinutesFromTimeStr(a.horaInicio || '');
+    const mb = agendaMinutesFromTimeStr(b.horaInicio || '');
+    return ma - mb;
+  });
+
+  if(!events.length){
+    const p = document.createElement('p');
+    p.className = 'muted';
+    p.textContent = 'Sin eventos para este día.';
+    body.appendChild(p);
+  }else{
+    events.forEach(ev => {
+      const chip = document.createElement('div');
+      chip.className = 'cal-event-chip sec-default-filled';
+
+      const title = document.createElement('span');
+      title.className = 'cal-evt-title';
+      title.textContent = 'Líder ' + (ev.lider || '');
+
+      const time = document.createElement('span');
+      time.className = 'cal-evt-time';
+      time.textContent = (ev.horaInicioAMPM || '') + ' - ' + (ev.horaTerminoAMPM || '');
+
+      const desc = document.createElement('div');
+      desc.style.fontSize = '.72rem';
+      desc.textContent = ev.nombreEvento || '';
+
+      chip.appendChild(title);
+      chip.appendChild(time);
+      chip.appendChild(desc);
+
+      chip.addEventListener('click', ()=> agendaOpenEventForEdit(ev));
+      body.appendChild(chip);
+    });
+  }
+
+  cont.appendChild(body);
+}
+
+    function agendaRenderWeek(cont, filterVal){
+  const start = agendaStartOfWeek(AGENDA_CURRENT_DATE);
+  const end = agendaEndOfWeek(AGENDA_CURRENT_DATE);
+
+  const header = document.createElement('div');
+  header.className = 'cal-week-header-row';
+  header.textContent = 'Semana del ' +
+    start.getDate() + ' ' + AGENDA_MONTHS_SHORT[start.getMonth()] +
+    ' al ' +
+    end.getDate() + ' ' + AGENDA_MONTHS_SHORT[end.getMonth()] +
+    ' ' + end.getFullYear();
+  cont.appendChild(header);
+
+  const body = document.createElement('div');
+  body.className = 'cal-week-body';
+
+  for(let i=0;i<7;i++){
+    const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+    const iso = agendaFormatDMY(d);
+
+    const row = document.createElement('div');
+    row.style.borderRadius = '10px';
+    row.style.padding = '6px 8px';
+    row.style.background = '#f9fafb';
+    row.style.marginBottom = '6px';
+
+    const head = document.createElement('div');
+    head.style.display = 'flex';
+    head.style.alignItems = 'center';
+    head.style.justifyContent = 'space-between';
+
+    const left = document.createElement('span');
+    left.style.fontWeight = '700';
+    left.style.fontSize = '.8rem';
+    left.textContent = AGENDA_WEEKDAYS_SHORT[d.getDay()] + ' ' + d.getDate() + ' ' + AGENDA_MONTHS_SHORT[d.getMonth()];
+
+    head.appendChild(left);
+    row.appendChild(head);
+
+    const evs = agendaEventsOnDay(iso).filter(ev => agendaEventMatchesFilter(ev, filterVal));
+    evs.sort((a,b)=>{
+      const ma = agendaMinutesFromTimeStr(a.horaInicio || '');
+      const mb = agendaMinutesFromTimeStr(b.horaInicio || '');
+      return ma - mb;
+    });
+
+    if(!evs.length){
+      const p = document.createElement('p');
+      p.className = 'muted';
+      p.style.fontSize = '.72rem';
+      p.textContent = 'Sin eventos';
+      row.appendChild(p);
+    }else{
+      evs.forEach(ev => {
+        const chip = document.createElement('div');
+        chip.className = 'cal-event-chip sec-default-filled';
+
+        const title = document.createElement('span');
+        title.className = 'cal-evt-title';
+        title.textContent = 'Líder ' + (ev.lider || '');
+
+        const time = document.createElement('span');
+        time.className = 'cal-evt-time';
+        time.textContent = (ev.horaInicioAMPM || '') + ' - ' + (ev.horaTerminoAMPM || '');
+
+        chip.appendChild(title);
+        chip.appendChild(time);
+        chip.addEventListener('click', ()=> agendaOpenEventForEdit(ev));
+        row.appendChild(chip);
+      });
+    }
+
+    body.appendChild(row);
+  }
+
+  cont.appendChild(body);
+}
+
+    function agendaRenderYear(cont, filterVal){
+  const grid = document.createElement('div');
+  grid.className = 'cal-year-grid';
+
+  const year = AGENDA_CURRENT_DATE.getFullYear();
+  const eventsByMonth = {};
+
+  AGENDA_EVENTS.forEach(ev => {
+    const d = agendaParseDMY(ev.fechaEvento);
+    if(!d || d.getFullYear() !== year) return;
+    const m = d.getMonth();
+    if(!eventsByMonth[m]) eventsByMonth[m] = [];
+    if(agendaEventMatchesFilter(ev, filterVal)){
+      eventsByMonth[m].push(ev);
+    }
+  });
+
+  for(let m=0;m<12;m++){
+    const box = document.createElement('div');
+    box.className = 'cal-year-month';
+
+    const h4 = document.createElement('h4');
+    h4.textContent = new Date(year,m,1).toLocaleDateString('es-CO',{ month:'long' }).toUpperCase();
+    box.appendChild(h4);
+
+    const table = document.createElement('table');
+    const thead = document.createElement('thead');
+    const trh = document.createElement('tr');
+    AGENDA_WEEKDAYS_SHORT.forEach(d => {
+      const th = document.createElement('th');
+      th.textContent = d.charAt(0);
+      trh.appendChild(th);
+    });
+    thead.appendChild(trh);
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+    const first = new Date(year,m,1);
+    const startDay = first.getDay();
+    const daysInMonth = new Date(year,m+1,0).getDate();
+
+    let day = 1;
+    let done = false;
+    while(!done){
+      const tr = document.createElement('tr');
+      for(let wd=0; wd<7; wd++){
+        const td = document.createElement('td');
+        if(wd < startDay && day === 1){
+          td.textContent = '';
+        }else if(day > daysInMonth){
+          td.textContent = '';
+          done = true;
+        }else{
+          td.textContent = day;
+          const dmy = agendaFormatDMY(new Date(year,m,day));
+          const hasEvent = (eventsByMonth[m]||[]).some(ev => ev.fechaEvento === dmy);
+          if(hasEvent){
+            const dot = document.createElement('span');
+            dot.className = 'cal-year-dot';
+            td.appendChild(dot);
+          }
+          day++;
+        }
+        tr.appendChild(td);
+      }
+      tbody.appendChild(tr);
+    }
+
+    table.appendChild(tbody);
+    box.appendChild(table);
+    grid.appendChild(box);
+  }
+
+  cont.appendChild(grid);
+}
 
     /* ==== REFERIDOS (vista líder) ==== */
 let REF_DATA = [];

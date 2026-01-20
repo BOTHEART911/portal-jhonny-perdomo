@@ -3731,9 +3731,7 @@ backBtn.addEventListener('click', () => {
   if(el){ el.addEventListener('click', ()=> stopVideoPlayback(), { capture:true }); }
 })();
 
-    // S
-    
-    onido para botones Atrás/Regresar
+    // Sonido para botones Atrás/Regresar
     ['btn-ovl-back','a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver','btn-reg-atras','sede-volver','redes-volver','lc-volver','com-volver','ref-volver'].forEach(id=>{
   const el = document.getElementById(id);
   if(el) el.addEventListener('click', ()=> playSoundOnce(SOUNDS.back));

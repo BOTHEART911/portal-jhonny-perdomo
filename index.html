@@ -2624,6 +2624,21 @@ document.getElementById('go-redes').addEventListener('click', ()=>{
   showView('view-referidos');
 });
 
+   // NUESTRA AGENDA (botón del menú lateral)
+document.getElementById('go-agenda')?.addEventListener('click', async () => {
+  overlay.classList.remove('open');
+  try {
+    await agendaInitForCurrentLeader();
+    showView('view-agenda');
+  } catch (e) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error cargando agenda',
+      text: e.message || 'No fue posible cargar la agenda'
+    });
+  }
+}); 
+
     document.getElementById('go-feed').addEventListener('click', ()=>{
   overlay.classList.remove('open');
   showView('view-feed');
@@ -3716,22 +3731,9 @@ backBtn.addEventListener('click', () => {
   if(el){ el.addEventListener('click', ()=> stopVideoPlayback(), { capture:true }); }
 })();
 
-    // NUESTRA AGENDA (solo líderes permitidos; el botón ya se muestra/oculta en login)
-document.getElementById('go-agenda')?.addEventListener('click', async () => {
-  overlay.classList.remove('open');       // cerrar menú lateral
-  try {
-    await agendaInitForCurrentLeader();   // cargar y pintar agenda
-    showView('view-agenda');              // mostrar vista principal de agenda
-  } catch (e) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error cargando agenda',
-      text: e.message || 'No fue posible cargar la agenda'
-    });
-  }
-});
-
-    // Sonido para botones Atrás/Regresar
+    // S
+    
+    onido para botones Atrás/Regresar
     ['btn-ovl-back','a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver','btn-reg-atras','sede-volver','redes-volver','lc-volver','com-volver','ref-volver'].forEach(id=>{
   const el = document.getElementById(id);
   if(el) el.addEventListener('click', ()=> playSoundOnce(SOUNDS.back));
@@ -3771,7 +3773,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-    // ================== AGENDA LÍDERES ==================
+   // ================== AGENDA LÍDERES ==================
 const AGENDA_API_LIST = 'listEventosAgenda';
 const AGENDA_API_GET  = 'getEventoAgenda';
 const AGENDA_API_SAVE = 'guardarEventoAgenda';
@@ -3781,7 +3783,7 @@ let AGENDA_CURRENT_VIEW = 'month';
 let AGENDA_CURRENT_DATE = new Date();
 let AGENDA_SELECTED_EVENT = null;
 
-// Reutiliza helpers del calendario de index2 adaptados a prefijo agenda
+// ---------- Helpers básicos ----------
 function agendaPad2(n){
   return String(n).padStart(2,'0');
 }
@@ -3815,12 +3817,10 @@ function agendaMinutesFromTimeStr(str){
 const AGENDA_MONTHS_SHORT = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
 const AGENDA_WEEKDAYS_SHORT = ['DOM','LUN','MAR','MIÉ','JUE','VIE','SÁB'];
 
-    // Llama al backend (gs1) y llena AGENDA_EVENTS con los datos de la hoja EVENTOS
+// ---------- Carga de eventos desde Apps Script ----------
 async function agendaLoadEvents(){
   try{
     const list = await apiGet(AGENDA_API_LIST, {});
-    // El backend ya devuelve: codigo, nombreEvento, fechaEvento (dd/mm/aaaa),
-    // lugar, lider, contacto, estado, horaInicio, horaTermino, horaInicioAMPM, horaTerminoAMPM, etc.
     AGENDA_EVENTS = Array.isArray(list) ? list : [];
   }catch(e){
     AGENDA_EVENTS = [];
@@ -3828,10 +3828,10 @@ async function agendaLoadEvents(){
   }
 }
 
-    // Inicio y fin de semana (domingo-sábado), igual que en index2 pero con prefijo agenda
+// ---------- Rango de semana ----------
 function agendaStartOfWeek(d){
   const dt = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-  const day = dt.getDay();                // 0=Dom
+  const day = dt.getDay(); // 0 = Domingo
   const diff = (day + 7 - 0) % 7;
   dt.setDate(dt.getDate() - diff);
   return dt;
@@ -3841,7 +3841,7 @@ function agendaEndOfWeek(d){
   return new Date(start.getFullYear(), start.getMonth(), start.getDate() + 6);
 }
 
-// Actualiza el título superior ("Mes actual", "Semana del ...", etc.)
+// ---------- Título superior ----------
 function agendaUpdateTitle(){
   const el = document.getElementById('agenda-title-text');
   if(!el) return;
@@ -3870,7 +3870,7 @@ function agendaUpdateTitle(){
   el.textContent = d.toLocaleDateString('es-CO', { month:'long', year:'numeric' }).toUpperCase();
 }
 
-// Filtro de búsqueda: por líder, lugar o nombre de evento
+// ---------- Filtro ----------
 function agendaEventMatchesFilter(ev, query){
   if(!query) return true;
   const q = query.toLowerCase();
@@ -3881,12 +3881,13 @@ function agendaEventMatchesFilter(ev, query){
   ].some(v => String(v||'').toLowerCase().includes(q));
 }
 
-// Todos los eventos para una fecha "dd/mm/aaaa"
+// Eventos en un día exacto dd/mm/aaaa
 function agendaEventsOnDay(dmy){
   return AGENDA_EVENTS.filter(ev => ev.fechaEvento === dmy);
 }
 
-    function agendaRender(){
+// ---------- Render principal ----------
+function agendaRender(){
   const cont = document.getElementById('agenda-container');
   if(!cont) return;
 
@@ -3906,8 +3907,8 @@ function agendaEventsOnDay(dmy){
   }
 }
 
-    function agendaRenderMonth(cont, filterVal){
-  // Encabezados de días de la semana
+// ---------- Vista mes ----------
+function agendaRenderMonth(cont, filterVal){
   const header = document.createElement('div');
   header.className = 'cal-weekdays';
   AGENDA_WEEKDAYS_SHORT.forEach(d => {
@@ -3966,7 +3967,6 @@ function agendaEventsOnDay(dmy){
 
     cell.appendChild(headerNum);
 
-    // Eventos de este día
     const events = agendaEventsOnDay(iso).filter(ev => agendaEventMatchesFilter(ev, filterVal));
     events.sort((a,b)=>{
       const ma = agendaMinutesFromTimeStr(a.horaInicio || '');
@@ -3976,12 +3976,10 @@ function agendaEventsOnDay(dmy){
 
     events.forEach(ev => {
       const chip = document.createElement('div');
-      // Usamos una sola clase "default filled" (no hay secretarías aquí)
       chip.className = 'cal-event-chip sec-default-filled';
 
       const title = document.createElement('span');
       title.className = 'cal-evt-title';
-      // Texto: LÍDER + rango horario
       title.textContent = 'Líder ' + (ev.lider || '');
 
       const time = document.createElement('span');
@@ -3991,7 +3989,6 @@ function agendaEventsOnDay(dmy){
       chip.appendChild(title);
       chip.appendChild(time);
 
-      // Click: abrir edición
       chip.addEventListener('click', ()=> agendaOpenEventForEdit(ev));
 
       cell.appendChild(chip);
@@ -4002,7 +3999,8 @@ function agendaEventsOnDay(dmy){
   cont.appendChild(grid);
 }
 
-    function agendaRenderDay(cont, filterVal){
+// ---------- Vista día ----------
+function agendaRenderDay(cont, filterVal){
   const header = document.createElement('div');
   header.className = 'cal-day-header-row';
   const d = AGENDA_CURRENT_DATE;
@@ -4054,7 +4052,8 @@ function agendaEventsOnDay(dmy){
   cont.appendChild(body);
 }
 
-    function agendaRenderWeek(cont, filterVal){
+// ---------- Vista semana ----------
+function agendaRenderWeek(cont, filterVal){
   const start = agendaStartOfWeek(AGENDA_CURRENT_DATE);
   const end = agendaEndOfWeek(AGENDA_CURRENT_DATE);
 
@@ -4132,7 +4131,8 @@ function agendaEventsOnDay(dmy){
   cont.appendChild(body);
 }
 
-    function agendaRenderYear(cont, filterVal){
+// ---------- Vista año (resumen) ----------
+function agendaRenderYear(cont, filterVal){
   const grid = document.createElement('div');
   grid.className = 'cal-year-grid';
 
@@ -4208,6 +4208,56 @@ function agendaEventsOnDay(dmy){
   cont.appendChild(grid);
 }
 
+// ---------- Abrir evento para editar ----------
+function agendaOpenEventForEdit(ev){
+  if(!ev) return;
+
+  const codigo   = ev.codigo || '';
+  const nombre   = ev.nombreEvento || '';
+  const fechaStr = ev.fechaEvento || '';
+  const hIni     = ev.horaInicio || '';
+  const hFin     = ev.horaTerminacion || '';
+  const lugar    = ev.lugar || '';
+  const lider    = ev.lider || '';
+  const contacto = ev.contacto || '';
+
+  document.getElementById('agenda-evento-title').textContent = 'EDITAR EVENTO';
+  document.getElementById('agenda-evento-codigo').value = codigo;
+  document.getElementById('agenda-nombreEvento').value = nombre;
+  document.getElementById('agenda-fechaEvento').value = fechaStr;
+  document.getElementById('agenda-horaInicio').value = hIni;
+  document.getElementById('agenda-horaTerminacion').value = hFin;
+  document.getElementById('agenda-lugar').value = lugar;
+  document.getElementById('agenda-lider').value = lider;
+  document.getElementById('agenda-contacto').value = contacto;
+
+  showView('view-agenda-evento');
+}
+
+// ---------- Inicializar agenda para el líder actual ----------
+async function agendaInitForCurrentLeader() {
+  if (!currentUser) {
+    throw new Error('No hay sesión activa.');
+  }
+
+  AGENDA_CURRENT_VIEW = 'month';
+  AGENDA_CURRENT_DATE = new Date();
+
+  try{
+    document.getElementById('agenda-view-day')?.classList.remove('active');
+    document.getElementById('agenda-view-week')?.classList.remove('active');
+    document.getElementById('agenda-view-month')?.classList.add('active');
+    document.getElementById('agenda-view-year')?.classList.remove('active');
+  }catch(_){}
+
+  const liderInput    = document.getElementById('agenda-lider');
+  const contactoInput = document.getElementById('agenda-contacto');
+  if (liderInput)    liderInput.value    = currentUser.nombre   || '';
+  if (contactoInput) contactoInput.value = currentUser.telefono || '';
+
+  await agendaLoadEvents();
+  agendaRender();
+}
     /* ==== REFERIDOS (vista líder) ==== */
 let REF_DATA = [];
 
@@ -4375,6 +4425,95 @@ function renderReferidos(list){
 
 // Botón Regresar (aplica estilos/sonido existentes)
 document.getElementById('ref-volver').addEventListener('click', ()=> showView('view-menu'));
+
+    // Botón REGRESAR de la vista principal de agenda
+document.getElementById('agenda-btn-back')?.addEventListener('click', () => {
+  playSoundOnce(SOUNDS.back);
+  showView('view-menu');
+});
+
+// Botón "Ingresar Evento" (nuevo evento)
+document.getElementById('agenda-btn-new')?.addEventListener('click', () => {
+  document.getElementById('agenda-evento-title').textContent = 'REGISTRAR EVENTO';
+  document.getElementById('agenda-nombreEvento').value = '';
+  document.getElementById('agenda-fechaEvento').value = agendaFormatDMY(AGENDA_CURRENT_DATE);
+  document.getElementById('agenda-horaInicio').value = '';
+  document.getElementById('agenda-horaTerminacion').value = '';
+  document.getElementById('agenda-lugar').value = '';
+  document.getElementById('agenda-evento-codigo').value = '';
+
+  const liderInput    = document.getElementById('agenda-lider');
+  const contactoInput = document.getElementById('agenda-contacto');
+  if (liderInput)    liderInput.value    = currentUser?.nombre   || '';
+  if (contactoInput) contactoInput.value = currentUser?.telefono || '';
+
+  showView('view-agenda-evento');
+});
+
+// Botón REGRESAR del formulario de evento
+document.getElementById('agenda-evento-volver')?.addEventListener('click', () => {
+  playSoundOnce(SOUNDS.back);
+  showView('view-agenda');
+});
+
+// Guardar evento
+document.getElementById('agenda-evento-guardar')?.addEventListener('click', async () => {
+  const codigo   = (document.getElementById('agenda-evento-codigo').value || '').trim();
+  const nombre   = (document.getElementById('agenda-nombreEvento').value || '').trim();
+  const fechaStr = (document.getElementById('agenda-fechaEvento').value || '').trim();
+  const hIni     = (document.getElementById('agenda-horaInicio').value || '').trim();
+  const hFin     = (document.getElementById('agenda-horaTerminacion').value || '').trim();
+  const lugar    = (document.getElementById('agenda-lugar').value || '').trim();
+  const lider    = (document.getElementById('agenda-lider').value || '').trim();
+  const contacto = (document.getElementById('agenda-contacto').value || '').trim();
+
+  if (!nombre || !fechaStr || !hIni || !hFin || !lugar) {
+    return Swal.fire({
+      icon: 'warning',
+      title: 'Faltan datos',
+      text: 'Completa nombre, fecha, horas y lugar.'
+    });
+  }
+
+  const body = {
+    codigo,
+    nombreEvento: nombre,
+    fechaEvento: fechaStr,
+    horaInicio: hIni,
+    horaTerminacion: hFin,
+    lugar,
+    lider,
+    contacto,
+    documentoLider: currentUser?.documento || ''
+  };
+
+  try {
+    const r = await apiPost(AGENDA_API_SAVE, body);
+    if (r && r.success) {
+      await Swal.fire({
+        icon: 'success',
+        title: 'Evento guardado',
+        timer: 1600,
+        showConfirmButton: false
+      });
+      await agendaLoadEvents();
+      agendaRender();
+      showView('view-agenda');
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error al guardar',
+        text: r?.message || 'Error desconocido'
+      });
+    }
+  } catch (e) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: e.message
+    });
+  }
+});
 
   </script>
 </body>

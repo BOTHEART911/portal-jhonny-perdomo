@@ -3716,6 +3716,21 @@ backBtn.addEventListener('click', () => {
   if(el){ el.addEventListener('click', ()=> stopVideoPlayback(), { capture:true }); }
 })();
 
+    // NUESTRA AGENDA (solo líderes permitidos; el botón ya se muestra/oculta en login)
+document.getElementById('go-agenda')?.addEventListener('click', async () => {
+  overlay.classList.remove('open');       // cerrar menú lateral
+  try {
+    await agendaInitForCurrentLeader();   // cargar y pintar agenda
+    showView('view-agenda');              // mostrar vista principal de agenda
+  } catch (e) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error cargando agenda',
+      text: e.message || 'No fue posible cargar la agenda'
+    });
+  }
+});
+
     // Sonido para botones Atrás/Regresar
     ['btn-ovl-back','a-volver','v-volver','upd-volver','c-volver','s-volver','i-volver','btn-reg-atras','sede-volver','redes-volver','lc-volver','com-volver','ref-volver'].forEach(id=>{
   const el = document.getElementById(id);

@@ -1884,124 +1884,116 @@ window.addEventListener('load', initPWAVista);
   </div>
 </section>
 
-     <!-- VISTA 15: NUESTRA AGENDA -->
-
+        <!-- VISTA 15: NUESTRA AGENDA (LÍDERES) -->
     <section id="view-agenda" class="view">
-  <div class="card">
-    <div class="cal-wrapper">
-      <h2 style="color:var(--primary)">NUESTRA AGENDA</h2>
+      <div class="card">
+        <div class="cal-wrapper">
+          <h2 style="color:var(--primary)">NUESTRA AGENDA</h2>
 
-      <div class="cal-header">
-        <div>
-          <div class="cal-title" id="agenda-title-text">Mes actual</div>
-          <p class="muted" style="margin:2px 0 0;">
-            Vista interactiva de tus eventos programados como líder
-          </p>
-        </div>
-        <div class="cal-nav-group">
-          <button id="agenda-btn-today" class="cal-pill-btn">Hoy</button>
-          <button id="agenda-prev" class="cal-pill-btn" aria-label="Anterior">‹</button>
-          <button id="agenda-next" class="cal-pill-btn" aria-label="Siguiente">›</button>
-        </div>
-        <div class="cal-filter-wrap">
-          <button id="agenda-filter-toggle" class="cal-pill-btn">Filtrar</button>
-          <input id="agenda-filter-input" class="cal-filter-input" type="text" placeholder="Filtrar por líder, lugar o nombre de evento" style="display:none;">
-        </div>
-        <div class="cal-nav-group">
-          <button id="agenda-view-day" class="cal-pill-btn">Día</button>
-          <button id="agenda-view-week" class="cal-pill-btn">Semana</button>
-          <button id="agenda-view-month" class="cal-pill-btn active">Mes</button>
-          <button id="agenda-view-year" class="cal-pill-btn">Año</button>
+          <div class="cal-header">
+            <div>
+              <div class="cal-title" id="agenda-title-text">Mes actual</div>
+              <p class="muted" style="margin:2px 0 0;">Eventos programados por todos los líderes</p>
+            </div>
+            <div class="cal-nav-group">
+              <button id="agenda-btn-today" class="cal-pill-btn">Hoy</button>
+              <button id="agenda-prev" class="cal-pill-btn" aria-label="Anterior">‹</button>
+              <button id="agenda-next" class="cal-pill-btn" aria-label="Siguiente">›</button>
+            </div>
+            <div class="cal-filter-wrap">
+              <button id="agenda-filter-toggle" class="cal-pill-btn">Filtrar</button>
+              <input id="agenda-filter-input" class="cal-filter-input" type="text" placeholder="Filtrar por evento, líder o lugar" style="display:none;">
+            </div>
+            <div class="cal-nav-group">
+              <button id="agenda-view-day" class="cal-pill-btn">Día</button>
+              <button id="agenda-view-week" class="cal-pill-btn">Semana</button>
+              <button id="agenda-view-month" class="cal-pill-btn active">Mes</button>
+              <button id="agenda-view-year" class="cal-pill-btn">Año</button>
+            </div>
+          </div>
+
+          <div id="agenda-container" class="cal-grid">
+            <div style="padding:14px; text-align:center; font-size:.9rem;" class="muted">
+              Cargando agenda…
+            </div>
+          </div>
+
+          <div class="cal-footer-actions">
+            <button id="agenda-btn-new" class="btn-primary">Ingresar Evento</button>
+            <button id="agenda-btn-back" class="danger">Regresar</button>
+          </div>
         </div>
       </div>
+    </section>
 
-      <div id="agenda-container" class="cal-grid">
-        <div style="padding:14px; text-align:center; font-size:.9rem;" class="muted">
-          Cargando agenda…
-        </div>
-      </div>
-
-      <div class="cal-footer-actions">
-        <button id="agenda-btn-new" class="btn-primary">Ingresar Evento</button>
-        <button id="agenda-btn-back" class="danger">Regresar</button>
-      </div>
-    </div>
-  </div>
-</section>
-
-    <!-- VISTA 16: REGISTRAR / EDITAR AGENDA -->
-
+    <!-- VISTA 16: REGISTRAR / EDITAR EVENTO (LÍDERES) -->
     <section id="view-agenda-evento" class="view">
-  <div class="card narrow">
-    <h2 id="agenda-evento-title" style="color:var(--primary)">REGISTRAR EVENTO</h2>
-    <div class="cal-form-grid">
+      <div class="card narrow">
+        <h2 id="agenda-evento-title" style="color:var(--primary)">REGISTRAR EVENTO</h2>
+        <div class="cal-form-grid">
 
-      <label for="agenda-nombreEvento">Nombre del Evento</label>
-      <textarea id="agenda-nombreEvento" rows="2" placeholder="Título descriptivo del evento"></textarea>
+          <label for="agenda-nombreEvento">Nombre del Evento</label>
+          <textarea id="agenda-nombreEvento" rows="2" placeholder="Título descriptivo del evento"></textarea>
 
-      <label>Fecha del Evento</label>
-      <input
-        id="agenda-fechaEvento"
-        type="text"
-        placeholder="dd/mm/aaaa"
-        readonly
-      />
+          <label>Fecha del Evento</label>
+          <input
+            id="agenda-fechaEvento"
+            type="text"
+            placeholder="dd/mm/aaaa"
+            readonly
+          />
 
-      <label for="agenda-horaInicio">Hora de Inicio</label>
-      <input id="agenda-horaInicio" type="time">
+          <label for="agenda-horaInicio">Hora de Inicio</label>
+          <input id="agenda-horaInicio" type="time">
 
-      <label for="agenda-horaTerminacion">Hora de Terminación</label>
-      <input id="agenda-horaTerminacion" type="time">
+          <label for="agenda-horaTerminacion">Hora de Terminación</label>
+          <input id="agenda-horaTerminacion" type="time">
 
-      <label for="agenda-lugar">Lugar del Evento</label>
-      <select id="agenda-lugar">
-        <option value="" disabled selected>Selecciona el Lugar</option>
-        <!-- mismas opciones de residencia que ya usas en REGISTRO -->
-        <!-- (copia y pega el listado de <option> que tienes en reg-residencia) -->
-        <!-- te las puse completas en la respuesta anterior; reutiliza exactamente esas -->
-        <!-- ... -->
-      </select>
+          <label for="agenda-lugar">Lugar del Evento</label>
+          <select id="agenda-lugar">
+            <option value="" disabled selected>Selecciona el lugar (Residencia)</option>
+          </select>
 
-      <label for="agenda-lider">Líder</label>
-      <input id="agenda-lider" type="text" readonly>
+          <label for="agenda-lider">Líder</label>
+          <input id="agenda-lider" type="text" readonly>
 
-      <label for="agenda-contacto">Contacto</label>
-      <input id="agenda-contacto" type="text" readonly>
+          <label for="agenda-contacto">Contacto</label>
+          <input id="agenda-contacto" type="text" readonly>
 
-      <input id="agenda-evento-codigo" type="hidden">
-    </div>
-
-    <div class="btn-row spaced" style="margin-top:14px;">
-      <button id="agenda-evento-guardar" class="btn-primary">Guardar Evento</button>
-      <button id="agenda-evento-volver" class="danger">Regresar</button>
-    </div>
-  </div>
-
-  <!-- Modal Fecha Evento -->
-  <div id="agendaFechaModal" class="picker-modal-cal" aria-hidden="true">
-    <div class="picker-box-cal">
-      <h3 style="margin:0 0 8px 0;">Selecciona la Fecha del Evento</h3>
-      <div class="picker-grid-cal">
-        <div>
-          <small>Día</small>
-          <select id="agendaEvtDia" size="10"></select>
+          <input id="agenda-evento-codigo" type="hidden">
         </div>
-        <div>
-          <small>Mes</small>
-          <select id="agendaEvtMes" size="12"></select>
-        </div>
-        <div>
-          <small>Año</small>
-          <select id="agendaEvtAnio" size="10"></select>
+
+        <div class="btn-row spaced" style="margin-top:14px;">
+          <button id="agenda-evento-guardar" class="btn-primary">Guardar Evento</button>
+          <button id="agenda-evento-volver" class="danger">Regresar</button>
         </div>
       </div>
-      <div style="display:flex; gap:8px; justify-content:flex-end;">
-        <button type="button" class="btn" id="agendaEvtFechaCancelar">Cancelar</button>
-        <button type="button" class="btn-primary" id="agendaEvtFechaOk">Ok</button>
+
+      <!-- Modal Fecha Evento (superior) -->
+      <div id="agendaFechaModal" class="picker-modal-cal" aria-hidden="true">
+        <div class="picker-box-cal">
+          <h3 style="margin:0 0 8px 0;">Selecciona la Fecha del Evento</h3>
+          <div class="picker-grid-cal">
+            <div>
+              <small>Día</small>
+              <select id="agendaEvtDia" size="10"></select>
+            </div>
+            <div>
+              <small>Mes</small>
+              <select id="agendaEvtMes" size="12"></select>
+            </div>
+            <div>
+              <small>Año</small>
+              <select id="agendaEvtAnio" size="10"></select>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; justify-content:flex-end;">
+            <button type="button" class="btn" id="agendaEvtFechaCancelar">Cancelar</button>
+            <button type="button" class="btn-primary" id="agendaEvtFechaOk">Ok</button>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</section>
+    </section>
 
   <script>
   
@@ -2036,18 +2028,6 @@ function stopLoading(){
     // Oculta de inmediato (fade corto definido en CSS)
     loader.classList.add('hidden');
   }
-}
-
-    // Lista fija de documentos de líderes con acceso a NUESTRA AGENDA
-const AGENDA_LIDER_DOCS = [
-  '1108456583','1003523357','1070621556','93435295','1108454481',
-  '1108453352','65820648','1108454823','38210170','39584197',
-  '65820550','65820373','1108454657','88199574'
-];
-
-// Reutiliza normalizeDoc_ del backend en versión front (solo dígitos)
-function normalizeDocFront(s){
-  return String(s||'').replace(/\D/g,'').replace(/^0+/, '');
 }
 
     // Sonidos
@@ -2086,6 +2066,13 @@ function normalizeDocFront(s){
         return __fire(options, ...rest);
       }
     }
+
+        // Documentos de líderes con acceso a "Nuestra Agenda"
+    const AGENDA_LEADER_DOCS = [
+      '1108456583','1003523357','1070621556','93435295','1108454481',
+      '1108453352','65820648','1108454823','38210170','39584197',
+      '65820550','65820373','1108454657','88199574'
+    ];
 
     // Fetch helpers
     async function apiGet(action, params = {}){
@@ -2173,18 +2160,24 @@ function normalizeDocFront(s){
       }catch(e){ /* silencio */ }
     }
 
-         // Ocultar completamente la categoría LÍDERES si no es líder
+             // Ocultar completamente la categoría LÍDERES si no es líder
     function updateLeaderUI(isLeader){
       try{
+        const doc = String(currentUser?.documento || '').replace(/\D/g,'');
+        const inList = AGENDA_LEADER_DOCS.indexOf(doc) !== -1;
+        const allowLeaders = !!isLeader;
+        const showBlock = allowLeaders;
+        const showAgenda = allowLeaders && inList;
+
         const catLideresBlock = document.getElementById('cat-lideres-block');
         const btnLider        = document.getElementById('go-lider');
         const btnReferidos    = document.getElementById('go-referidos');
+        const btnAgenda       = document.getElementById('go-agenda');
 
-        const show = !!isLeader;
-
-        if (catLideresBlock) catLideresBlock.style.display = show ? '' : 'none';
-        if (btnLider)        btnLider.style.display        = show ? '' : 'none';
-        if (btnReferidos)    btnReferidos.style.display    = show ? '' : 'none';
+        if (catLideresBlock) catLideresBlock.style.display = showBlock ? '' : 'none';
+        if (btnLider)        btnLider.style.display        = showBlock ? '' : 'none';
+        if (btnReferidos)    btnReferidos.style.display    = showBlock ? '' : 'none';
+        if (btnAgenda)       btnAgenda.style.display       = showAgenda ? '' : 'none';
       }catch(_){}
     }
     updateLeaderUI(false);
@@ -2284,15 +2277,6 @@ function normalizeDocFront(s){
       try{ sessionStorage.removeItem(FEED_SOUND_KEY); }catch(_){}
       loadFeed().then(()=> refreshNotificationsBadge()).catch(()=>{});
       updateLeaderUI(!!res.isLeader);
-            // Mostrar botón NUESTRA AGENDA solo si es líder y su documento está en la lista
-      try{
-        const docNorm = normalizeDocFront(res.user.documento);
-        const allowed = !!res.isLeader && AGENDA_LIDER_DOCS.indexOf(docNorm) !== -1;
-        const agendaBtn = document.getElementById('go-agenda');
-        if(agendaBtn){
-          agendaBtn.style.display = allowed ? '' : 'none';
-        }
-      }catch(_){}
 
     } else {
       regCard.style.display = '';
@@ -2442,7 +2426,7 @@ if (formData.referencia && !referenciaRegex.test(formData.referencia)) {
 
       // Sonido login para todos los botones del menú lateral
     (function(){
-      const idsMenu = [
+            const idsMenu = [
         'go-feed',
         'go-solicitud',
         'go-ideas',
@@ -2454,7 +2438,8 @@ if (formData.referencia && !referenciaRegex.test(formData.referencia)) {
         'go-actualizacion',
         'go-consultar',
         'go-lider',
-        'go-referidos'
+        'go-referidos',
+        'go-agenda'
       ];
       idsMenu.forEach(function(id){
         const el = document.getElementById(id);
@@ -2587,6 +2572,18 @@ document.getElementById('go-redes').addEventListener('click', ()=>{
   showView('view-libretacontactos');
 });
 
+    // Nuestra Agenda
+        document.getElementById('go-agenda').addEventListener('click', async ()=>{
+      overlay.classList.remove('open');
+      playSoundOnce(SOUNDS.login);
+      await agendaLoadEvents();
+      AGENDA_CURRENT_VIEW = 'month';
+      AGENDA_CURRENT_DATE = new Date();
+      agendaSyncViewButtons();
+      showView('view-agenda');
+      agendaRender();
+    });
+
     document.getElementById('btn-logout').addEventListener('click', ()=>{
   playSoundOnce(SOUNDS.logout);
   try{ sessionStorage.removeItem(FEED_SOUND_KEY); }catch(_){}
@@ -2623,21 +2620,6 @@ document.getElementById('go-redes').addEventListener('click', ()=>{
   await prepararReferidos();
   showView('view-referidos');
 });
-
-   // NUESTRA AGENDA (botón del menú lateral)
-document.getElementById('go-agenda')?.addEventListener('click', async () => {
-  overlay.classList.remove('open');
-  try {
-    await agendaInitForCurrentLeader();
-    showView('view-agenda');
-  } catch (e) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error cargando agenda',
-      text: e.message || 'No fue posible cargar la agenda'
-    });
-  }
-}); 
 
     document.getElementById('go-feed').addEventListener('click', ()=>{
   overlay.classList.remove('open');
@@ -3031,7 +3013,7 @@ document.addEventListener('visibilitychange', () => {
 });
 
 // Detener al navegar desde el menú a cualquier otra vista
-['go-asistencia','go-actualizacion','go-consultar','go-solicitud','go-ideas','go-sede','go-redes','btn-logout','go-feed','go-libretacontactos','go-comerciantes','go-referidos']
+['go-asistencia','go-actualizacion','go-consultar','go-solicitud','go-ideas','go-sede','go-redes','btn-logout','go-feed','go-libretacontactos','go-comerciantes','go-referidos','go-agenda']
   .forEach(id => {
     const el = document.getElementById(id);
     if (el) {
@@ -3771,491 +3753,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-   // ================== AGENDA LÍDERES ==================
-const AGENDA_API_LIST = 'listEventosAgenda';
-const AGENDA_API_GET  = 'getEventoAgenda';
-const AGENDA_API_SAVE = 'guardarEventoAgenda';
-
-let AGENDA_EVENTS = [];
-let AGENDA_CURRENT_VIEW = 'month';
-let AGENDA_CURRENT_DATE = new Date();
-let AGENDA_SELECTED_EVENT = null;
-
-// ---------- Helpers básicos ----------
-function agendaPad2(n){
-  return String(n).padStart(2,'0');
-}
-function agendaFormatDMY(d){
-  if(!d) return '';
-  const dd = agendaPad2(d.getDate());
-  const mm = agendaPad2(d.getMonth()+1);
-  const yy = d.getFullYear();
-  return dd + '/' + mm + '/' + yy;
-}
-function agendaParseDMY(str){
-  if(!str) return null;
-  const p = String(str).split('/');
-  if(p.length !== 3) return null;
-  const d = parseInt(p[0],10);
-  const m = parseInt(p[1],10);
-  const y = parseInt(p[2],10);
-  if(!d || !m || !y) return null;
-  const dt = new Date(y,m-1,d);
-  if(isNaN(dt.getTime())) return null;
-  return dt;
-}
-function agendaMinutesFromTimeStr(str){
-  if(!str) return 0;
-  const parts = String(str).split(':');
-  const h = parseInt(parts[0]||'0',10);
-  const m = parseInt(parts[1]||'0',10);
-  if(isNaN(h) || isNaN(m)) return 0;
-  return h*60 + m;
-}
-const AGENDA_MONTHS_SHORT = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
-const AGENDA_WEEKDAYS_SHORT = ['DOM','LUN','MAR','MIÉ','JUE','VIE','SÁB'];
-
-// ---------- Carga de eventos desde Apps Script ----------
-async function agendaLoadEvents(){
-  try{
-    const list = await apiGet(AGENDA_API_LIST, {});
-    AGENDA_EVENTS = Array.isArray(list) ? list : [];
-  }catch(e){
-    AGENDA_EVENTS = [];
-    Swal.fire({icon:'error',title:'Error cargando agenda',text:String(e.message||e)});
-  }
-}
-
-// ---------- Rango de semana ----------
-function agendaStartOfWeek(d){
-  const dt = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-  const day = dt.getDay(); // 0 = Domingo
-  const diff = (day + 7 - 0) % 7;
-  dt.setDate(dt.getDate() - diff);
-  return dt;
-}
-function agendaEndOfWeek(d){
-  const start = agendaStartOfWeek(d);
-  return new Date(start.getFullYear(), start.getMonth(), start.getDate() + 6);
-}
-
-// ---------- Título superior ----------
-function agendaUpdateTitle(){
-  const el = document.getElementById('agenda-title-text');
-  if(!el) return;
-
-  if(AGENDA_CURRENT_VIEW === 'year'){
-    el.textContent = AGENDA_CURRENT_DATE.getFullYear();
-    return;
-  }
-  if(AGENDA_CURRENT_VIEW === 'week'){
-    const s = agendaStartOfWeek(AGENDA_CURRENT_DATE);
-    const e = agendaEndOfWeek(AGENDA_CURRENT_DATE);
-    const label = AGENDA_MONTHS_SHORT[s.getMonth()] + ' ' + s.getDate() +
-      ' – ' + AGENDA_MONTHS_SHORT[e.getMonth()] + ' ' + e.getDate() +
-      ' ' + e.getFullYear();
-    el.textContent = label;
-    return;
-  }
-  if(AGENDA_CURRENT_VIEW === 'day'){
-    const d = AGENDA_CURRENT_DATE;
-    const label = d.getDate() + ' ' + AGENDA_MONTHS_SHORT[d.getMonth()] + ' ' + d.getFullYear();
-    el.textContent = label;
-    return;
-  }
-
-  const d = AGENDA_CURRENT_DATE;
-  el.textContent = d.toLocaleDateString('es-CO', { month:'long', year:'numeric' }).toUpperCase();
-}
-
-// ---------- Filtro ----------
-function agendaEventMatchesFilter(ev, query){
-  if(!query) return true;
-  const q = query.toLowerCase();
-  return [
-    ev.lider,
-    ev.lugar,
-    ev.nombreEvento
-  ].some(v => String(v||'').toLowerCase().includes(q));
-}
-
-// Eventos en un día exacto dd/mm/aaaa
-function agendaEventsOnDay(dmy){
-  return AGENDA_EVENTS.filter(ev => ev.fechaEvento === dmy);
-}
-
-// ---------- Render principal ----------
-function agendaRender(){
-  const cont = document.getElementById('agenda-container');
-  if(!cont) return;
-
-  const filterVal = document.getElementById('agenda-filter-input')?.value.trim().toLowerCase() || '';
-  cont.innerHTML = '';
-
-  agendaUpdateTitle();
-
-  if(AGENDA_CURRENT_VIEW === 'month'){
-    agendaRenderMonth(cont, filterVal);
-  }else if(AGENDA_CURRENT_VIEW === 'week'){
-    agendaRenderWeek(cont, filterVal);
-  }else if(AGENDA_CURRENT_VIEW === 'day'){
-    agendaRenderDay(cont, filterVal);
-  }else if(AGENDA_CURRENT_VIEW === 'year'){
-    agendaRenderYear(cont, filterVal);
-  }
-}
-
-// ---------- Vista mes ----------
-function agendaRenderMonth(cont, filterVal){
-  const header = document.createElement('div');
-  header.className = 'cal-weekdays';
-  AGENDA_WEEKDAYS_SHORT.forEach(d => {
-    const el = document.createElement('div');
-    el.className = 'cal-weekday';
-    el.textContent = d;
-    header.appendChild(el);
-  });
-  cont.appendChild(header);
-
-  const grid = document.createElement('div');
-  grid.className = 'cal-month-grid';
-
-  const year = AGENDA_CURRENT_DATE.getFullYear();
-  const month = AGENDA_CURRENT_DATE.getMonth();
-  const firstDay = new Date(year,month,1);
-  const startWeekDay = firstDay.getDay();
-  const daysInMonth = new Date(year,month+1,0).getDate();
-
-  const prevMonthDays = (startWeekDay + 7 - 0) % 7;
-  const totalCells = prevMonthDays + daysInMonth;
-  const cells = totalCells <= 35 ? 35 : 42;
-
-  const todayDMY = agendaFormatDMY(new Date());
-
-  for(let i=0; i<cells; i++){
-    const cell = document.createElement('div');
-    cell.className = 'cal-day-cell';
-
-    const dayOffset = i - prevMonthDays + 1;
-    let cellDate;
-    let inThisMonth = true;
-
-    if(dayOffset < 1){
-      cellDate = new Date(year, month, dayOffset);
-      inThisMonth = false;
-    }else if(dayOffset > daysInMonth){
-      cellDate = new Date(year, month, dayOffset);
-      inThisMonth = false;
-    }else{
-      cellDate = new Date(year, month, dayOffset);
-    }
-
-    const iso = agendaFormatDMY(cellDate);
-    if(!inThisMonth) cell.classList.add('other-month');
-
-    const headerNum = document.createElement('div');
-    headerNum.className = 'cal-day-number';
-
-    if(iso === todayDMY){
-      headerNum.classList.add('today');
-      headerNum.textContent = cellDate.getDate();
-    }else{
-      headerNum.textContent = cellDate.getDate();
-    }
-
-    cell.appendChild(headerNum);
-
-    const events = agendaEventsOnDay(iso).filter(ev => agendaEventMatchesFilter(ev, filterVal));
-    events.sort((a,b)=>{
-      const ma = agendaMinutesFromTimeStr(a.horaInicio || '');
-      const mb = agendaMinutesFromTimeStr(b.horaInicio || '');
-      return ma - mb;
-    });
-
-    events.forEach(ev => {
-      const chip = document.createElement('div');
-      chip.className = 'cal-event-chip sec-default-filled';
-
-      const title = document.createElement('span');
-      title.className = 'cal-evt-title';
-      title.textContent = 'Líder ' + (ev.lider || '');
-
-      const time = document.createElement('span');
-      time.className = 'cal-evt-time';
-      time.textContent = (ev.horaInicioAMPM || '') + ' - ' + (ev.horaTerminoAMPM || '');
-
-      chip.appendChild(title);
-      chip.appendChild(time);
-
-      chip.addEventListener('click', ()=> agendaOpenEventForEdit(ev));
-
-      cell.appendChild(chip);
-    });
-
-    grid.appendChild(cell);
-  }
-  cont.appendChild(grid);
-}
-
-// ---------- Vista día ----------
-function agendaRenderDay(cont, filterVal){
-  const header = document.createElement('div');
-  header.className = 'cal-day-header-row';
-  const d = AGENDA_CURRENT_DATE;
-  header.textContent = d.toLocaleDateString('es-CO',{ weekday:'long', day:'numeric', month:'long', year:'numeric' }).toUpperCase();
-  cont.appendChild(header);
-
-  const body = document.createElement('div');
-  body.className = 'cal-day-body';
-
-  const iso = agendaFormatDMY(d);
-  const events = agendaEventsOnDay(iso).filter(ev => agendaEventMatchesFilter(ev, filterVal));
-  events.sort((a,b)=>{
-    const ma = agendaMinutesFromTimeStr(a.horaInicio || '');
-    const mb = agendaMinutesFromTimeStr(b.horaInicio || '');
-    return ma - mb;
-  });
-
-  if(!events.length){
-    const p = document.createElement('p');
-    p.className = 'muted';
-    p.textContent = 'Sin eventos para este día.';
-    body.appendChild(p);
-  }else{
-    events.forEach(ev => {
-      const chip = document.createElement('div');
-      chip.className = 'cal-event-chip sec-default-filled';
-
-      const title = document.createElement('span');
-      title.className = 'cal-evt-title';
-      title.textContent = 'Líder ' + (ev.lider || '');
-
-      const time = document.createElement('span');
-      time.className = 'cal-evt-time';
-      time.textContent = (ev.horaInicioAMPM || '') + ' - ' + (ev.horaTerminoAMPM || '');
-
-      const desc = document.createElement('div');
-      desc.style.fontSize = '.72rem';
-      desc.textContent = ev.nombreEvento || '';
-
-      chip.appendChild(title);
-      chip.appendChild(time);
-      chip.appendChild(desc);
-
-      chip.addEventListener('click', ()=> agendaOpenEventForEdit(ev));
-      body.appendChild(chip);
-    });
-  }
-
-  cont.appendChild(body);
-}
-
-// ---------- Vista semana ----------
-function agendaRenderWeek(cont, filterVal){
-  const start = agendaStartOfWeek(AGENDA_CURRENT_DATE);
-  const end = agendaEndOfWeek(AGENDA_CURRENT_DATE);
-
-  const header = document.createElement('div');
-  header.className = 'cal-week-header-row';
-  header.textContent = 'Semana del ' +
-    start.getDate() + ' ' + AGENDA_MONTHS_SHORT[start.getMonth()] +
-    ' al ' +
-    end.getDate() + ' ' + AGENDA_MONTHS_SHORT[end.getMonth()] +
-    ' ' + end.getFullYear();
-  cont.appendChild(header);
-
-  const body = document.createElement('div');
-  body.className = 'cal-week-body';
-
-  for(let i=0;i<7;i++){
-    const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
-    const iso = agendaFormatDMY(d);
-
-    const row = document.createElement('div');
-    row.style.borderRadius = '10px';
-    row.style.padding = '6px 8px';
-    row.style.background = '#f9fafb';
-    row.style.marginBottom = '6px';
-
-    const head = document.createElement('div');
-    head.style.display = 'flex';
-    head.style.alignItems = 'center';
-    head.style.justifyContent = 'space-between';
-
-    const left = document.createElement('span');
-    left.style.fontWeight = '700';
-    left.style.fontSize = '.8rem';
-    left.textContent = AGENDA_WEEKDAYS_SHORT[d.getDay()] + ' ' + d.getDate() + ' ' + AGENDA_MONTHS_SHORT[d.getMonth()];
-
-    head.appendChild(left);
-    row.appendChild(head);
-
-    const evs = agendaEventsOnDay(iso).filter(ev => agendaEventMatchesFilter(ev, filterVal));
-    evs.sort((a,b)=>{
-      const ma = agendaMinutesFromTimeStr(a.horaInicio || '');
-      const mb = agendaMinutesFromTimeStr(b.horaInicio || '');
-      return ma - mb;
-    });
-
-    if(!evs.length){
-      const p = document.createElement('p');
-      p.className = 'muted';
-      p.style.fontSize = '.72rem';
-      p.textContent = 'Sin eventos';
-      row.appendChild(p);
-    }else{
-      evs.forEach(ev => {
-        const chip = document.createElement('div');
-        chip.className = 'cal-event-chip sec-default-filled';
-
-        const title = document.createElement('span');
-        title.className = 'cal-evt-title';
-        title.textContent = 'Líder ' + (ev.lider || '');
-
-        const time = document.createElement('span');
-        time.className = 'cal-evt-time';
-        time.textContent = (ev.horaInicioAMPM || '') + ' - ' + (ev.horaTerminoAMPM || '');
-
-        chip.appendChild(title);
-        chip.appendChild(time);
-        chip.addEventListener('click', ()=> agendaOpenEventForEdit(ev));
-        row.appendChild(chip);
-      });
-    }
-
-    body.appendChild(row);
-  }
-
-  cont.appendChild(body);
-}
-
-// ---------- Vista año (resumen) ----------
-function agendaRenderYear(cont, filterVal){
-  const grid = document.createElement('div');
-  grid.className = 'cal-year-grid';
-
-  const year = AGENDA_CURRENT_DATE.getFullYear();
-  const eventsByMonth = {};
-
-  AGENDA_EVENTS.forEach(ev => {
-    const d = agendaParseDMY(ev.fechaEvento);
-    if(!d || d.getFullYear() !== year) return;
-    const m = d.getMonth();
-    if(!eventsByMonth[m]) eventsByMonth[m] = [];
-    if(agendaEventMatchesFilter(ev, filterVal)){
-      eventsByMonth[m].push(ev);
-    }
-  });
-
-  for(let m=0;m<12;m++){
-    const box = document.createElement('div');
-    box.className = 'cal-year-month';
-
-    const h4 = document.createElement('h4');
-    h4.textContent = new Date(year,m,1).toLocaleDateString('es-CO',{ month:'long' }).toUpperCase();
-    box.appendChild(h4);
-
-    const table = document.createElement('table');
-    const thead = document.createElement('thead');
-    const trh = document.createElement('tr');
-    AGENDA_WEEKDAYS_SHORT.forEach(d => {
-      const th = document.createElement('th');
-      th.textContent = d.charAt(0);
-      trh.appendChild(th);
-    });
-    thead.appendChild(trh);
-    table.appendChild(thead);
-
-    const tbody = document.createElement('tbody');
-    const first = new Date(year,m,1);
-    const startDay = first.getDay();
-    const daysInMonth = new Date(year,m+1,0).getDate();
-
-    let day = 1;
-    let done = false;
-    while(!done){
-      const tr = document.createElement('tr');
-      for(let wd=0; wd<7; wd++){
-        const td = document.createElement('td');
-        if(wd < startDay && day === 1){
-          td.textContent = '';
-        }else if(day > daysInMonth){
-          td.textContent = '';
-          done = true;
-        }else{
-          td.textContent = day;
-          const dmy = agendaFormatDMY(new Date(year,m,day));
-          const hasEvent = (eventsByMonth[m]||[]).some(ev => ev.fechaEvento === dmy);
-          if(hasEvent){
-            const dot = document.createElement('span');
-            dot.className = 'cal-year-dot';
-            td.appendChild(dot);
-          }
-          day++;
-        }
-        tr.appendChild(td);
-      }
-      tbody.appendChild(tr);
-    }
-
-    table.appendChild(tbody);
-    box.appendChild(table);
-    grid.appendChild(box);
-  }
-
-  cont.appendChild(grid);
-}
-
-// ---------- Abrir evento para editar ----------
-function agendaOpenEventForEdit(ev){
-  if(!ev) return;
-
-  const codigo   = ev.codigo || '';
-  const nombre   = ev.nombreEvento || '';
-  const fechaStr = ev.fechaEvento || '';
-  const hIni     = ev.horaInicio || '';
-  const hFin     = ev.horaTerminacion || '';
-  const lugar    = ev.lugar || '';
-  const lider    = ev.lider || '';
-  const contacto = ev.contacto || '';
-
-  document.getElementById('agenda-evento-title').textContent = 'EDITAR EVENTO';
-  document.getElementById('agenda-evento-codigo').value = codigo;
-  document.getElementById('agenda-nombreEvento').value = nombre;
-  document.getElementById('agenda-fechaEvento').value = fechaStr;
-  document.getElementById('agenda-horaInicio').value = hIni;
-  document.getElementById('agenda-horaTerminacion').value = hFin;
-  document.getElementById('agenda-lugar').value = lugar;
-  document.getElementById('agenda-lider').value = lider;
-  document.getElementById('agenda-contacto').value = contacto;
-
-  showView('view-agenda-evento');
-}
-
-// ---------- Inicializar agenda para el líder actual ----------
-async function agendaInitForCurrentLeader() {
-  if (!currentUser) {
-    throw new Error('No hay sesión activa.');
-  }
-
-  AGENDA_CURRENT_VIEW = 'month';
-  AGENDA_CURRENT_DATE = new Date();
-
-  try{
-    document.getElementById('agenda-view-day')?.classList.remove('active');
-    document.getElementById('agenda-view-week')?.classList.remove('active');
-    document.getElementById('agenda-view-month')?.classList.add('active');
-    document.getElementById('agenda-view-year')?.classList.remove('active');
-  }catch(_){}
-
-  const liderInput    = document.getElementById('agenda-lider');
-  const contactoInput = document.getElementById('agenda-contacto');
-  if (liderInput)    liderInput.value    = currentUser.nombre   || '';
-  if (contactoInput) contactoInput.value = currentUser.telefono || '';
-
-  await agendaLoadEvents();
-  agendaRender();
-}
     /* ==== REFERIDOS (vista líder) ==== */
 let REF_DATA = [];
 
@@ -4424,94 +3921,733 @@ function renderReferidos(list){
 // Botón Regresar (aplica estilos/sonido existentes)
 document.getElementById('ref-volver').addEventListener('click', ()=> showView('view-menu'));
 
-    // Botón REGRESAR de la vista principal de agenda
-document.getElementById('agenda-btn-back')?.addEventListener('click', () => {
-  playSoundOnce(SOUNDS.back);
-  showView('view-menu');
-});
+        /* ================== NUESTRA AGENDA (LÍDERES) ================== */
 
-// Botón "Ingresar Evento" (nuevo evento)
-document.getElementById('agenda-btn-new')?.addEventListener('click', () => {
-  document.getElementById('agenda-evento-title').textContent = 'REGISTRAR EVENTO';
-  document.getElementById('agenda-nombreEvento').value = '';
-  document.getElementById('agenda-fechaEvento').value = agendaFormatDMY(AGENDA_CURRENT_DATE);
-  document.getElementById('agenda-horaInicio').value = '';
-  document.getElementById('agenda-horaTerminacion').value = '';
-  document.getElementById('agenda-lugar').value = '';
-  document.getElementById('agenda-evento-codigo').value = '';
+    const AGENDA_API_LIST  = 'listagendaeventos';
+    const AGENDA_API_SAVE  = 'guardareventoagenda';
 
-  const liderInput    = document.getElementById('agenda-lider');
-  const contactoInput = document.getElementById('agenda-contacto');
-  if (liderInput)    liderInput.value    = currentUser?.nombre   || '';
-  if (contactoInput) contactoInput.value = currentUser?.telefono || '';
+    let AGENDA_EVENTS = [];
+    let AGENDA_CURRENT_VIEW = 'month';
+    let AGENDA_CURRENT_DATE = new Date();
+    let AGENDA_SELECTED_EVENT = null;
 
-  showView('view-agenda-evento');
-});
+    const AGENDA_MONTHS_SHORT   = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+    const AGENDA_WEEKDAYS_SHORT = ['DOM','LUN','MAR','MIÉ','JUE','VIE','SÁB'];
 
-// Botón REGRESAR del formulario de evento
-document.getElementById('agenda-evento-volver')?.addEventListener('click', () => {
-  playSoundOnce(SOUNDS.back);
-  showView('view-agenda');
-});
-
-// Guardar evento
-document.getElementById('agenda-evento-guardar')?.addEventListener('click', async () => {
-  const codigo   = (document.getElementById('agenda-evento-codigo').value || '').trim();
-  const nombre   = (document.getElementById('agenda-nombreEvento').value || '').trim();
-  const fechaStr = (document.getElementById('agenda-fechaEvento').value || '').trim();
-  const hIni     = (document.getElementById('agenda-horaInicio').value || '').trim();
-  const hFin     = (document.getElementById('agenda-horaTerminacion').value || '').trim();
-  const lugar    = (document.getElementById('agenda-lugar').value || '').trim();
-  const lider    = (document.getElementById('agenda-lider').value || '').trim();
-  const contacto = (document.getElementById('agenda-contacto').value || '').trim();
-
-  if (!nombre || !fechaStr || !hIni || !hFin || !lugar) {
-    return Swal.fire({
-      icon: 'warning',
-      title: 'Faltan datos',
-      text: 'Completa nombre, fecha, horas y lugar.'
-    });
-  }
-
-  const body = {
-    codigo,
-    nombreEvento: nombre,
-    fechaEvento: fechaStr,
-    horaInicio: hIni,
-    horaTerminacion: hFin,
-    lugar,
-    lider,
-    contacto,
-    documentoLider: currentUser?.documento || ''
-  };
-
-  try {
-    const r = await apiPost(AGENDA_API_SAVE, body);
-    if (r && r.success) {
-      await Swal.fire({
-        icon: 'success',
-        title: 'Evento guardado',
-        timer: 1600,
-        showConfirmButton: false
-      });
-      await agendaLoadEvents();
-      agendaRender();
-      showView('view-agenda');
-    } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error al guardar',
-        text: r?.message || 'Error desconocido'
-      });
+    function agendaPad2(n){
+      return String(n).padStart(2,'0');
     }
-  } catch (e) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: e.message
+    function agendaFormatDMY(d){
+      if(!d) return '';
+      const dd = agendaPad2(d.getDate());
+      const mm = agendaPad2(d.getMonth()+1);
+      const yy = d.getFullYear();
+      return dd + '/' + mm + '/' + yy;
+    }
+    function agendaParseDMY(str){
+      if(!str) return null;
+      const p = String(str).split('/');
+      if(p.length !== 3) return null;
+      const d = parseInt(p[0],10);
+      const m = parseInt(p[1],10);
+      const y = parseInt(p[2],10);
+      if(!d || !m || !y) return null;
+      const dt = new Date(y,m-1,d);
+      if(isNaN(dt.getTime())) return null;
+      return dt;
+    }
+    function agendaMinutesFromTimeStr(str){
+      if(!str) return 0;
+      const p = String(str).split(':');
+      const h = parseInt(p[0]||'0',10);
+      const m = parseInt(p[1]||'0',10);
+      if(isNaN(h) || isNaN(m)) return 0;
+      return h*60 + m;
+    }
+
+    function agendaStatusColorClass(estado){
+      const st = String(estado||'').toUpperCase();
+      if(st === 'TERMINADO') return 'cal-event-chip sec-default-filled';
+      if(st === 'CORRIENDO') return 'cal-event-chip sec-educacion-filled';
+      return 'cal-event-chip sec-default';
+    }
+
+    function agendaEventMatchesFilter(ev, query){
+      if(!query) return true;
+      const q = query.toLowerCase();
+      return [
+        ev.nombreEvento,
+        ev.lider,
+        ev.lugar
+      ].some(v => String(v||'').toLowerCase().includes(q));
+    }
+
+    function agendaStartOfWeek(d){
+      const dt = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      const day = dt.getDay();
+      const diff = (day + 7 - 0) % 7;
+      dt.setDate(dt.getDate() - diff);
+      return dt;
+    }
+    function agendaEndOfWeek(d){
+      const start = agendaStartOfWeek(d);
+      return new Date(start.getFullYear(), start.getMonth(), start.getDate() + 6);
+    }
+
+    function agendaUpdateTitle(){
+      const titleEl = document.getElementById('agenda-title-text');
+      if(!titleEl) return;
+      if(AGENDA_CURRENT_VIEW === 'year'){
+        titleEl.textContent = AGENDA_CURRENT_DATE.getFullYear();
+        return;
+      }
+      if(AGENDA_CURRENT_VIEW === 'week'){
+        const start = agendaStartOfWeek(AGENDA_CURRENT_DATE);
+        const end   = agendaEndOfWeek(AGENDA_CURRENT_DATE);
+        const label = AGENDA_MONTHS_SHORT[start.getMonth()] + ' ' + start.getDate() +
+          ' – ' + AGENDA_MONTHS_SHORT[end.getMonth()] + ' ' + end.getDate() +
+          ' ' + end.getFullYear();
+        titleEl.textContent = label;
+        return;
+      }
+      if(AGENDA_CURRENT_VIEW === 'day'){
+        const d = AGENDA_CURRENT_DATE;
+        const label = d.getDate() + ' ' + AGENDA_MONTHS_SHORT[d.getMonth()] + ' ' + d.getFullYear();
+        titleEl.textContent = label;
+        return;
+      }
+      const d = AGENDA_CURRENT_DATE;
+      titleEl.textContent = d.toLocaleDateString('es-CO', { month:'long', year:'numeric' }).toUpperCase();
+    }
+
+    function agendaEventsOnDay(isoDMY){
+      return AGENDA_EVENTS.filter(ev => ev.fechaEvento === isoDMY);
+    }
+
+    async function agendaLoadEvents(){
+      try{
+        const list = await apiGet(AGENDA_API_LIST,{});
+        AGENDA_EVENTS = Array.isArray(list) ? list : [];
+      }catch(e){
+        AGENDA_EVENTS = [];
+        Swal.fire({ icon:'error', title:'Error cargando agenda', text:String(e.message||e) });
+      }
+    }
+
+    function agendaRender(){
+      const cont = document.getElementById('agenda-container');
+      if(!cont) return;
+      const filterVal = document.getElementById('agenda-filter-input')?.value.trim().toLowerCase() || '';
+      cont.innerHTML = '';
+      agendaUpdateTitle();
+
+      if(AGENDA_CURRENT_VIEW === 'month'){
+        agendaRenderMonth(cont, filterVal);
+      }else if(AGENDA_CURRENT_VIEW === 'week'){
+        agendaRenderWeek(cont, filterVal);
+      }else if(AGENDA_CURRENT_VIEW === 'day'){
+        agendaRenderDay(cont, filterVal);
+      }else if(AGENDA_CURRENT_VIEW === 'year'){
+        agendaRenderYear(cont, filterVal);
+      }
+    }
+
+    function agendaRenderMonth(cont, filterVal){
+      const header = document.createElement('div');
+      header.className = 'cal-weekdays';
+      AGENDA_WEEKDAYS_SHORT.forEach(d => {
+        const el = document.createElement('div');
+        el.className = 'cal-weekday';
+        el.textContent = d;
+        header.appendChild(el);
+      });
+      cont.appendChild(header);
+
+      const grid = document.createElement('div');
+      grid.className = 'cal-month-grid';
+
+      const year = AGENDA_CURRENT_DATE.getFullYear();
+      const month = AGENDA_CURRENT_DATE.getMonth();
+      const firstDay = new Date(year,month,1);
+      const startWeekDay = firstDay.getDay();
+      const daysInMonth = new Date(year,month+1,0).getDate();
+
+      const prevMonthDays = (startWeekDay + 7 - 0) % 7;
+      const totalCells = prevMonthDays + daysInMonth;
+      const cells = totalCells <= 35 ? 35 : 42;
+
+      const todayDMY = agendaFormatDMY(new Date());
+
+      for(let i=0; i<cells; i++){
+        const cell = document.createElement('div');
+        cell.className = 'cal-day-cell';
+        const dayOffset = i - prevMonthDays + 1;
+        let cellDate;
+        let inThisMonth = true;
+
+        if(dayOffset < 1){
+          cellDate = new Date(year, month, dayOffset);
+          inThisMonth = false;
+        }else if(dayOffset > daysInMonth){
+          cellDate = new Date(year, month, dayOffset);
+          inThisMonth = false;
+        }else{
+          cellDate = new Date(year, month, dayOffset);
+        }
+
+        const iso = agendaFormatDMY(cellDate);
+        if(!inThisMonth) cell.classList.add('other-month');
+
+        const headerNum = document.createElement('div');
+        headerNum.className = 'cal-day-number';
+
+        if(iso === todayDMY){
+          headerNum.classList.add('today');
+          headerNum.textContent = cellDate.getDate();
+        }else{
+          headerNum.textContent = cellDate.getDate();
+        }
+
+        cell.appendChild(headerNum);
+
+        const events = agendaEventsOnDay(iso).filter(ev => agendaEventMatchesFilter(ev, filterVal));
+        events.sort((a,b)=>{
+          const ma = agendaMinutesFromTimeStr(a.horaInicioRaw || '');
+          const mb = agendaMinutesFromTimeStr(b.horaInicioRaw || '');
+          return ma - mb;
+        });
+
+        events.forEach(ev => {
+          const chip = document.createElement('div');
+          chip.className = agendaStatusColorClass(ev.estado);
+
+          const title = document.createElement('span');
+          title.className = 'cal-evt-title';
+          title.textContent = ev.nombreEvento || '';
+
+          const time = document.createElement('span');
+          time.className = 'cal-evt-time';
+          time.textContent = (ev.horaInicioAMPM || '') + ' - ' + (ev.horaTerminacionAMPM || '');
+
+          chip.appendChild(title);
+          chip.appendChild(time);
+
+          chip.addEventListener('click', ()=> agendaOpenEventForEdit(ev.codigo));
+          cell.appendChild(chip);
+        });
+
+        grid.appendChild(cell);
+      }
+      cont.appendChild(grid);
+    }
+
+    function agendaRenderDay(cont, filterVal){
+      const header = document.createElement('div');
+      header.className = 'cal-day-header-row';
+      const d = AGENDA_CURRENT_DATE;
+      header.textContent = d.toLocaleDateString('es-CO',{ weekday:'long', day:'numeric', month:'long', year:'numeric' }).toUpperCase();
+      cont.appendChild(header);
+
+      const body = document.createElement('div');
+      body.className = 'cal-day-body';
+
+      const iso = agendaFormatDMY(d);
+      const events = agendaEventsOnDay(iso).filter(ev => agendaEventMatchesFilter(ev, filterVal));
+      events.sort((a,b)=>{
+        const ma = agendaMinutesFromTimeStr(a.horaInicioRaw || '');
+        const mb = agendaMinutesFromTimeStr(b.horaInicioRaw || '');
+        return ma - mb;
+      });
+
+      if(!events.length){
+        const p = document.createElement('p');
+        p.className = 'muted';
+        p.textContent = 'Sin eventos para este día.';
+        body.appendChild(p);
+      }else{
+        events.forEach(ev => {
+          const chip = document.createElement('div');
+          chip.className = agendaStatusColorClass(ev.estado);
+
+          const title = document.createElement('span');
+          title.className = 'cal-evt-title';
+          title.textContent = ev.nombreEvento || '';
+
+          const time = document.createElement('span');
+          time.className = 'cal-evt-time';
+          time.textContent = (ev.horaInicioAMPM || '') + ' - ' + (ev.horaTerminacionAMPM || '');
+
+          const desc = document.createElement('div');
+          desc.style.fontSize = '.72rem';
+          desc.textContent = (ev.lider || '') + ' – ' + (ev.lugar || '');
+
+          chip.appendChild(title);
+          chip.appendChild(time);
+          chip.appendChild(desc);
+
+          chip.addEventListener('click', ()=> agendaOpenEventForEdit(ev.codigo));
+          body.appendChild(chip);
+        });
+      }
+      cont.appendChild(body);
+    }
+
+    function agendaRenderWeek(cont, filterVal){
+      const start = agendaStartOfWeek(AGENDA_CURRENT_DATE);
+      const end   = agendaEndOfWeek(AGENDA_CURRENT_DATE);
+
+      const header = document.createElement('div');
+      header.className = 'cal-week-header-row';
+      header.textContent = 'Semana del ' +
+        start.getDate() + ' ' + AGENDA_MONTHS_SHORT[start.getMonth()] +
+        ' al ' +
+        end.getDate() + ' ' + AGENDA_MONTHS_SHORT[end.getMonth()] +
+        ' ' + end.getFullYear();
+      cont.appendChild(header);
+
+      const body = document.createElement('div');
+      body.className = 'cal-week-body';
+
+      for(let i=0;i<7;i++){
+        const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+        const iso = agendaFormatDMY(d);
+
+        const row = document.createElement('div');
+        row.style.borderRadius = '10px';
+        row.style.padding = '6px 8px';
+        row.style.background = '#f9fafb';
+        row.style.marginBottom = '6px';
+
+        const head = document.createElement('div');
+        head.style.display = 'flex';
+        head.style.alignItems = 'center';
+        head.style.justifyContent = 'space-between';
+
+        const left = document.createElement('span');
+        left.style.fontWeight = '700';
+        left.style.fontSize = '.8rem';
+        left.textContent = AGENDA_WEEKDAYS_SHORT[d.getDay()] + ' ' + d.getDate() + ' ' + AGENDA_MONTHS_SHORT[d.getMonth()];
+
+        head.appendChild(left);
+        row.appendChild(head);
+
+        const evs = agendaEventsOnDay(iso).filter(ev => agendaEventMatchesFilter(ev, filterVal));
+        evs.sort((a,b)=>{
+          const ma = agendaMinutesFromTimeStr(a.horaInicioRaw || '');
+          const mb = agendaMinutesFromTimeStr(b.horaInicioRaw || '');
+          return ma - mb;
+        });
+
+        if(!evs.length){
+          const p = document.createElement('p');
+          p.className = 'muted';
+          p.style.fontSize = '.72rem';
+          p.textContent = 'Sin eventos';
+          row.appendChild(p);
+        }else{
+          evs.forEach(ev => {
+            const chip = document.createElement('div');
+            chip.className = agendaStatusColorClass(ev.estado);
+
+            const title = document.createElement('span');
+            title.className = 'cal-evt-title';
+            title.textContent = ev.lider || '';
+
+            const time = document.createElement('span');
+            time.className = 'cal-evt-time';
+            time.textContent = (ev.horaInicioAMPM || '') + ' - ' + (ev.horaTerminacionAMPM || '');
+
+            chip.appendChild(title);
+            chip.appendChild(time);
+            chip.addEventListener('click', ()=> agendaOpenEventForEdit(ev.codigo));
+            row.appendChild(chip);
+          });
+        }
+
+        body.appendChild(row);
+      }
+
+      cont.appendChild(body);
+    }
+
+    function agendaRenderYear(cont, filterVal){
+      const grid = document.createElement('div');
+      grid.className = 'cal-year-grid';
+
+      const year = AGENDA_CURRENT_DATE.getFullYear();
+      const eventsByMonth = {};
+      AGENDA_EVENTS.forEach(ev => {
+        const d = agendaParseDMY(ev.fechaEvento);
+        if(!d || d.getFullYear() !== year) return;
+        const m = d.getMonth();
+        if(!eventsByMonth[m]) eventsByMonth[m] = [];
+        if(agendaEventMatchesFilter(ev, filterVal)){
+          eventsByMonth[m].push(ev);
+        }
+      });
+
+      for(let m=0;m<12;m++){
+        const box = document.createElement('div');
+        box.className = 'cal-year-month';
+
+        const h4 = document.createElement('h4');
+        h4.textContent = new Date(year,m,1).toLocaleDateString('es-CO',{ month:'long' }).toUpperCase();
+        box.appendChild(h4);
+
+        const table = document.createElement('table');
+        const thead = document.createElement('thead');
+        const trh = document.createElement('tr');
+        AGENDA_WEEKDAYS_SHORT.forEach(d => {
+          const th = document.createElement('th');
+          th.textContent = d.charAt(0);
+          trh.appendChild(th);
+        });
+        thead.appendChild(trh);
+        table.appendChild(thead);
+
+        const tbody = document.createElement('tbody');
+        const first = new Date(year,m,1);
+        const startDay = first.getDay();
+        const daysInMonth = new Date(year,m+1,0).getDate();
+
+        let day = 1;
+        let done = false;
+        while(!done){
+          const tr = document.createElement('tr');
+          for(let wd=0; wd<7; wd++){
+            const td = document.createElement('td');
+            if(wd < startDay && day === 1){
+              td.textContent = '';
+            }else if(day > daysInMonth){
+              td.textContent = '';
+              done = true;
+            }else{
+              td.textContent = day;
+              const dmy = agendaFormatDMY(new Date(year,m,day));
+              const hasEvent = (eventsByMonth[m]||[]).some(ev => ev.fechaEvento === dmy);
+              if(hasEvent){
+                const dot = document.createElement('span');
+                dot.className = 'cal-year-dot';
+                td.appendChild(dot);
+              }
+              day++;
+            }
+            tr.appendChild(td);
+          }
+          tbody.appendChild(tr);
+        }
+
+        table.appendChild(tbody);
+        box.appendChild(table);
+        grid.appendChild(box);
+      }
+
+      cont.appendChild(grid);
+    }
+
+    function agendaSyncViewButtons(){
+      ['agenda-view-day','agenda-view-week','agenda-view-month','agenda-view-year'].forEach(id=>{
+        const el = document.getElementById(id);
+        if(!el) return;
+        el.classList.remove('active');
+      });
+      if(AGENDA_CURRENT_VIEW === 'day')   document.getElementById('agenda-view-day')?.classList.add('active');
+      if(AGENDA_CURRENT_VIEW === 'week')  document.getElementById('agenda-view-week')?.classList.add('active');
+      if(AGENDA_CURRENT_VIEW === 'month') document.getElementById('agenda-view-month')?.classList.add('active');
+      if(AGENDA_CURRENT_VIEW === 'year')  document.getElementById('agenda-view-year')?.classList.add('active');
+    }
+
+    document.getElementById('agenda-btn-back')?.addEventListener('click', ()=>{
+      playSoundOnce(SOUNDS.back);
+      showView('view-menu');
     });
-  }
-});
+    document.getElementById('agenda-btn-today')?.addEventListener('click', ()=>{
+      AGENDA_CURRENT_DATE = new Date();
+      agendaRender();
+    });
+    document.getElementById('agenda-prev')?.addEventListener('click', ()=>{
+      if(AGENDA_CURRENT_VIEW === 'year'){
+        AGENDA_CURRENT_DATE.setFullYear(AGENDA_CURRENT_DATE.getFullYear()-1);
+      }else if(AGENDA_CURRENT_VIEW === 'month'){
+        AGENDA_CURRENT_DATE.setMonth(AGENDA_CURRENT_DATE.getMonth()-1);
+      }else if(AGENDA_CURRENT_VIEW === 'week'){
+        AGENDA_CURRENT_DATE.setDate(AGENDA_CURRENT_DATE.getDate()-7);
+      }else if(AGENDA_CURRENT_VIEW === 'day'){
+        AGENDA_CURRENT_DATE.setDate(AGENDA_CURRENT_DATE.getDate()-1);
+      }
+      agendaRender();
+    });
+    document.getElementById('agenda-next')?.addEventListener('click', ()=>{
+      if(AGENDA_CURRENT_VIEW === 'year'){
+        AGENDA_CURRENT_DATE.setFullYear(AGENDA_CURRENT_DATE.getFullYear()+1);
+      }else if(AGENDA_CURRENT_VIEW === 'month'){
+        AGENDA_CURRENT_DATE.setMonth(AGENDA_CURRENT_DATE.getMonth()+1);
+      }else if(AGENDA_CURRENT_VIEW === 'week'){
+        AGENDA_CURRENT_DATE.setDate(AGENDA_CURRENT_DATE.getDate()+7);
+      }else if(AGENDA_CURRENT_VIEW === 'day'){
+        AGENDA_CURRENT_DATE.setDate(AGENDA_CURRENT_DATE.getDate()+1);
+      }
+      agendaRender();
+    });
+
+    document.getElementById('agenda-view-day')?.addEventListener('click', ()=>{
+      AGENDA_CURRENT_VIEW = 'day';
+      agendaSyncViewButtons();
+      agendaRender();
+    });
+    document.getElementById('agenda-view-week')?.addEventListener('click', ()=>{
+      AGENDA_CURRENT_VIEW = 'week';
+      agendaSyncViewButtons();
+      agendaRender();
+    });
+    document.getElementById('agenda-view-month')?.addEventListener('click', ()=>{
+      AGENDA_CURRENT_VIEW = 'month';
+      agendaSyncViewButtons();
+      agendaRender();
+    });
+    document.getElementById('agenda-view-year')?.addEventListener('click', ()=>{
+      AGENDA_CURRENT_VIEW = 'year';
+      agendaSyncViewButtons();
+      agendaRender();
+    });
+
+    document.getElementById('agenda-filter-toggle')?.addEventListener('click', ()=>{
+      const input = document.getElementById('agenda-filter-input');
+      if(!input) return;
+      const visible = input.style.display !== 'none';
+      if(visible){
+        input.style.display = 'none';
+        input.value = '';
+        agendaRender();
+      }else{
+        input.style.display = '';
+        input.focus();
+      }
+    });
+    document.getElementById('agenda-filter-input')?.addEventListener('input', ()=>{
+      agendaRender();
+    });
+
+    document.getElementById('agenda-btn-new')?.addEventListener('click', ()=>{
+      AGENDA_SELECTED_EVENT = null;
+      agendaResetEventoForm();
+      agendaFillEventoFromUser();
+      document.getElementById('agenda-evento-title').textContent = 'REGISTRAR EVENTO';
+      showView('view-agenda-evento');
+    });
+
+    document.getElementById('agenda-evento-volver')?.addEventListener('click', ()=>{
+      playSoundOnce(SOUNDS.back);
+      showView('view-agenda');
+    });
+
+    function agendaResetEventoForm(){
+      document.getElementById('agenda-evento-codigo').value = '';
+      document.getElementById('agenda-nombreEvento').value = '';
+      document.getElementById('agenda-fechaEvento').value = '';
+      document.getElementById('agenda-horaInicio').value = '';
+      document.getElementById('agenda-horaTerminacion').value = '';
+      document.getElementById('agenda-lugar').value = '';
+      document.getElementById('agenda-lider').value = '';
+      document.getElementById('agenda-contacto').value = '';
+    }
+
+    function agendaFillEventoFromUser(){
+      if(!currentUser) return;
+      document.getElementById('agenda-lider').value = currentUser.nombre || '';
+      document.getElementById('agenda-contacto').value = (currentUser.telefono || '').replace(/^57/,'');
+    }
+
+    function agendaFillEventoForm(ev){
+      document.getElementById('agenda-evento-codigo').value = ev.codigo || '';
+      document.getElementById('agenda-nombreEvento').value = ev.nombreEvento || '';
+      document.getElementById('agenda-fechaEvento').value = ev.fechaEvento || '';
+      // horaInicioRaw y horaTerminacionRaw vienen como "6:00:00" ó "18:00:00"
+      function toTimeInput(h){
+        if(!h) return '';
+        const hm = h.split(':');
+        const hh = hm[0] || '00';
+        const mm = hm[1] || '00';
+        return hh.padStart(2,'0') + ':' + mm.padStart(2,'0');
+      }
+      document.getElementById('agenda-horaInicio').value = toTimeInput(ev.horaInicioRaw);
+      document.getElementById('agenda-horaTerminacion').value = toTimeInput(ev.horaTerminacionRaw);
+      document.getElementById('agenda-lugar').value = ev.lugar || '';
+      document.getElementById('agenda-lider').value = ev.lider || '';
+      document.getElementById('agenda-contacto').value = (ev.contacto || '').replace(/^57/,'');
+    }
+
+    async function agendaOpenEventForEdit(codigo){
+      // Solo permite editar si el líder coincide con el usuario logueado
+      const ev = AGENDA_EVENTS.find(e => String(e.codigo) === String(codigo));
+      if(!ev){
+        Swal.fire({ icon:'info', title:'Evento no encontrado' });
+        return;
+      }
+      const userName = String(currentUser?.nombre || '').trim().toUpperCase();
+      const evLeader = String(ev.lider || '').trim().toUpperCase();
+      if(!userName || userName !== evLeader){
+        Swal.fire({ icon:'info', title:'Solo puedes editar tus propios eventos' });
+        return;
+      }
+      AGENDA_SELECTED_EVENT = ev;
+      agendaResetEventoForm();
+      agendaFillEventoForm(ev);
+      document.getElementById('agenda-evento-title').textContent = 'EDITAR EVENTO';
+      showView('view-agenda-evento');
+    }
+
+    function agendaInitSimplePicker(dSelId,mSelId,aSelId){
+      const dSel = document.getElementById(dSelId);
+      const mSel = document.getElementById(mSelId);
+      const aSel = document.getElementById(aSelId);
+      if(dSel && !dSel.childElementCount){
+        for(let d=1; d<=31; d++){
+          const opt = document.createElement('option');
+          opt.value = agendaPad2(d);
+          opt.textContent = opt.value;
+          dSel.appendChild(opt);
+        }
+      }
+      if(mSel && !mSel.childElementCount){
+        const mesesNombres=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+        for(let i=0;i<12;i++){
+          const opt = document.createElement('option');
+          opt.value = agendaPad2(i+1);
+          opt.textContent = mesesNombres[i];
+          mSel.appendChild(opt);
+        }
+      }
+      if(aSel && !aSel.childElementCount){
+        const fixedYear = 2026;
+        const opt = document.createElement('option');
+        opt.value = String(fixedYear);
+        opt.textContent = String(fixedYear);
+        opt.selected = true;
+        aSel.appendChild(opt);
+      }
+    }
+
+    agendaInitSimplePicker('agendaEvtDia','agendaEvtMes','agendaEvtAnio');
+
+    document.getElementById('agenda-fechaEvento')?.addEventListener('click', ()=>{
+      const m = document.getElementById('agendaFechaModal');
+      if(m){
+        m.style.display = 'flex';
+        m.setAttribute('aria-hidden','false');
+      }
+    });
+    document.getElementById('agendaEvtFechaCancelar')?.addEventListener('click', ()=>{
+      const m = document.getElementById('agendaFechaModal');
+      if(m){
+        m.style.display = 'none';
+        m.setAttribute('aria-hidden','true');
+      }
+    });
+    document.getElementById('agendaEvtFechaOk')?.addEventListener('click', ()=>{
+      const d = document.getElementById('agendaEvtDia')?.value || '01';
+      const m = document.getElementById('agendaEvtMes')?.value || '01';
+      const y = document.getElementById('agendaEvtAnio')?.value || String(new Date().getFullYear());
+      document.getElementById('agenda-fechaEvento').value = d + '/' + m + '/' + y;
+      const modal = document.getElementById('agendaFechaModal');
+      if(modal){
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden','true');
+      }
+    });
+
+    // Rellenar opciones de lugar con las mismas residencias del registro
+    (function initAgendaLugarFromResidencias(){
+      const origen = document.getElementById('reg-residencia');
+      const destino = document.getElementById('agenda-lugar');
+      if(!origen || !destino) return;
+      const opts = origen.querySelectorAll('option');
+      destino.innerHTML = '<option value="" disabled selected>Selecciona el lugar (Residencia)</option>';
+      opts.forEach(o=>{
+        const val = o.value;
+        if(!val) return;
+        const opt = document.createElement('option');
+        opt.value = val;
+        opt.textContent = val;
+        destino.appendChild(opt);
+      });
+    })();
+
+    document.getElementById('agenda-evento-guardar')?.addEventListener('click', async ()=>{
+      if(!currentUser){
+        Swal.fire({ icon:'warning', title:'Sesión inválida' });
+        return;
+      }
+      const codigo = document.getElementById('agenda-evento-codigo').value.trim();
+      const nombreEvento = document.getElementById('agenda-nombreEvento').value.trim();
+      const fechaEvento = document.getElementById('agenda-fechaEvento').value.trim();
+      const horaInicio = document.getElementById('agenda-horaInicio').value.trim();
+      const horaTerminacion = document.getElementById('agenda-horaTerminacion').value.trim();
+      const lugar = document.getElementById('agenda-lugar').value;
+      const lider = document.getElementById('agenda-lider').value.trim();
+      const contacto = document.getElementById('agenda-contacto').value.trim();
+
+      if(!nombreEvento || !fechaEvento || !horaInicio || !horaTerminacion || !lugar || !lider || !contacto){
+        Swal.fire({ icon:'warning', title:'Campos requeridos', text:'Todos los campos son obligatorios.' });
+        return;
+      }
+
+      // Resumen
+      const resumenHtml = `
+        <b>Nombre del Evento:</b> ${nombreEvento}<br>
+        <b>Fecha:</b> ${fechaEvento}<br>
+        <b>Hora Inicio:</b> ${horaInicio}<br>
+        <b>Hora Terminación:</b> ${horaTerminacion}<br>
+        <b>Lugar:</b> ${lugar}<br>
+        <b>Líder:</b> ${lider}<br>
+        <b>Contacto:</b> ${contacto}<br>
+      `;
+      const rs = await Swal.fire({
+        icon:'info',
+        title:'Resumen de Evento',
+        html:resumenHtml,
+        showCancelButton:true,
+        confirmButtonText:'Confirmar',
+        cancelButtonText:'Editar',
+        width:'80%',
+        customClass:{ popup:'swal2-responsive-popup' },
+        soundTag:'resumen'
+      });
+      if(!rs.isConfirmed) return;
+
+      // Convertir time input HH:MM a texto "H:MM:00" respetando formato
+      function toSheetHora(hhmm){
+        const parts = String(hhmm).split(':');
+        const h = parseInt(parts[0]||'0',10);
+        const m = parts[1] || '00';
+        return String(h) + ':' + m + ':00';
+      }
+
+      const body = {
+        codigo,
+        nombreEvento,
+        fechaEvento,
+        lugar,
+        lider,
+        contacto,
+        horaInicio: toSheetHora(horaInicio),
+        horaTerminacion: toSheetHora(horaTerminacion)
+      };
+
+      try{
+        const r = await apiPost(AGENDA_API_SAVE, body);
+        if(!r || !r.success){
+          Swal.fire({ icon:'error', title:'Error al guardar', text:r && r.message ? r.message : 'Intenta nuevamente.' });
+          return;
+        }
+        await agendaLoadEvents();
+        Swal.fire({ icon:'success', title:'Evento guardado', timer:1800, showConfirmButton:false });
+        showView('view-agenda');
+        agendaRender();
+      }catch(e){
+        Swal.fire({ icon:'error', title:'Error', text:String(e.message||e) });
+      }
+    });
 
   </script>
 </body>

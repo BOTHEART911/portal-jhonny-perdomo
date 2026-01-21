@@ -1166,7 +1166,7 @@ button:hover{ background:var(--primary-2); color:#fff; border-color:var(--primar
         <!-- BOTONES ESPECIALES SOLO PARA LÍDERES AUTORIZADOS -->
         <button class="menu-btn" id="go-agenda">Nuestra Agenda 📆</button>
         <button class="menu-btn" id="go-servicios">Portal de Sevicios 💼</button>
-        <button class="menu-btn" id="go-gestion">Gestión de Asistencias ✅</button>
+        <button class="menu-btn" id="go-asistir">Gestión de Asistencias ✅</button>
         <button class="menu-btn" id="go-appcomercial">App Comercial 🛒</button>
       </div>
     </div>
@@ -2063,7 +2063,7 @@ function stopLoading(){
 
         const btnAgenda       = document.getElementById('go-agenda');
         const btnServicios    = document.getElementById('go-servicios');
-        const btnGestion    = document.getElementById('go-gestion');
+        const btnAsistir    = document.getElementById('go-asistir');
         const btnAppComercial = document.getElementById('go-appcomercial');
 
         const show = !!isLeader;
@@ -2076,7 +2076,7 @@ function stopLoading(){
         // Estos tres solo para líderes autorizados por documento
         if (btnAgenda)       btnAgenda.style.display       = (show && isAuth) ? '' : 'none';
         if (btnServicios)    btnServicios.style.display    = (show && isAuth) ? '' : 'none';
-        if (btnGestion)    btnGestion.style.display    = (show && isAuth) ? '' : 'none';
+        if (btnAsistir)    btnAsistir.style.display    = (show && isAuth) ? '' : 'none';
         if (btnAppComercial) btnAppComercial.style.display = (show && isAuth) ? '' : 'none';
       }catch(_){}
     }
@@ -2533,9 +2533,9 @@ document.getElementById('go-redes').addEventListener('click', ()=>{
       });
     }
 
-     const btnAsistenciaPriv = document.getElementById('go-gestion');
-    if (btnGestionPriv){
-      btnGestionPriv.addEventListener('click', ()=>{
+     const btnAsistirPriv = document.getElementById('go-asistir');
+    if (btnAsistirPriv){
+      btnAsistirPriv.addEventListener('click', ()=>{
         overlay.classList.remove('open');
         window.open('https://botheart911.github.io/asistencia-jhonny-perdomo/#instalar', '_blank');
       });

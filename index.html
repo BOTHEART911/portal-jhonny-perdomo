@@ -2964,7 +2964,7 @@ document.getElementById('btn-compartir').addEventListener('click', ()=>{
 
         const enc = encodeURIComponent(txt);
         const esMovil = /android|iphone|ipad|mobile/i.test(navigator.userAgent);
-        window.open((esMovil ? "whatsapp://send?text=" : "https://api.whatsapp.com/send?text=") + enc, "_blank');
+        window.open((esMovil ? "whatsapp://send?text=" : "https://api.whatsapp.com/send?text=") + enc, "_blank");
       });
     }
 

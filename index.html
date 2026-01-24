@@ -1162,6 +1162,7 @@ button:hover{ background:var(--primary-2); color:#fff; border-color:var(--primar
       <div id="cat-lideres" class="menu-cat-options">
         <button class="menu-btn" id="go-lider">Refiere por Whatsapp 📤</button>
         <button class="menu-btn" id="go-referidos">Mis Referidos 🔢</button>
+        <button class="menu-btn" id="go-jlideres">Portal de Lideres 🔍</button>
 
         <!-- BOTONES ESPECIALES SOLO PARA LÍDERES AUTORIZADOS -->
         <button class="menu-btn" id="go-agenda">Nuestra Agenda 📆</button>
@@ -2511,10 +2512,11 @@ document.getElementById('go-redes').addEventListener('click', ()=>{
   showView('view-referidos');
 });
 
-    document.getElementById('go-feed').addEventListener('click', ()=>{
+    document.getElementById('go-jlideres').addEventListener('click', ()=>{
   overlay.classList.remove('open');
-  showView('view-feed');
-});
+  await prepararReferidos();
+  window.open('https://botheart911.github.io/lideres-jhonny-perdomo/', '_blank');
+});    
 
         // NUEVOS: BOTONES SOLO PARA LÍDERES AUTORIZADOS
     const btnAgendaPriv = document.getElementById('go-agenda');

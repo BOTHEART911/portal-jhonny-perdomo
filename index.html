@@ -851,9 +851,9 @@ button:hover{ background:var(--primary-2); color:#fff; border-color:var(--primar
 
                 <label>Documento:</label>
         <div class="pwd-wrapper">
-          <input
+         <input
             id="doc-login"
-            type="password"
+            type="tel"
             inputmode="numeric"
             placeholder="Sin puntos ni espacios"
           />
@@ -2113,23 +2113,33 @@ function stopLoading(){
     const regCard = document.getElementById('registro-card');
     const btnGuardarRegistro = document.getElementById('btn-guardar-registro');
 
-        // Toggle ver/ocultar Documento en login (igual que indexref)
+        // Toggle ver/ocultar Documento en login (inicia visible)
     (function(){
       const toggleBtn = document.getElementById('toggle-doc-login');
       const input = document.getElementById('doc-login');
       if(!toggleBtn || !input) return;
-      toggleBtn.addEventListener('click', ()=>{
-        const oculto = input.type === 'password';
-        input.type = oculto ? 'tel' : 'password';
-        const nuevoIcono = oculto
+
+      function syncUI(){
+        const visible = input.type !== 'password';
+        const icono = visible
           ? 'https://res.cloudinary.com/dqqeavica/image/upload/v1764084782/Ocultar_lgdxpd.png'
           : 'https://res.cloudinary.com/dqqeavica/image/upload/v1764084782/Mostrar_yymceh.png';
-        const accion = oculto ? 'Ocultar' : 'Mostrar';
+        const accion = visible ? 'Ocultar' : 'Mostrar';
         toggleBtn.setAttribute('aria-label', accion + ' documento');
-        toggleBtn.innerHTML = '<img src="'+nuevoIcono+'" alt="'+accion+'">';
+        toggleBtn.innerHTML = '<img src="'+icono+'" alt="'+accion+'">';
+      }
+
+      // Estado inicial: visible
+      input.type = 'tel';
+      syncUI();
+
+      toggleBtn.addEventListener('click', ()=>{
+        const visible = input.type !== 'password';
+        input.type = visible ? 'password' : 'tel';
+        syncUI();
       });
     })();
-
+    
     btnLogin.addEventListener('click', async () => {
   const documento = (docLogin.value || '').trim();
 

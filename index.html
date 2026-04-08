@@ -11,16 +11,6 @@
   <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<!-- 
-  ============================================================
-  BLOQUE <style> COMPLETO PARA index1.html
-  Diseño adaptado de index2.html → paleta AZUL #007BFF
-  Fuentes: Sora (títulos) + IBM Plex Sans (cuerpo)
-  Instrucciones: reemplaza TODO el bloque <style>...</style>
-  de tu index1.html con este contenido.
-  ============================================================
--->
-
 <style>
 
 /* ============================================================
@@ -775,6 +765,256 @@ button:active { transform: translateY(0); }
 
 /* ── Avatar emoji ── */
 .avatar-emoji { width: 120px; height: 120px; display: block; margin: 0 auto; }
+
+  /* ═══════════════════════════════════════════════════════════
+   1) BOTÓN ACTIVAR NOTIFICACIONES → MISMO ESTILO QUE .chip
+   ═══════════════════════════════════════════════════════════ */
+ 
+#onesignal-container {
+  /* Sobreescribe los estilos inline */
+  text-align: center !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+  margin: 0 !important;
+ 
+  /* Se comporta como el flex-item del btn-row */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 1;
+}
+ 
+/* Ocultamos el párrafo de texto, queda solo el botón */
+#onesignal-container > p {
+  display: none !important;
+}
+ 
+/* El <button> interno hereda el aspecto chip */
+#onesignal-container > button {
+  /* Pill shape igual a .chip */
+  width: 100% !important;
+  height: 100% !important;
+  padding: 8px 16px !important;
+  border-radius: 999px !important;
+  border: 1.5px solid rgba(0,123,255,.35) !important;
+  background: rgba(255,255,255,.72) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  color: #111 !important;
+  font-family: 'IBM Plex Sans', sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 16px !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+  transition: background .18s ease, color .18s ease, box-shadow .18s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+}
+#onesignal-container > button::before {
+  content: '🔔';
+  font-size: 16px;
+}
+#onesignal-container > button:hover {
+  background: var(--primary) !important;
+  color: #fff !important;
+  border-color: var(--primary-2) !important;
+  box-shadow: 0 4px 16px rgba(0,123,255,.28) !important;
+  transform: translateY(-1px) !important;
+}
+ 
+ 
+/* ═══════════════════════════════════════════════════════════
+   2) SECCIÓN DE USUARIO DINÁMICA Y ATRACTIVA
+   ═══════════════════════════════════════════════════════════ */
+ 
+/* ── Avatar con anillo animado ── */
+#view-menu .image-center .notif-wrap {
+  position: relative;
+}
+#view-menu .image-center .notif-wrap img:first-child {
+  border-radius: 50%;
+  width: 72px;
+  height: 72px;
+  position: relative;
+  z-index: 1;
+  box-shadow:
+    0 0 0 3px rgba(0,123,255,.50),
+    0 0 18px rgba(0,123,255,.35);
+  animation: avatarPulse 2.8s ease-in-out infinite;
+}
+@keyframes avatarPulse {
+  0%,100% {
+    box-shadow: 0 0 0 3px rgba(0,123,255,.50), 0 0 18px rgba(0,123,255,.30);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(0,123,255,.20), 0 0 32px rgba(0,123,255,.55);
+  }
+}
+ 
+/* ── Anillo giratorio detrás del avatar ── */
+#view-menu .image-center .notif-wrap::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    #007BFF,
+    #93c6ff,
+    #007BFF,
+    #0056b3,
+    #007BFF
+  );
+  animation: spinRing 4s linear infinite;
+  z-index: 0;
+}
+#view-menu .image-center .notif-wrap::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.0);
+  z-index: 0;
+}
+@keyframes spinRing {
+  to { transform: rotate(360deg); }
+}
+ 
+/* ── Nombre del usuario — tipografía premium ── */
+#view-menu #u-nombre {
+  font-family: 'Sora', sans-serif;
+  font-weight: 900;
+  font-size: 1.4rem;
+  letter-spacing: .5px;
+  background: linear-gradient(135deg, #007BFF 0%, #0056b3 60%, #2e96ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 6px 0 4px;
+  animation: nameGlow 3s ease-in-out infinite alternate;
+}
+@keyframes nameGlow {
+  from { filter: drop-shadow(0 0 4px rgba(0,123,255,.30)); }
+  to   { filter: drop-shadow(0 0 10px rgba(0,123,255,.60)); }
+}
+ 
+/* ── Plan badge ── */
+#view-menu #u-plan {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 800;
+  font-size: .85rem;
+  letter-spacing: .5px;
+  color: #007BFF !important;
+  animation: planBadge 2.5s ease-in-out infinite alternate;
+}
+@keyframes planBadge {
+  from { opacity: .75; }
+  to   { opacity: 1; }
+}
+ 
+/* ── Card de datos del usuario ── */
+#view-menu .narrow {
+  max-width: 480px;
+  margin: 10px auto 6px;
+  background: rgba(255,255,255,.07);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-radius: 22px;
+  padding: 18px 20px 14px;
+  /* Borde degradado animado */
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  box-shadow:
+    0 0 0 2px rgba(0,123,255,.40),
+    0 12px 40px rgba(0,86,179,.18),
+    inset 0 1px 0 rgba(255,255,255,.18);
+  animation: cardBorderPulse 3.5s ease-in-out infinite alternate;
+  position: relative;
+  overflow: hidden;
+}
+ 
+/* Shimmer sweep sobre la card */
+#view-menu .narrow::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -80%;
+  width: 50%; height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(147,198,255,.12) 50%,
+    transparent
+  );
+  animation: cardShimmer 4s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes cardShimmer {
+  0%   { left: -80%; }
+  50%  { left: 130%; }
+  100% { left: 130%; }
+}
+@keyframes cardBorderPulse {
+  from { box-shadow: 0 0 0 2px rgba(0,123,255,.35), 0 10px 32px rgba(0,86,179,.14), inset 0 1px 0 rgba(255,255,255,.16); }
+  to   { box-shadow: 0 0 0 3px rgba(0,123,255,.65), 0 14px 44px rgba(0,86,179,.26), inset 0 1px 0 rgba(255,255,255,.22); }
+}
+ 
+/* ── Filas de datos como pills animados ── */
+#view-menu .narrow p {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0;
+  padding: 9px 14px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.72);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(0,123,255,.14);
+  box-shadow: 0 2px 8px rgba(0,86,179,.07);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: .9rem;
+  color: #111;
+  transition: transform .15s ease, box-shadow .15s ease;
+  /* Entrada escalonada */
+  opacity: 0;
+  animation: rowSlideIn .45s ease forwards;
+}
+#view-menu .narrow p:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 14px rgba(0,123,255,.18);
+}
+ 
+/* Íconos emoji según el contenido de cada label */
+#view-menu .narrow p:nth-child(1)::before { content: '🪪'; font-size: 1rem; }
+#view-menu .narrow p:nth-child(2)::before { content: '📱'; font-size: 1rem; }
+#view-menu .narrow p:nth-child(3)::before { content: '🏘️'; font-size: 1rem; }
+#view-menu .narrow p:nth-child(4)::before { content: '👥'; font-size: 1rem; }
+#view-menu .narrow p:nth-child(5)::before { content: '📍'; font-size: 1rem; }
+#view-menu .narrow p:nth-child(6)::before { content: '🗳️'; font-size: 1rem; }
+#view-menu .narrow p:nth-child(7)::before { content: '🪑'; font-size: 1rem; }
+ 
+/* Entrada escalonada de cada fila */
+@keyframes rowSlideIn {
+  from { opacity: 0; transform: translateX(-14px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+#view-menu .narrow p:nth-child(1) { animation-delay: .05s; }
+#view-menu .narrow p:nth-child(2) { animation-delay: .12s; }
+#view-menu .narrow p:nth-child(3) { animation-delay: .19s; }
+#view-menu .narrow p:nth-child(4) { animation-delay: .26s; }
+#view-menu .narrow p:nth-child(5) { animation-delay: .33s; }
+#view-menu .narrow p:nth-child(6) { animation-delay: .40s; }
+#view-menu .narrow p:nth-child(7) { animation-delay: .47s; }
+ 
+/* El label negrita queda en azul */
+#view-menu .narrow p b {
+  color: var(--primary);
+  font-weight: 800;
+  min-width: 88px;
+  display: inline-block;
+}
 
 </style>
 

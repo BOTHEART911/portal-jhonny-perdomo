@@ -455,7 +455,8 @@ button:active { transform: translateY(0); }
 /* ── VIDEO CARD — más llamativa y dinámica ── */
 .video-card {
   position: relative;
-  width: min(620px, 94vw);
+  width: 100%;
+  max-width: 620px;
   aspect-ratio: 16 / 9;
   margin: 18px auto;
   background: #000;
@@ -1014,16 +1015,6 @@ button:active { transform: translateY(0); }
   font-weight: 800;
   min-width: 88px;
   display: inline-block;
-}
-
-  /* ── Video card — centrado responsive ── */
-.video-card {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  max-width: min(620px, 94vw);
-  width: 94vw;
-  box-sizing: border-box;
 }
 
 </style>

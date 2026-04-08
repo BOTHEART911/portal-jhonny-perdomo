@@ -1016,6 +1016,16 @@ button:active { transform: translateY(0); }
   display: inline-block;
 }
 
+  /* ── Video card — centrado responsive ── */
+.video-card {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: min(620px, 94vw);
+  width: 94vw;
+  box-sizing: border-box;
+}
+
 </style>
 
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
@@ -1305,8 +1315,9 @@ button:active { transform: translateY(0); }
     <!-- VISTA 2: MENÚ -->
 <section id="view-menu" class="view">
   <div class="btn-row" style="margin-bottom:12px;">
-    <button class="chip" id="btn-open-menu">MENÚ</button>
-
+    
+      <button class="chip danger" id="btn-logout">Cerrar Sesión</button>
+  
      <div id="onesignal-container" style="text-align: center; padding: 15px; background: #f9f9f9; border-radius: 10px; margin: 10px;">
   <p style="font-size: 14px; color: var(--primary); margin-bottom: 8px; font-weight: 500;">
     🔔 ¿Quieres estar al día con el Equipo? 🔔
@@ -1315,8 +1326,9 @@ button:active { transform: translateY(0); }
     Activar Notificaciones
   </button>
 </div>
+
+    <button class="chip" id="btn-open-menu">MENÚ</button>
     
-    <button class="chip danger" id="btn-logout">Cerrar Sesión</button>
   </div>
 
   <div class="image-center">

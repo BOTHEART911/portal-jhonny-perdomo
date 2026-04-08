@@ -1084,7 +1084,27 @@ button:active { transform: translateY(0); }
 .social-btn:nth-child(4) { animation-delay: .29s; }
 
 .social-btn img {
-  wid
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,.15);
+  transition: transform .2s ease;
+  margin: 0;
+}
+
+.social-btn:hover {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary-2);
+  box-shadow: 0 8px 28px rgba(0,123,255,.38);
+  transform: translateY(-4px) scale(1.03);
+}
+.social-btn:hover img {
+  transform: scale(1.12) rotate(-4deg);
+}
+
 
 </style>
 

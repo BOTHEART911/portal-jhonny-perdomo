@@ -1017,6 +1017,75 @@ button:active { transform: translateY(0); }
   display: inline-block;
 }
 
+  /* ── VISTA SÍGUENOS — rediseño premium ── */
+#view-redes .card {
+  background: rgba(255,255,255,.07);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 2px solid transparent;
+  box-shadow:
+    0 0 0 2px rgba(0,123,255,.40),
+    0 12px 40px rgba(0,86,179,.18);
+  border-radius: 22px;
+  animation: cardBorderPulse 3.5s ease-in-out infinite alternate;
+}
+
+#view-redes h2 {
+  font-family: 'Sora', sans-serif;
+  font-weight: 900;
+  font-size: 1.6rem;
+  background: linear-gradient(135deg, #007BFF 0%, #0056b3 60%, #2e96ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: nameGlow 3s ease-in-out infinite alternate;
+}
+
+#view-redes .helper {
+  color: #111;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+/* Grid 2 columnas siempre */
+.social-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 16px 0;
+}
+
+/* Botones sociales — glassmorphism + animación entrada */
+.social-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px 12px;
+  border-radius: 20px;
+  border: 1.5px solid rgba(0,123,255,.25);
+  background: rgba(255,255,255,.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #111;
+  font-family: 'Sora', sans-serif;
+  font-weight: 800;
+  font-size: .95rem;
+  text-decoration: none;
+  box-shadow: 0 6px 20px rgba(0,86,179,.12);
+  transition: transform .2s ease, box-shadow .2s ease, background .2s ease, color .2s ease;
+  opacity: 0;
+  animation: rowSlideIn .4s ease forwards;
+}
+.social-btn:nth-child(1) { animation-delay: .05s; }
+.social-btn:nth-child(2) { animation-delay: .13s; }
+.social-btn:nth-child(3) { animation-delay: .21s; }
+.social-btn:nth-child(4) { animation-delay: .29s; }
+
+.social-btn img {
+  wid
+
 </style>
 
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>

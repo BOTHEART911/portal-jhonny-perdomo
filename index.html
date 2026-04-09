@@ -1105,7 +1105,7 @@ button:active { transform: translateY(0); }
   transform: scale(1.12) rotate(-4deg);
 }
 
-  /* ═══════════════════════════════════════════════════════════
+ /* ═══════════════════════════════════════════════════════════
    VISTA MIS REFERIDOS — Rediseño premium y dinámico
    ═══════════════════════════════════════════════════════════ */
 
@@ -1136,6 +1136,19 @@ button:active { transform: translateY(0); }
 }
 
 /* Badge contador — más llamativo */
+.ref-summary-wrap {
+  display: flex; flex-direction: column;
+  align-items: center !important;
+  justify-content: center;
+  gap: 8px; margin: 8px 0 16px;
+}
+
+.ref-selected-group {
+  display: flex; flex-direction: column;
+  align-items: center !important;
+  gap: 6px;
+}
+
 .ref-selected-badge {
   font-family: 'Sora', sans-serif;
   font-size: 2rem !important;
@@ -1158,6 +1171,7 @@ button:active { transform: translateY(0); }
   letter-spacing: 1px;
   text-transform: uppercase;
   color: var(--primary) !important;
+  text-align: center;
 }
 
 /* Input filtro */
@@ -1176,15 +1190,6 @@ button:active { transform: translateY(0); }
   box-shadow: 0 4px 14px rgba(0,86,179,.10) !important;
   transition: border-color .2s ease, box-shadow .2s ease !important;
 }
-
-  .ref-summary-wrap {
-  align-items: center !important;
-}
-
-.ref-selected-group {
-  align-items: center !important;
-}
-  
 .ref-filter-input:focus {
   border-color: var(--primary) !important;
   box-shadow: 0 0 0 3px rgba(0,123,255,.12) !important;
@@ -1206,7 +1211,6 @@ button:active { transform: translateY(0); }
   box-shadow: 0 4px 16px rgba(0,86,179,.10) !important;
   display: flex; flex-direction: column; gap: 8px;
   transition: transform .18s ease, box-shadow .18s ease;
-  /* entrada animada */
   opacity: 0;
   animation: rowSlideIn .4s ease forwards;
 }
@@ -1215,7 +1219,6 @@ button:active { transform: translateY(0); }
   box-shadow: 0 8px 24px rgba(0,123,255,.20) !important;
 }
 
-/* Número de orden sutil dentro de cada card */
 .ref-item:nth-child(1)  { animation-delay: .04s; }
 .ref-item:nth-child(2)  { animation-delay: .08s; }
 .ref-item:nth-child(3)  { animation-delay: .12s; }
@@ -1227,7 +1230,7 @@ button:active { transform: translateY(0); }
 .ref-item:nth-child(9)  { animation-delay: .36s; }
 .ref-item:nth-child(10) { animation-delay: .40s; }
 
-/* Fila superior: nombre + badge votación */
+/* Fila superior */
 .ref-row-top {
   display: flex; align-items: center;
   justify-content: space-between; gap: 10px;
@@ -1244,7 +1247,7 @@ button:active { transform: translateY(0); }
   margin: 0;
 }
 
-/* Detalle CC / Residencia */
+/* Detalle */
 .ref-details {
   display: flex; flex-direction: column; gap: 3px;
   font-family: 'IBM Plex Sans', sans-serif;
@@ -1270,7 +1273,7 @@ button:active { transform: translateY(0); }
   box-shadow: 0 6px 18px rgba(0,123,255,.28) !important;
 }
 .ref-wa img { width: 26px !important; height: 26px !important; border-radius: 6px; background: #fff; }
-
+  
 </style>
 
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
